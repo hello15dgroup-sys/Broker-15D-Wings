@@ -1,0 +1,33 @@
+{
+  "entities": {
+    "Mission": {
+      "title": "Mission",
+      "description": "A flight mission representing a chat channel.",
+      "type": "object",
+      "properties": {
+        "initializedAt": { "type": "timestamp" }
+      }
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A message in a chat.",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "createdAt": { "type": "timestamp" },
+        "sender": { "type": "string", "enum": ["client", "agent"] }
+      },
+      "required": ["text", "createdAt", "sender"]
+    }
+  },
+  "firestore": {
+    "missions/{missionId}": {
+      "schema": "Mission",
+      "description": "Flight mission chat roots."
+    },
+    "missions/{missionId}/chat/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Messages for a mission."
+    }
+  }
+}

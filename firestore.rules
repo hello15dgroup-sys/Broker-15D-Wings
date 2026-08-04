@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper for IDs
+    function isValidId(id) { 
+        return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+
+    // Missions and their chats
+    match /missions/{missionId} {
+      // Allow access if the user knows the missionId (shared secret)
+      allow read, write: if isValidId(missionId);
+      
+      match /chat/{messageId} {
+        allow read, write: if isValidId(missionId) && isValidId(messageId);
+      }
+    }
+  }
+}
