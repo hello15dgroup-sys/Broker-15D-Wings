@@ -16,6 +16,7 @@ import {
   X,
   AlertCircle,
   Bell,
+  ArrowLeft,
 } from "lucide-react";
 import { formatCurrency, calculateFlightTime, formatToLocalDate } from "../lib/utils";
 const Spline = lazy(() => import("@splinetool/react-spline"));
@@ -1271,7 +1272,7 @@ export default function BrokerPortal() {
                       }}
                       className="text-[11px] text-gray-400 hover:text-white transition-colors tracking-wide"
                     >
-                      Don't have a broker account? <span className="text-fbblue font-semibold">Sign Up (SMS Auth)</span>
+                      Don't have a broker account? <span className="text-fbblue font-semibold">Sign Up</span>
                     </button>
                   </div>
                 </motion.div>
@@ -1815,12 +1816,23 @@ export default function BrokerPortal() {
               className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex flex-col"
             >
               <div className="flex justify-between items-center p-4 md:px-8 border-b border-white/10 bg-black">
-                <h3 className="text-white font-sync tracking-widest text-sm">
-                  15D EXPERIENCES PORTAL
-                </h3>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setShowExperienceIframe(false)}
+                    className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl flex items-center gap-2 text-xs font-sync tracking-wider transition-all border border-white/15 cursor-pointer active:scale-95 shadow-md"
+                    title="Back to Broker Portal"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-white" />
+                    <span className="hidden sm:inline">BACK</span>
+                  </button>
+                  <h3 className="text-white font-sync tracking-widest text-sm uppercase">
+                    15D EXPERIENCES PORTAL
+                  </h3>
+                </div>
                 <button
                   onClick={() => setShowExperienceIframe(false)}
-                  className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+                  className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                  title="Close"
                 >
                   <X className="w-5 h-5 text-white" />
                 </button>
@@ -1843,12 +1855,23 @@ export default function BrokerPortal() {
               className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex flex-col"
             >
               <div className="flex justify-between items-center p-4 md:px-8 border-b border-white/10 bg-black">
-                <h3 className="text-white font-sync tracking-widest text-sm uppercase">
-                  BOOK FLIGHT — FLY 15D WINGS
-                </h3>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setShowBookFlightIframe(false)}
+                    className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl flex items-center gap-2 text-xs font-sync tracking-wider transition-all border border-white/15 cursor-pointer active:scale-95 shadow-md"
+                    title="Back to Broker Portal"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-white" />
+                    <span className="hidden sm:inline">BACK</span>
+                  </button>
+                  <h3 className="text-white font-sync tracking-widest text-sm uppercase">
+                    BOOK FLIGHT — FLY 15D WINGS
+                  </h3>
+                </div>
                 <button
                   onClick={() => setShowBookFlightIframe(false)}
                   className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                  title="Close"
                 >
                   <X className="w-5 h-5 text-white" />
                 </button>
