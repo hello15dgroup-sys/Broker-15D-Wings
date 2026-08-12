@@ -220,7 +220,7 @@ export default function VerificationGate({ missionId, operatorId, docType, onVer
                 {result.status === 'VERIFIED' ? <CheckCircle2 className="w-10 h-10" /> : <AlertTriangle className="w-10 h-10" />}
               </div>
               <div className="space-y-2">
-                <h3 className={`text-xl font-sync tracking-[0.2em] font-bold ${result.status === 'VERIFIED' ? 'text-emerald-500' : 'text-red-500'}`}>
+                <h3 className={`text-xl font-lexend tracking-[0.2em] font-bold ${result.status === 'VERIFIED' ? 'text-emerald-500' : 'text-red-500'}`}>
                   {result.status === 'VERIFIED' ? 'CERTAINTY SECURED' : 'MATCH FAILURE'}
                 </h3>
                 <p className="text-gray-400 text-xs font-light max-w-xs mx-auto leading-relaxed">{result.message}</p>

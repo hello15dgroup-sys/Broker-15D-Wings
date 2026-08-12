@@ -65,7 +65,7 @@ export default function FuelMathCalculator({ missionId, flightDurationHours, onC
              <Calculator className="w-5 h-5 text-fbblue" />
           </div>
           <div>
-            <h3 className="text-white font-sync tracking-widest text-sm">AVIATION FUEL MATH</h3>
+            <h3 className="text-white font-lexend tracking-widest text-sm">AVIATION FUEL MATH</h3>
             <p className="text-gray-400 text-[10px] uppercase tracking-widest ui-sync">NCAA / ICAO IFR BLOCK FUEL</p>
           </div>
         </div>
@@ -130,7 +130,7 @@ export default function FuelMathCalculator({ missionId, flightDurationHours, onC
         </div>
       </div>
 
-      <button onClick={handleSubmit} disabled={isSubmitting} className="w-full bg-fbblue hover:bg-blue-600 text-white font-sync font-bold tracking-widest py-4 rounded-xl text-xs transition-colors flex justify-center items-center gap-2">
+      <button onClick={handleSubmit} disabled={isSubmitting} className="w-full bg-fbblue hover:bg-blue-600 text-white font-lexend font-bold tracking-widest py-4 rounded-xl text-xs transition-colors flex justify-center items-center gap-2">
         {isSubmitting ? 'TRANSMITTING...' : 'TRANSMIT TO ICC COMMAND'}
       </button>
 

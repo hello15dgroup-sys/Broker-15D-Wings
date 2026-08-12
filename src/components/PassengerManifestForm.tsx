@@ -518,7 +518,7 @@ export default function PassengerManifestForm({ missionId, onSuccess, theme = 'd
           <button 
             type="submit" 
             disabled={isUploading}
-            className="w-full bg-fbblue text-white py-6 rounded-2xl text-[10px] font-bold font-sync tracking-[0.2em] shadow-[0_0_30px_rgba(56,189,248,0.3)] hover:shadow-[0_0_40px_rgba(56,189,248,0.5)] transition-all flex items-center justify-center gap-4 disabled:opacity-50"
+            className="w-full bg-fbblue text-white py-6 rounded-2xl text-[10px] font-bold font-lexend tracking-[0.2em] shadow-[0_0_30px_rgba(56,189,248,0.3)] hover:shadow-[0_0_40px_rgba(56,189,248,0.5)] transition-all flex items-center justify-center gap-4 disabled:opacity-50"
           >
             {isUploading ? (
               <>

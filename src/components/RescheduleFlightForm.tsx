@@ -213,7 +213,7 @@ export default function RescheduleFlightForm({ mission, onSuccess }: RescheduleF
               onChange={(date) => setNewDate(date ? date.toISOString() : '')}
               showTimeSelect
               dateFormat="MMMM d, yyyy h:mm aa"
-              className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-4 text-white font-sync text-sm outline-none focus:border-fbblue transition-all cursor-pointer"
+              className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-4 py-4 text-white font-lexend text-sm outline-none focus:border-fbblue transition-all cursor-pointer"
               placeholderText="Select date and time"
               wrapperClassName="w-full"
             />
@@ -309,7 +309,7 @@ export default function RescheduleFlightForm({ mission, onSuccess }: RescheduleF
         <button 
           onClick={handleUpdate}
           disabled={updating || !newDate}
-          className="w-full bg-white text-black py-4 rounded-xl text-xs font-bold font-sync tracking-widest disabled:opacity-50 hover:bg-gray-200 transition-all flex items-center justify-center gap-2 mt-8"
+          className="w-full bg-white text-black py-4 rounded-xl text-xs font-bold font-lexend tracking-widest disabled:opacity-50 hover:bg-gray-200 transition-all flex items-center justify-center gap-2 mt-8"
         >
           {updating ? (
             <>

@@ -269,7 +269,7 @@ function OperatorLogin({ onLogin }: { onLogin: () => void; key?: string }) {
       <div className="w-full space-y-10">
         <div className="text-center space-y-4">
           <span className="ui-sync text-fbblue text-[10px] tracking-widest block font-sync uppercase">OPERATOR CLEARANCE PROFILE</span>
-          <h1 className="font-sync font-light text-3xl text-white tracking-widest">ACCESS PORTAL</h1>
+          <h1 className="font-lexend font-light text-3xl text-white tracking-widest">ACCESS PORTAL</h1>
           <p className="text-gray-400 text-xs font-light leading-relaxed">
             All partner operators receive an authorized access code linked to their corporate mail. Clearance is granted upon successful validation.
           </p>
@@ -279,7 +279,7 @@ function OperatorLogin({ onLogin }: { onLogin: () => void; key?: string }) {
           {error && <div className="text-red-500 text-xs text-center border border-red-500/30 p-2 rounded bg-red-500/10 ui-sync">{error}</div>}
           <div className="space-y-4">
             <div>
-              <label className="ui-sync text-[8px] text-gray-400 block ml-1 mb-2 font-sync tracking-wider">CORPORATE EMAIL</label>
+              <label className="ui-sync text-[8px] text-gray-400 block ml-1 mb-2 font-lexend tracking-wider">CORPORATE EMAIL</label>
               <div className="relative">
                 <LogIn className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-fbblue" />
                 <input 
@@ -292,7 +292,7 @@ function OperatorLogin({ onLogin }: { onLogin: () => void; key?: string }) {
               </div>
             </div>
             <div>
-               <label className="ui-sync text-[8px] text-gray-400 block ml-1 mb-2 font-sync tracking-wider">COORDINATION ACCESS CODE</label>
+               <label className="ui-sync text-[8px] text-gray-400 block ml-1 mb-2 font-lexend tracking-wider">COORDINATION ACCESS CODE</label>
                <div className="relative">
                  <Key className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-400" />
                  <input 
@@ -311,7 +311,7 @@ function OperatorLogin({ onLogin }: { onLogin: () => void; key?: string }) {
             </div>
           </div>
 
-          <button onClick={handleAuth} disabled={loading} className="w-full bg-white text-black py-4 rounded-xl text-xs flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors font-sync tracking-widest font-bold shadow-lg cursor-pointer">
+          <button onClick={handleAuth} disabled={loading} className="w-full bg-white text-black py-4 rounded-xl text-xs flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors font-lexend tracking-widest font-bold shadow-lg cursor-pointer">
             {loading ? (
               <div className="flex items-center gap-2 justify-center">
                 <span className="text-fbblue font-sync tracking-widest uppercase font-bold">VERIFYING...</span>
@@ -483,7 +483,7 @@ function OperatorOnboarding({ onComplete }: { onComplete: () => void; key?: stri
       </div>
 
       <div className="flex justify-center mt-12">
-        <button disabled={!canSubmit || loading} onClick={handleSubmit} className={`px-12 py-4 rounded-xl text-xs transition-colors font-sync tracking-widest font-bold shadow-xl ${canSubmit ? 'bg-white text-black hover:bg-gray-200' : 'bg-white/10 text-white/40 cursor-not-allowed'}`}>
+        <button disabled={!canSubmit || loading} onClick={handleSubmit} className={`px-12 py-4 rounded-xl text-xs transition-colors font-lexend tracking-widest font-bold shadow-xl ${canSubmit ? 'bg-white text-black hover:bg-gray-200' : 'bg-white/10 text-white/40 cursor-not-allowed'}`}>
           {loading ? 'SUBMITTING...' : 'SUBMIT KYC DIRECTORY'}
         </button>
       </div>
@@ -1208,7 +1208,7 @@ function OperatorCommandCentre() {
                     </div>
                     <div>
                       <h3 className="font-lexend font-light text-3xl text-white">{m.id}</h3>
-                      <p className="text-slate-400 text-xs font-light mt-1 font-sync tracking-wider">
+                      <p className="text-slate-400 text-xs font-light mt-1 font-lexend tracking-wider">
                          {(Array.isArray(m.legs) && m.legs.length > 0 ? (m.legs[0].departure || m.legs[0].from) : m.raw_payload?.departure)} → {(Array.isArray(m.legs) && m.legs.length > 0 ? (m.legs[m.legs.length - 1].arrival || m.legs[m.legs.length - 1].to) : m.raw_payload?.destination)} • {m.operator_aircraft || m.aircraft_class || 'Heavy Jet'}
                       </p>
                     </div>
@@ -1311,7 +1311,7 @@ function OperatorCommandCentre() {
                              {m.mission_customizations.map((c: any, i: number) => (
                                 <div key={i} className="bg-black/40 p-3 rounded-lg border border-white/5">
                                    <div className="flex justify-between items-center mb-2">
-                                     <span className="text-[10px] text-white font-sync tracking-widest">{c.cci_level}</span>
+                                     <span className="text-[10px] text-white font-lexend tracking-widest">{c.cci_level}</span>
                                      <span className="text-[8px] text-fbblue uppercase py-0.5 px-2 bg-fbblue/10 rounded">{c.status}</span>
                                    </div>
                                    <p className="text-xs text-gray-400 font-light">{c.request_details}</p>
@@ -1366,7 +1366,7 @@ function OperatorCommandCentre() {
                                   value={aircraftInput[m.id] !== undefined ? aircraftInput[m.id] : (m.operator_aircraft || '')}
                                   onChange={(e) => setAircraftInput(prev => ({ ...prev, [m.id]: e.target.value }))}
                                   placeholder="e.g. 5N-BGE / Gulfstream G550"
-                                  className="w-full bg-black border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-light outline-none focus:border-fbblue/50 transition-all font-sync tracking-wider"
+                                  className="w-full bg-black border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white text-sm font-light outline-none focus:border-fbblue/50 transition-all font-lexend tracking-wider"
                                />
                             </div>
                          </div>
@@ -1442,7 +1442,7 @@ function OperatorCommandCentre() {
                       </div>
                       <button 
                         onClick={() => handleSubmitQuote(m.id)}
-                        className="w-full bg-white text-black py-5 rounded-2xl text-xs font-bold font-sync tracking-widest hover:bg-emerald-500 hover:text-white transition-all shadow-xl flex items-center justify-center gap-3 group"
+                        className="w-full bg-white text-black py-5 rounded-2xl text-xs font-bold font-lexend tracking-widest hover:bg-emerald-500 hover:text-white transition-all shadow-xl flex items-center justify-center gap-3 group"
                       >
                          <CheckCircle2 className="w-4 h-4" /> {m.operator_quote ? 'UPDATE SUBMITTED QUOTE' : 'SUBMIT QUOTE TO ICC'}
                       </button>
@@ -1568,7 +1568,7 @@ function OperatorCommandCentre() {
                                  {m.mission_customizations.map((c: any, i: number) => (
                                     <div key={i} className="bg-black/40 p-3 rounded-lg border border-white/5">
                                        <div className="flex justify-between items-center mb-2">
-                                         <span className="text-[10px] text-white font-sync tracking-widest">{c.cci_level}</span>
+                                         <span className="text-[10px] text-white font-lexend tracking-widest">{c.cci_level}</span>
                                          <span className="text-[8px] text-fbblue uppercase py-0.5 px-2 bg-fbblue/10 rounded">{c.status}</span>
                                        </div>
                                        <p className="text-xs text-gray-400 font-light">{c.request_details}</p>
@@ -1596,7 +1596,7 @@ function OperatorCommandCentre() {
                           </div>
                           <div className="flex flex-col gap-6 relative z-10 max-w-xl">
                             <div className="space-y-2">
-                              <h4 className="text-xl font-sync font-bold text-amber-500 tracking-widest">TAIL HEARTBEAT REQUEST</h4>
+                              <h4 className="text-xl font-lexend font-bold text-amber-500 tracking-widest">TAIL HEARTBEAT REQUEST</h4>
                               <p className="text-xs text-amber-500/70 font-light leading-relaxed uppercase">
                                 System requires confirmation of asset exclusivity for Tail <strong className="text-white font-bold">{activeHeartbeat.tail_number}</strong>. Failure to respond within the 15-minute window results in immediate ORS decay and mission pivot.
                               </p>

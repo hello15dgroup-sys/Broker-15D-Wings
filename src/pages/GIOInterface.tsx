@@ -163,7 +163,7 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
       <div className="w-full space-y-10">
         <div className="text-center space-y-4">
           <span className="ui-sync text-fbblue text-[10px] tracking-widest block">GROUND INTELLIGENCE</span>
-          <h1 className="font-sync font-light text-2xl text-white tracking-widest">GIO TARMAC PORTAL</h1>
+          <h1 className="font-lexend font-light text-2xl text-white tracking-widest">GIO TARMAC PORTAL</h1>
           <p className="text-gray-400 text-xs font-light leading-relaxed">
             Physical truth layer authentication. Access restricted to actively assigned missions.
           </p>
@@ -214,7 +214,7 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
                   className="w-full bg-black border border-white/10 rounded-xl px-5 py-4 text-white text-sm outline-none focus:border-fbblue/50 transition-colors" 
                 />
               </div>
-              <button onClick={handleApply} disabled={loading} className="w-full bg-emerald-500 text-black py-4 rounded-xl text-xs hover:bg-emerald-400 transition-colors font-sync tracking-widest font-bold shadow-lg mt-2">
+              <button onClick={handleApply} disabled={loading} className="w-full bg-emerald-500 text-black py-4 rounded-xl text-xs hover:bg-emerald-400 transition-colors font-lexend tracking-widest font-bold shadow-lg mt-2">
                 {loading ? <span className="animate-spin">...</span> : 'SUBMIT APPLICATION'}
               </button>
               <button onClick={() => setIsApplying(false)} className="w-full text-xs text-gray-500 hover:text-white pt-2 ui-sync">
@@ -247,7 +247,7 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
                 />
               </div>
               
-              <button onClick={handleAuth} disabled={loading} className="w-full bg-white text-black py-4 rounded-xl text-xs hover:bg-gray-200 transition-colors font-sync tracking-widest font-bold shadow-lg mt-2">
+              <button onClick={handleAuth} disabled={loading} className="w-full bg-white text-black py-4 rounded-xl text-xs hover:bg-gray-200 transition-colors font-lexend tracking-widest font-bold shadow-lg mt-2">
                 {loading ? <span className="animate-spin">...</span> : 'AUTHENTICATE PROTOCOL'}
               </button>
               
@@ -625,7 +625,7 @@ function GIODashboard() {
                <button className="text-xs bg-white/[0.05] border border-white/10 px-4 py-2 rounded-lg">Update Profile</button>
              </div>
              <div className="space-y-4">
-               <h4 className="text-xs text-gray-400 font-sync tracking-widest mb-4">SECURITY</h4>
+               <h4 className="text-xs text-gray-400 font-lexend tracking-widest mb-4">SECURITY</h4>
                <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl flex justify-between items-center">
                  <span className="text-sm font-light">Biometric App Lock</span>
                  <div className="w-10 h-6 bg-fbblue rounded-full relative">
@@ -639,7 +639,7 @@ function GIODashboard() {
                  </div>
                </div>
              </div>
-             <button className="w-full py-4 text-xs font-sync tracking-widest text-red-500 bg-red-500/10 border border-red-500/20 rounded-xl mt-8">
+             <button className="w-full py-4 text-xs font-lexend tracking-widest text-red-500 bg-red-500/10 border border-red-500/20 rounded-xl mt-8">
                TERMINATE SESSION
              </button>
            </div>

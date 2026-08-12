@@ -274,7 +274,7 @@ function ICCLogin({ onLogin }: { onLogin: (role: 'STRATEGIC_AUTHORITY' | 'MISSIO
           <div className="w-16 h-16 mx-auto mb-6 bg-white/[0.03] border border-white/10 rounded-2xl flex items-center justify-center">
               <Command className="w-8 h-8 text-white/80" />
           </div>
-          <h2 className="font-sync font-light text-white text-2xl tracking-widest">ICC COMMAND</h2>
+          <h2 className="font-lexend font-light text-white text-2xl tracking-widest">ICC COMMAND</h2>
           <p className="ui-sync text-gray-400 tracking-[0.2em] text-[8px]">SUPER ADMIN ACCESS</p>
         </div>
 
@@ -317,7 +317,7 @@ function ICCLogin({ onLogin }: { onLogin: (role: 'STRATEGIC_AUTHORITY' | 'MISSIO
             </div>
           </div>
 
-          <button onClick={handleAuth} disabled={loading} className="w-full bg-white text-black py-4 rounded-xl text-xs hover:bg-gray-200 transition-colors shadow-lg mt-4 font-sync tracking-widest font-bold">
+          <button onClick={handleAuth} disabled={loading} className="w-full bg-white text-black py-4 rounded-xl text-xs hover:bg-gray-200 transition-colors shadow-lg mt-4 font-lexend tracking-widest font-bold">
              {loading ? <span className="animate-spin">...</span> : 'AUTHORIZE ACCESS'}
           </button>
           
@@ -720,7 +720,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                      <div className="flex items-center gap-6">
                         <div className={`w-3 h-3 rounded-full ${m.status === 'ACTIVATED' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : (isAwaitingPayment ? 'bg-amber-500 animate-pulse' : 'bg-gray-500')}`} />
                         <div>
-                           <h4 className="text-white font-sync text-xs tracking-widest">{m.id}</h4>
+                           <h4 className="text-white font-lexend text-xs tracking-widest">{m.id}</h4>
                            <p className="text-[10px] text-gray-500 mt-1 uppercase">{m.client_name || 'Principal'} • {m.status.replace('_', ' ')} • Pay: {m.payment_status}</p>
                            
                            {/* Quick overview */}
@@ -1246,7 +1246,7 @@ function MissionExpandedView({ mission, refetchMissions }: { mission: any, refet
                          alert("Failed to approve quote: " + error.message);
                        }
                      }}
-                     className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl text-[10px] font-sync tracking-widest transition-colors shadow-lg cursor-pointer"
+                     className="w-full py-2 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-xl text-[10px] font-lexend tracking-widest transition-colors shadow-lg cursor-pointer"
                    >
                      APPROVE FINAL QUOTE & DISPATCH PAYLOAD
                    </button>

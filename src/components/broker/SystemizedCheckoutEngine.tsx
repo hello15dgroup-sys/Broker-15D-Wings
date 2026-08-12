@@ -177,7 +177,7 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
                 </div>
                 <div className="flex justify-between text-gray-400">
                   <span>Account Title:</span>
-                  <span className="text-white">15D Wings / Mission Escrow</span>
+                  <span className="text-white">15D Wings / Flight Escrow</span>
                 </div>
                 <div className="flex justify-between text-gray-400 pt-2 border-t border-white/10">
                   <span>Amount Due (NGN):</span>

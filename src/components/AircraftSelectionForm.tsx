@@ -351,7 +351,7 @@ export default function AircraftSelectionForm({ mission, onSuccess }: AircraftSe
   if (loading) return (
     <div className="p-8 flex flex-col items-center justify-center space-y-4">
       <Loader2 className="w-8 h-8 animate-spin text-fbblue" />
-      <p className="text-xs text-gray-400 font-sync tracking-widest">FETCHING FLEET...</p>
+      <p className="text-xs text-gray-400 font-lexend tracking-widest">FETCHING FLEET...</p>
     </div>
   );
 
@@ -359,7 +359,7 @@ export default function AircraftSelectionForm({ mission, onSuccess }: AircraftSe
     <div className="p-4 md:p-8 space-y-6 md:space-y-8 max-w-2xl mx-auto w-full">
       <div className="text-center space-y-2 mb-6 md:mb-8">
         <h2 className="monument text-base md:text-lg text-slate-50 font-black tracking-widest">SELECT AIRCRAFT</h2>
-        <p className="text-[10px] text-fbblue font-sync tracking-widest">VIRTUAL TOURS ENABLED</p>
+        <p className="text-[10px] text-fbblue font-lexend tracking-widest">VIRTUAL TOURS ENABLED</p>
       </div>
       
       <div className="space-y-4">
@@ -392,7 +392,7 @@ export default function AircraftSelectionForm({ mission, onSuccess }: AircraftSe
                 <div className="flex flex-col items-end gap-1 md:gap-2 shrink-0">
                     {selectedCategory === idx.toString() && <CheckCircle2 className="w-4 h-4 md:w-5 md:h-5 text-fbblue" />}
                     {a.tour && (
-                         <span className="text-[7px] md:text-[8px] text-fbblue font-sync tracking-tighter">VR READY</span>
+                         <span className="text-[7px] md:text-[8px] text-fbblue font-lexend tracking-tighter">VR READY</span>
                     )}
                 </div>
             </div>
@@ -431,7 +431,7 @@ export default function AircraftSelectionForm({ mission, onSuccess }: AircraftSe
       <button 
         onClick={handleUpdate}
         disabled={updating || !selectedCategory}
-        className="w-full bg-white text-black py-3.5 md:py-4 rounded-xl text-[10px] md:text-xs font-bold font-sync tracking-widest disabled:opacity-50 hover:bg-fbblue hover:text-white transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 mt-6 md:mt-8 shadow-xl"
+        className="w-full bg-white text-black py-3.5 md:py-4 rounded-xl text-[10px] md:text-xs font-bold font-lexend tracking-widest disabled:opacity-50 hover:bg-fbblue hover:text-white transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 mt-6 md:mt-8 shadow-xl"
       >
         {updating ? (
           <>

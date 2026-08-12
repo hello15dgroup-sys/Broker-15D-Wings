@@ -114,7 +114,7 @@ export default function VoiceAssistant() {
            </button>
            
            <div className="text-center space-y-2">
-             <p className={`text-xs font-sync tracking-widest ${isListening ? 'text-fbblue' : 'text-gray-500'}`}>
+             <p className={`text-xs font-lexend tracking-widest ${isListening ? 'text-fbblue' : 'text-gray-500'}`}>
                {status.toUpperCase()}
              </p>
              <p className="text-[10px] text-gray-600 font-light max-w-[200px] mx-auto">

@@ -132,14 +132,14 @@ export default function PaymentReceiptForm({ missionId, onSuccess, onSkip }: Pay
             type="button"
             onClick={onSkip}
             disabled={isUploading}
-            className="py-4 rounded-xl border border-white/10 text-xs text-gray-400 hover:text-white hover:bg-white/5 transition-all font-sync tracking-widest"
+            className="py-4 rounded-xl border border-white/10 text-xs text-gray-400 hover:text-white hover:bg-white/5 transition-all font-lexend tracking-widest"
           >
             SKIP UPLOAD
           </button>
           <button
             type="submit"
             disabled={!file || isUploading}
-            className="py-4 rounded-xl bg-white text-black font-bold text-xs hover:bg-gray-200 transition-all shadow-lg disabled:opacity-50 font-sync tracking-widest"
+            className="py-4 rounded-xl bg-white text-black font-bold text-xs hover:bg-gray-200 transition-all shadow-lg disabled:opacity-50 font-lexend tracking-widest"
           >
             {isUploading ? 'UPLOADING...' : 'SUBMIT EVIDENCE'}
           </button>

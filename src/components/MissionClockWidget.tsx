@@ -150,51 +150,51 @@ export function MissionClockWidget({ mission }: { mission: any }) {
         ) : (
           <div className="flex items-center gap-3 md:gap-6">
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-sync tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
                 {timeLeft.weeks.toString().padStart(2, "0")}
               </span>
               <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
                 w
               </span>
             </div>
-            <div className="text-gray-700 font-sync text-2xl md:text-4xl">
+            <div className="text-gray-700 font-lexend text-2xl md:text-4xl">
               :
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-sync tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
                 {timeLeft.days.toString().padStart(2, "0")}
               </span>
               <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
                 d
               </span>
             </div>
-            <div className="text-gray-700 font-sync text-2xl md:text-4xl">
+            <div className="text-gray-700 font-lexend text-2xl md:text-4xl">
               :
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-sync tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
                 {timeLeft.hours.toString().padStart(2, "0")}
               </span>
               <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
                 h
               </span>
             </div>
-            <div className="text-gray-700 font-sync text-2xl md:text-4xl">
+            <div className="text-gray-700 font-lexend text-2xl md:text-4xl">
               :
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-sync tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
                 {timeLeft.minutes.toString().padStart(2, "0")}
               </span>
               <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
                 m
               </span>
             </div>
-            <div className="text-gray-700 font-sync text-2xl md:text-4xl">
+            <div className="text-gray-700 font-lexend text-2xl md:text-4xl">
               :
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-sync tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
                 {timeLeft.seconds.toString().padStart(2, "0")}
               </span>
               <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
