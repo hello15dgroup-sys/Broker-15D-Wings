@@ -65,8 +65,8 @@ export default function FuelMathCalculator({ missionId, flightDurationHours, onC
              <Calculator className="w-5 h-5 text-fbblue" />
           </div>
           <div>
-            <h3 className="text-white font-lexend tracking-widest text-sm">AVIATION FUEL MATH</h3>
-            <p className="text-gray-400 text-[10px] uppercase tracking-widest ui-sync">NCAA / ICAO IFR BLOCK FUEL</p>
+            <h3 className="text-white font-sync tracking-widest text-sm">AVIATION FUEL MATH</h3>
+            <p className="text-gray-400 text-[10px] uppercase tracking-widest font-sync">NCAA / ICAO IFR BLOCK FUEL</p>
           </div>
         </div>
         <button onClick={onCancel} className="text-gray-500 hover:text-white transition-colors"><span className="text-2xl leading-none">&times;</span></button>
@@ -74,14 +74,14 @@ export default function FuelMathCalculator({ missionId, flightDurationHours, onC
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-           <label className="text-[10px] text-gray-500 ui-sync tracking-widest flex items-center gap-1">
+           <label className="text-[10px] text-gray-500 font-lexend tracking-widest flex items-center gap-1">
               HOURLY BURN (GAL/HR)
               <Info className="w-3 h-3 text-gray-600 cursor-help" />
            </label>
            <input type="number" value={fuelBurn} onChange={e => setFuelBurn(Number(e.target.value))} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:border-fbblue/50 outline-none transition-colors" />
         </div>
         <div className="space-y-2">
-           <label className="text-[10px] text-gray-500 ui-sync tracking-widest flex items-center gap-1">
+           <label className="text-[10px] text-gray-500 font-lexend tracking-widest flex items-center gap-1">
               FUEL PRICE (USD/GAL)
            </label>
            <input type="number" value={fuelPrice} step="0.01" onChange={e => setFuelPrice(Number(e.target.value))} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:border-fbblue/50 outline-none transition-colors" />
@@ -89,7 +89,7 @@ export default function FuelMathCalculator({ missionId, flightDurationHours, onC
       </div>
 
       <div className="space-y-4">
-        <h4 className="text-[10px] text-gray-500 ui-sync tracking-widest border-b border-white/5 pb-2">COMPUTATION ENGINE</h4>
+        <h4 className="text-[10px] text-gray-500 font-lexend tracking-widest border-b border-white/5 pb-2">COMPUTATION ENGINE</h4>
         
         <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-xs">
           <div className="flex justify-between items-end">
@@ -120,11 +120,11 @@ export default function FuelMathCalculator({ missionId, flightDurationHours, onC
 
         <div className="pt-4 border-t border-white/5 flex items-center justify-between">
            <div>
-              <p className="text-[10px] text-fbblue ui-sync tracking-widest font-bold mb-1">TOTAL BLOCK FUEL</p>
+              <p className="text-[10px] text-fbblue font-lexend tracking-widest font-bold mb-1">TOTAL BLOCK FUEL</p>
               <p className="text-2xl text-white font-lexend">{blockFuel.toFixed(1)} <span className="text-base text-gray-500 font-light">gal</span></p>
            </div>
            <div className="text-right">
-              <p className="text-[10px] text-emerald-500 ui-sync tracking-widest font-bold mb-1">COST ESTIMATE</p>
+              <p className="text-[10px] text-emerald-500 font-lexend tracking-widest font-bold mb-1">COST ESTIMATE</p>
               <p className="text-2xl text-white font-lexend">{formatCurrency(totalCost)}</p>
            </div>
         </div>

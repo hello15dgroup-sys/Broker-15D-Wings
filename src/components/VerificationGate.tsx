@@ -132,7 +132,7 @@ export default function VerificationGate({ missionId, operatorId, docType, onVer
       <div className="p-8 space-y-8">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <span className="ui-sync text-[8px] text-fbblue tracking-[0.3em] font-bold uppercase">Compliance Gate: {docType.replace('_', ' ')}</span>
+            <span className="font-sync text-[8px] text-fbblue tracking-[0.3em] font-bold uppercase">Compliance Gate: {docType.replace('_', ' ')}</span>
             <h2 className="text-xl font-light text-white uppercase tracking-tight">{config.title}</h2>
           </div>
           <button onClick={onCancel} className="p-2 hover:bg-white/5 rounded-full transition-colors">
@@ -150,7 +150,7 @@ export default function VerificationGate({ missionId, operatorId, docType, onVer
               <div className="space-y-4">
                 {config.fields.map(f => (
                   <div key={f.key}>
-                    <label className="ui-sync text-[8px] text-gray-500 block ml-1 mb-2 uppercase">{f.label}</label>
+                    <label className="font-sync text-[8px] text-gray-500 block ml-1 mb-2 uppercase">{f.label}</label>
                     <input 
                       type={f.type || 'text'}
                       value={metadata[f.key] || ''}
@@ -181,12 +181,12 @@ export default function VerificationGate({ missionId, operatorId, docType, onVer
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-white">Upload Digital Evidence</p>
-                  <p className="text-[10px] text-gray-500 ui-sync tracking-wider uppercase">PDF, JPG, or PNG under 10MB</p>
+                  <p className="text-[10px] text-gray-500 font-sync tracking-wider uppercase">PDF, JPG, or PNG under 10MB</p>
                 </div>
               </div>
 
               <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-2">
-                <span className="ui-sync text-[8px] text-gray-500 tracking-widest block uppercase">Locked Metadata Preview</span>
+                <span className="font-sync text-[8px] text-gray-500 tracking-widest block uppercase">Locked Metadata Preview</span>
                 <div className="grid grid-cols-2 gap-4">
                   {Object.entries(metadata).map(([k, v]) => (
                     <div key={k}>
@@ -209,7 +209,7 @@ export default function VerificationGate({ missionId, operatorId, docType, onVer
               </div>
               <div className="space-y-2">
                 <h3 className="text-lg font-light text-white uppercase tracking-widest">Verifying Certainty</h3>
-                <p className="text-[10px] text-gray-500 ui-sync animate-pulse">MATCHING METADATA VIA AUTONOMOUS AI AUDIT...</p>
+                <p className="text-[10px] text-gray-500 font-lexend animate-pulse">MATCHING METADATA VIA AUTONOMOUS AI AUDIT...</p>
               </div>
             </motion.div>
           )}
@@ -227,7 +227,7 @@ export default function VerificationGate({ missionId, operatorId, docType, onVer
               </div>
               {result.status === 'REJECTED' && (
                 <div className="w-full bg-red-500/10 border border-red-500/20 p-4 rounded-2xl flex flex-col items-center gap-2">
-                  <span className="ui-sync text-[10px] text-red-500 font-bold uppercase tracking-widest">20-Minute Micro-Timer Activated</span>
+                  <span className="font-sync text-[10px] text-red-500 font-bold uppercase tracking-widest">20-Minute Micro-Timer Activated</span>
                   <p className="text-[9px] text-red-500/60 leading-relaxed uppercase">Over-write with valid data immediately or risk mission un-assignment (ORS Decay: -2.50 pts).</p>
                   <button onClick={() => setStep('METADATA')} className="mt-4 px-8 py-2 bg-red-500 text-white rounded-lg text-[10px] font-sync font-bold tracking-widest hover:bg-red-600 transition-all uppercase">RE-SUBMIT DATA</button>
                 </div>
@@ -238,7 +238,7 @@ export default function VerificationGate({ missionId, operatorId, docType, onVer
       </div>
 
       <div className="bg-white/[0.02] border-t border-white/5 p-4 text-center">
-         <p className="text-[8px] text-gray-600 ui-sync tracking-widest uppercase">Verification protocol linked to Operational Reliability Score (ORS)</p>
+         <p className="text-[8px] text-gray-600 font-sync tracking-widest uppercase">Verification protocol linked to Operational Reliability Score (ORS)</p>
       </div>
     </div>
   );

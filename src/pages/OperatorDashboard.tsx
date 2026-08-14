@@ -268,18 +268,18 @@ function OperatorLogin({ onLogin }: { onLogin: () => void; key?: string }) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-md mx-auto flex flex-col items-center mt-10">
       <div className="w-full space-y-10">
         <div className="text-center space-y-4">
-          <span className="ui-sync text-fbblue text-[10px] tracking-widest block font-sync uppercase">OPERATOR CLEARANCE PROFILE</span>
-          <h1 className="font-lexend font-light text-3xl text-white tracking-widest">ACCESS PORTAL</h1>
+          <span className="font-sync text-fbblue text-[10px] tracking-widest block font-sync uppercase">OPERATOR CLEARANCE PROFILE</span>
+          <h1 className="font-sync font-light text-3xl text-white tracking-widest">ACCESS PORTAL</h1>
           <p className="text-gray-400 text-xs font-light leading-relaxed">
             All partner operators receive an authorized access code linked to their corporate mail. Clearance is granted upon successful validation.
           </p>
         </div>
 
         <div className="glass-3 bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] space-y-6 shadow-2xl">
-          {error && <div className="text-red-500 text-xs text-center border border-red-500/30 p-2 rounded bg-red-500/10 ui-sync">{error}</div>}
+          {error && <div className="text-red-500 text-xs text-center border border-red-500/30 p-2 rounded bg-red-500/10 font-lexend">{error}</div>}
           <div className="space-y-4">
             <div>
-              <label className="ui-sync text-[8px] text-gray-400 block ml-1 mb-2 font-lexend tracking-wider">CORPORATE EMAIL</label>
+              <label className="font-lexend text-[8px] text-gray-400 block ml-1 mb-2 font-lexend tracking-wider">CORPORATE EMAIL</label>
               <div className="relative">
                 <LogIn className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-fbblue" />
                 <input 
@@ -292,7 +292,7 @@ function OperatorLogin({ onLogin }: { onLogin: () => void; key?: string }) {
               </div>
             </div>
             <div>
-               <label className="ui-sync text-[8px] text-gray-400 block ml-1 mb-2 font-lexend tracking-wider">COORDINATION ACCESS CODE</label>
+               <label className="font-lexend text-[8px] text-gray-400 block ml-1 mb-2 font-lexend tracking-wider">COORDINATION ACCESS CODE</label>
                <div className="relative">
                  <Key className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-emerald-400" />
                  <input 
@@ -392,7 +392,7 @@ function OperatorOnboarding({ onComplete }: { onComplete: () => void; key?: stri
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-4xl mx-auto mt-10">
       <div className="text-center space-y-4 mb-10">
-        <h1 className="font-lexend font-light text-4xl text-white">OPERATOR ONBOARDING & KYC</h1>
+        <h1 className="font-sync font-light text-4xl text-white">OPERATOR ONBOARDING & KYC</h1>
         <p className="text-gray-400 text-xs font-light leading-relaxed max-w-xl mx-auto">
           Welcome to the 15D Wings Command Centre. We require all partner operators to undergo strict compliance verification in accordance with NCAA & ICAO regulations. Please provide your corporate details and upload your operational certificates.
         </p>
@@ -404,7 +404,7 @@ function OperatorOnboarding({ onComplete }: { onComplete: () => void; key?: stri
             
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-gray-400 text-[10px] ui-sync">REGISTERED COMPANY NAME (AS ON AOC)</label>
+                <label className="text-gray-400 text-[10px] font-lexend">REGISTERED COMPANY NAME (AS ON AOC)</label>
                 <input 
                   type="text" 
                   value={formData.companyName}
@@ -415,7 +415,7 @@ function OperatorOnboarding({ onComplete }: { onComplete: () => void; key?: stri
               </div>
 
               <div className="space-y-2">
-                <label className="text-gray-400 text-[10px] ui-sync">OPERATIONAL REGION (FLIGHT AXIS)</label>
+                <label className="text-gray-400 text-[10px] font-lexend">OPERATIONAL REGION (FLIGHT AXIS)</label>
                 <input 
                   type="text" 
                   value={formData.operationalRegion}
@@ -426,7 +426,7 @@ function OperatorOnboarding({ onComplete }: { onComplete: () => void; key?: stri
               </div>
 
               <div className="space-y-2">
-                <label className="text-gray-400 text-[10px] ui-sync">DISPATCH WHATSAPP NUMBER</label>
+                <label className="text-gray-400 text-[10px] font-lexend">DISPATCH WHATSAPP NUMBER</label>
                 <input 
                   type="text" 
                   value={formData.whatsapp}
@@ -437,7 +437,7 @@ function OperatorOnboarding({ onComplete }: { onComplete: () => void; key?: stri
               </div>
 
                <div className="space-y-2">
-                <label className="text-gray-400 text-[10px] ui-sync">PRIMARY DISPATCH EMAIL</label>
+                <label className="text-gray-400 text-[10px] font-lexend">PRIMARY DISPATCH EMAIL</label>
                 <input 
                   type="email" 
                   value={formData.email}
@@ -454,19 +454,19 @@ function OperatorOnboarding({ onComplete }: { onComplete: () => void; key?: stri
             <div className="grid grid-cols-2 gap-4">
                <div onClick={() => setDocs({ ...docs, aoc: true })} className={`border ${docs.aoc ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-white/10 hover:border-fbblue/40 bg-white/[0.02]'} p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-3 cursor-pointer transition-colors`}>
                   <Upload className={`w-5 h-5 ${docs.aoc ? 'text-emerald-500' : 'text-fbblue'}`} />
-                  <p className="text-[10px] text-white ui-sync">{docs.aoc ? 'AOC UPLOADED' : 'UPLOAD AOC'}</p>
+                  <p className="text-[10px] text-white font-lexend">{docs.aoc ? 'AOC UPLOADED' : 'UPLOAD AOC'}</p>
                </div>
                <div onClick={() => setDocs({ ...docs, opspecs: true })} className={`border ${docs.opspecs ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-white/10 hover:border-fbblue/40 bg-white/[0.02]'} p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-3 cursor-pointer transition-colors`}>
                   <Upload className={`w-5 h-5 ${docs.opspecs ? 'text-emerald-500' : 'text-fbblue'}`} />
-                  <p className="text-[10px] text-white ui-sync">{docs.opspecs ? 'OPSPECS UPLOADED' : 'UPLOAD OPSPECS'}</p>
+                  <p className="text-[10px] text-white font-lexend">{docs.opspecs ? 'OPSPECS UPLOADED' : 'UPLOAD OPSPECS'}</p>
                </div>
                <div onClick={() => setDocs({ ...docs, insurance: true })} className={`border ${docs.insurance ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-white/10 hover:border-fbblue/40 bg-white/[0.02]'} p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-3 cursor-pointer transition-colors`}>
                   <Upload className={`w-5 h-5 ${docs.insurance ? 'text-emerald-500' : 'text-fbblue'}`} />
-                  <p className="text-[10px] text-white ui-sync">{docs.insurance ? 'INSURANCE UPLOADED' : 'UPLOAD FLEET INSURANCE'}</p>
+                  <p className="text-[10px] text-white font-lexend">{docs.insurance ? 'INSURANCE UPLOADED' : 'UPLOAD FLEET INSURANCE'}</p>
                </div>
                <div onClick={() => setDocs({ ...docs, incorporation: true })} className={`border ${docs.incorporation ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-white/10 hover:border-fbblue/40 bg-white/[0.02]'} p-4 rounded-xl flex flex-col items-center justify-center text-center space-y-3 cursor-pointer transition-colors`}>
                   <Upload className={`w-5 h-5 ${docs.incorporation ? 'text-emerald-500' : 'text-fbblue'}`} />
-                  <p className="text-[10px] text-white ui-sync leading-tight">{docs.incorporation ? 'INCORPORATION UPLOADED' : 'UPLOAD CERT OF INCORPORATION'}</p>
+                  <p className="text-[10px] text-white font-lexend leading-tight">{docs.incorporation ? 'INCORPORATION UPLOADED' : 'UPLOAD CERT OF INCORPORATION'}</p>
                </div>
             </div>
          </div>
@@ -497,7 +497,7 @@ function OperatorPendingReview() {
        <div className="w-24 h-24 rounded-full border-2 border-dashed border-fbblue animate-[spin_10s_linear_infinite] flex items-center justify-center">
           <ShieldCheck className="w-10 h-10 text-fbblue animate-none" />
        </div>
-       <h1 className="font-lexend font-light text-4xl text-white uppercase">Awaiting ICC Clearance</h1>
+       <h1 className="font-sync font-light text-4xl text-white uppercase">Awaiting ICC Clearance</h1>
        <p className="text-gray-400 text-sm font-light leading-relaxed max-w-xl mx-auto">
          Your regulatory documents and operator profile have been securely transmitted to the ICC command. We are actively cross-referencing your AOC and Insurance profiles against global safety indexes. This typically takes 24 hours.
        </p>
@@ -844,7 +844,7 @@ function OperatorCommandCentre() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/95 backdrop-blur-2xl"
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/95 backdrop-blur-[10px]"
         >
           <motion.div 
             initial={{ scale: 0.95, y: 15 }}
@@ -900,7 +900,7 @@ function OperatorCommandCentre() {
           className="max-w-xl mx-auto space-y-8 mt-4 md:mt-16 px-4"
         >
           {/* Header persistent Nav so they can logout */}
-          <div className="w-full flex justify-between items-center bg-[#0d0d0d]/80 backdrop-blur-md border border-white/5 p-2 px-3 balance-nav rounded-2xl shadow-2xl relative z-40">
+          <div className="w-full flex justify-between items-center bg-[#0d0d0d]/80 backdrop-blur-[10px] border border-white/5 p-2 px-3 balance-nav rounded-2xl shadow-2xl relative z-40">
             <div className="flex items-center gap-1.5 min-w-0">
               <div className="w-6 h-6 rounded bg-fbblue/10 border border-fbblue/20 flex items-center justify-center shrink-0 shadow-inner">
                 <Plane className="w-3 h-3 text-fbblue" />
@@ -1012,7 +1012,7 @@ function OperatorCommandCentre() {
           className="max-w-7xl mx-auto space-y-6 mt-4 md:mt-16 px-4"
         >
           {/* Header persistent Nav so they can logout and reset */}
-          <div className="w-full flex justify-between items-center bg-[#0d0d0d]/80 backdrop-blur-md border border-white/5 p-2 px-3 balance-nav rounded-2xl shadow-2xl relative z-40">
+          <div className="w-full flex justify-between items-center bg-[#0d0d0d]/80 backdrop-blur-[10px] border border-white/5 p-2 px-3 balance-nav rounded-2xl shadow-2xl relative z-40">
             <div className="flex items-center gap-1.5 min-w-0">
               <div className="w-6 h-6 rounded bg-fbblue/10 border border-fbblue/20 flex items-center justify-center shrink-0">
                 <Plane className="w-3 text-fbblue" />
@@ -1060,7 +1060,7 @@ function OperatorCommandCentre() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-7xl mx-auto space-y-12">
       <AnimatePresence>
         {computingFuelFor && (
-           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-[10px]">
               <FuelMathCalculator 
                  missionId={computingFuelFor} 
                  flightDurationHours={6.5}
@@ -1073,7 +1073,7 @@ function OperatorCommandCentre() {
         )}
 
         {activeVerification && operator && (
-           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl">
+           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-[10px]">
              <VerificationGate 
                 missionId={activeVerification.missionId}
                 operatorId={operator.id}
@@ -1129,8 +1129,8 @@ function OperatorCommandCentre() {
 
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b border-white/5 pb-8">
         <div>
-          <span className="ui-sync text-fbblue mb-2 block tracking-widest text-[10px]">OPERATOR COMMAND CENTRE</span>
-          <h1 className="font-lexend font-light text-4xl md:text-5xl tracking-tight uppercase leading-tight">
+          <span className="font-lexend text-fbblue mb-2 block tracking-widest text-[10px]">OPERATOR COMMAND CENTRE</span>
+          <h1 className="font-sync font-light text-4xl md:text-5xl tracking-tight uppercase leading-tight">
             {operator?.name || (() => {
               const localSessionRaw = localStorage.getItem('operator_session');
               if (localSessionRaw) {
@@ -1145,7 +1145,7 @@ function OperatorCommandCentre() {
           <div className="flex gap-4 mt-4">
             <div className="glass-vip px-4 py-3 rounded-xl flex items-center gap-6 border border-white/10 shadow-xl">
               <div className="flex flex-col">
-                <span className="ui-sync text-[8px] text-gray-400 tracking-widest mb-1 uppercase">Reliability Score (ORS)</span>
+                <span className="font-sync text-[8px] text-gray-400 tracking-widest mb-1 uppercase">Reliability Score (ORS)</span>
                 <div className="flex items-center gap-3">
                    <div className={`w-2.5 h-2.5 rounded-full ${earnedScore > 85 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : earnedScore > 60 ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 'bg-red-500 animate-pulse'}`} />
                    <span className="text-2xl font-light font-mono text-white tracking-tighter">{earnedScore.toFixed(2)}%</span>
@@ -1153,7 +1153,7 @@ function OperatorCommandCentre() {
               </div>
               <div className="w-px h-10 bg-white/10" />
               <div className="flex flex-col">
-                <span className="ui-sync text-[8px] text-gray-400 tracking-widest mb-1 uppercase">Fleet Status</span>
+                <span className="font-sync text-[8px] text-gray-400 tracking-widest mb-1 uppercase">Fleet Status</span>
                 <span className="text-xs text-emerald-500 font-sync tracking-widest uppercase">[( {operator?.rotation_count || 0} ) MISSIONS EXECUTED]</span>
               </div>
             </div>
@@ -1163,19 +1163,19 @@ function OperatorCommandCentre() {
         <div className="w-full lg:w-auto">
           {isOveApproved ? (
             <div className="flex overflow-x-auto w-full lg:w-auto bg-white/[0.02] border border-white/5 p-1 rounded-xl scrollbar-none gap-0.5">
-              <button onClick={() => setActiveTab('INBOX')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg flex items-center gap-1.5 text-[9px] lg:text-[10px] ui-sync tracking-wider transition-colors ${activeTab === 'INBOX' ? 'bg-fbblue text-white' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('INBOX')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg flex items-center gap-1.5 text-[9px] lg:text-[10px] font-lexend tracking-wider transition-colors ${activeTab === 'INBOX' ? 'bg-fbblue text-white' : 'text-gray-400 hover:text-white'}`}>
                 <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" /> INBOX (1)
               </button>
-              <button onClick={() => setActiveTab('ACTIVE')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg text-[9px] lg:text-[10px] ui-sync tracking-wider transition-colors ${activeTab === 'ACTIVE' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('ACTIVE')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg text-[9px] lg:text-[10px] font-lexend tracking-wider transition-colors ${activeTab === 'ACTIVE' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}`}>
                 ACTIVE
               </button>
-              <button onClick={() => setActiveTab('OVE_GATE')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg flex items-center gap-1 text-[9px] lg:text-[10px] ui-sync tracking-wider transition-colors ${activeTab === 'OVE_GATE' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 animate-pulse' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('OVE_GATE')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg flex items-center gap-1 text-[9px] lg:text-[10px] font-lexend tracking-wider transition-colors ${activeTab === 'OVE_GATE' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 animate-pulse' : 'text-gray-400 hover:text-white'}`}>
                 VERIFICATION GATE ✓
               </button>
-              <button onClick={() => setActiveTab('FLEET')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg text-[9px] lg:text-[10px] ui-sync tracking-wider transition-colors ${activeTab === 'FLEET' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('FLEET')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg text-[9px] lg:text-[10px] font-lexend tracking-wider transition-colors ${activeTab === 'FLEET' ? 'bg-white/10 text-white' : 'text-gray-400 hover:text-white'}`}>
                 FLEET INDEX
               </button>
-              <button onClick={() => setActiveTab('REGIONS')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg text-[9px] lg:text-[10px] ui-sync tracking-wider transition-colors ${activeTab === 'REGIONS' ? 'bg-fbblue text-white' : 'text-gray-400 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('REGIONS')} className={`flex-1 lg:flex-none justify-center whitespace-nowrap px-3.5 py-2.5 lg:px-6 lg:py-3.5 rounded-lg text-[9px] lg:text-[10px] font-lexend tracking-wider transition-colors ${activeTab === 'REGIONS' ? 'bg-fbblue text-white' : 'text-gray-400 hover:text-white'}`}>
                 OPERATIONS REGION
               </button>
             </div>
@@ -1190,11 +1190,11 @@ function OperatorCommandCentre() {
 
       {activeTab === 'INBOX' && (
         <section className="space-y-6">
-          <h2 className="ui-sync text-sm text-gray-400 tracking-widest">MISSION INBOX</h2>
+          <h2 className="font-sync text-sm text-gray-400 tracking-widest">MISSION INBOX</h2>
           
           {missions?.length === 0 ? (
              <div className="p-20 text-center border border-dashed border-white/5 rounded-3xl">
-                <p className="text-gray-500 ui-sync text-[10px] tracking-widest uppercase">No pending mission broadcasts</p>
+                <p className="text-gray-500 font-sync text-[10px] tracking-widest uppercase">No pending mission broadcasts</p>
              </div>
           ) : (
             missions?.map((m: any) => (
@@ -1207,7 +1207,7 @@ function OperatorCommandCentre() {
                       <Plane className="w-8 h-8 text-fbblue" />
                     </div>
                     <div>
-                      <h3 className="font-lexend font-light text-3xl text-white">{m.id}</h3>
+                      <h3 className="font-sync font-light text-3xl text-white">{m.id}</h3>
                       <p className="text-slate-400 text-xs font-light mt-1 font-lexend tracking-wider">
                          {(Array.isArray(m.legs) && m.legs.length > 0 ? (m.legs[0].departure || m.legs[0].from) : m.raw_payload?.departure)} → {(Array.isArray(m.legs) && m.legs.length > 0 ? (m.legs[m.legs.length - 1].arrival || m.legs[m.legs.length - 1].to) : m.raw_payload?.destination)} • {m.operator_aircraft || m.aircraft_class || 'Heavy Jet'}
                       </p>
@@ -1216,29 +1216,29 @@ function OperatorCommandCentre() {
                   
                   <div className="flex flex-col md:items-end gap-2 text-nearblack">
                     {m.operator_quote ? (
-                      <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[8px] ui-sync rounded border border-emerald-500/20 font-mono font-bold uppercase tracking-wider">QUOTE SUBMITTED ({m.operator_quote} USD)</span>
+                      <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[8px] font-sync rounded border border-emerald-500/20 font-mono font-bold uppercase tracking-wider">QUOTE SUBMITTED ({m.operator_quote} USD)</span>
                     ) : (
-                      <span className="px-3 py-1 bg-amber-500/10 text-amber-500 text-[8px] ui-sync rounded border border-amber-500/20 font-mono font-bold uppercase tracking-wider">AWAITING QUOTE</span>
+                      <span className="px-3 py-1 bg-amber-500/10 text-amber-500 text-[8px] font-sync rounded border border-amber-500/20 font-mono font-bold uppercase tracking-wider">AWAITING QUOTE</span>
                     )}
-                    <p className="text-[10px] text-gray-500 ui-sync uppercase tracking-widest">Received {formatToLocalDate(m.created_at)}</p>
+                    <p className="text-[10px] text-gray-500 font-sync uppercase tracking-widest">Received {formatToLocalDate(m.created_at)}</p>
                   </div>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8 border-t border-white/5 pt-8 relative z-10">
                    <div className="space-y-4">
-                      <h4 className="ui-sync text-fbblue text-[10px] tracking-widest font-bold">MISSION PARAMETERS</h4>
+                      <h4 className="font-lexend text-fbblue text-[10px] tracking-widest font-bold">MISSION PARAMETERS</h4>
                       {Array.isArray(m.legs) && m.legs.length > 0 ? (
                         <div className="space-y-4">
                           {m.legs.map((leg: any, idx: number) => (
                              <div key={idx} className="p-4 bg-white/[0.02] border border-white/5 rounded-xl space-y-3">
-                                <p className="text-gray-500 text-[8px] ui-sync">LEG {idx + 1} • {leg.date || m.raw_payload?.date}</p>
+                                <p className="text-gray-500 text-[8px] font-lexend">LEG {idx + 1} • {leg.date || m.raw_payload?.date}</p>
                                 <div className="grid grid-cols-2 gap-4">
                                   <div>
-                                     <p className="text-gray-500 text-[8px] ui-sync mb-1">DEPARTURE</p>
+                                     <p className="text-gray-500 text-[8px] font-lexend mb-1">DEPARTURE</p>
                                      <p className="text-xs text-white uppercase">{leg.departure || leg.from}</p>
                                   </div>
                                   <div>
-                                     <p className="text-gray-500 text-[8px] ui-sync mb-1">DESTINATION</p>
+                                     <p className="text-gray-500 text-[8px] font-lexend mb-1">DESTINATION</p>
                                      <p className="text-xs text-white uppercase">{leg.arrival || leg.to}</p>
                                   </div>
                                 </div>
@@ -1249,16 +1249,16 @@ function OperatorCommandCentre() {
                         <>
                           <div className="grid grid-cols-2 gap-4">
                              <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-                                <p className="text-gray-500 text-[8px] ui-sync mb-1">DEPARTURE</p>
+                                <p className="text-gray-500 text-[8px] font-lexend mb-1">DEPARTURE</p>
                                 <p className="text-xs text-white uppercase">{m.raw_payload?.departure}</p>
                              </div>
                              <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-                                <p className="text-gray-500 text-[8px] ui-sync mb-1">DESTINATION</p>
+                                <p className="text-gray-500 text-[8px] font-lexend mb-1">DESTINATION</p>
                                 <p className="text-xs text-white uppercase">{m.raw_payload?.destination}</p>
                              </div>
                           </div>
                           <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-                             <p className="text-gray-500 text-[8px] ui-sync mb-1">SCHEDULED DATE</p>
+                             <p className="text-gray-500 text-[8px] font-lexend mb-1">SCHEDULED DATE</p>
                              <p className="text-xs text-white">{m.raw_payload?.date}</p>
                           </div>
                         </>
@@ -1267,7 +1267,7 @@ function OperatorCommandCentre() {
                       {/* Passenger Manifest Panel */}
                       <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl space-y-3">
                          <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                            <p className="text-fbblue text-[8px] ui-sync font-bold uppercase tracking-wider">PASSENGER MANIFEST & LOGISTICS</p>
+                            <p className="text-fbblue text-[8px] font-sync font-bold uppercase tracking-wider">PASSENGER MANIFEST & LOGISTICS</p>
                             <span className="text-white text-[9px] font-mono">PAX: {m.passengers?.length || m.pax || 0}</span>
                          </div>
                          {m.passengers && m.passengers.length > 0 ? (
@@ -1306,7 +1306,7 @@ function OperatorCommandCentre() {
                       
                       {m.mission_customizations && m.mission_customizations.length > 0 && (
                         <div className="p-4 bg-fbblue/5 border border-fbblue/20 rounded-xl space-y-3 mt-4 w-full">
-                           <p className="text-fbblue text-[8px] ui-sync font-bold uppercase tracking-wider">Asset Tailoring (CCI)</p>
+                           <p className="text-fbblue text-[8px] font-sync font-bold uppercase tracking-wider">Asset Tailoring (CCI)</p>
                            <div className="space-y-2">
                              {m.mission_customizations.map((c: any, i: number) => (
                                 <div key={i} className="bg-black/40 p-3 rounded-lg border border-white/5">
@@ -1323,18 +1323,18 @@ function OperatorCommandCentre() {
                    </div>
 
                    <div className="space-y-6">
-                      <h4 className="ui-sync text-fbblue text-[10px] tracking-widest font-bold">OPERATIONAL RESPONSE</h4>
+                      <h4 className="font-lexend text-fbblue text-[10px] tracking-widest font-bold">OPERATIONAL RESPONSE</h4>
                       <div className="space-y-2">
-                         <label className="text-gray-400 text-[10px] ui-sync block ml-1">FINAL QUOTE (USD)</label>
+                         <label className="text-gray-400 text-[10px] font-lexend block ml-1">FINAL QUOTE (USD)</label>
                        </div>
 
                        <div className="space-y-2">
-                          <label className="text-gray-400 text-[10px] ui-sync block ml-1">PLANE AVAILABILITY</label>
+                          <label className="text-gray-400 text-[10px] font-lexend block ml-1">PLANE AVAILABILITY</label>
                           <div className="flex gap-4">
                              <button 
                                type="button" 
                                onClick={() => setIsAvailable(prev => ({ ...prev, [m.id]: true }))}
-                               className={`flex-1 py-3 px-4 rounded-xl text-[10px] ui-sync font-bold border transition-all ${
+                               className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-lexend font-bold border transition-all ${
                                  (isAvailable[m.id] ?? true) 
                                    ? 'bg-[#10B981]/15 text-[#10B981] border-[#10B981]/30 font-bold' 
                                    : 'bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/10'
@@ -1345,7 +1345,7 @@ function OperatorCommandCentre() {
                              <button 
                                type="button" 
                                onClick={() => setIsAvailable(prev => ({ ...prev, [m.id]: false }))}
-                               className={`flex-1 py-3 px-4 rounded-xl text-[10px] ui-sync font-bold border transition-all ${
+                               className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-lexend font-bold border transition-all ${
                                  (isAvailable[m.id] === false) 
                                    ? 'bg-rose-500/15 text-rose-500 border-rose-500/30 font-bold' 
                                    : 'bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/10'
@@ -1358,7 +1358,7 @@ function OperatorCommandCentre() {
 
                        {(isAvailable[m.id] ?? true) && (
                          <div className="space-y-2">
-                            <label className="text-gray-400 text-[10px] ui-sync block ml-1">ASSIGNED AIRCRAFT (TAIL / MODEL)</label>
+                            <label className="text-gray-400 text-[10px] font-lexend block ml-1">ASSIGNED AIRCRAFT (TAIL / MODEL)</label>
                             <div className="relative">
                                <Plane className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-fbblue" />
                                <input 
@@ -1374,7 +1374,7 @@ function OperatorCommandCentre() {
 
                        {(isAvailable[m.id] ?? true) && (
                          <div className="space-y-3 bg-white/[0.02] p-4 rounded-2xl border border-white/5 mt-4">
-                            <label className="text-fbblue text-[8px] ui-sync block tracking-widest font-semibold uppercase">MISSION PRE-VERIFICATION CHECKLIST</label>
+                            <label className="text-fbblue text-[8px] font-sync block tracking-widest font-semibold uppercase">MISSION PRE-VERIFICATION CHECKLIST</label>
                             <p className="text-[9px] text-gray-500 leading-normal font-light">
                               You must confirm compliance and technical parameters to verify suitability before submitting your quote.
                             </p>
@@ -1457,13 +1457,13 @@ function OperatorCommandCentre() {
       {activeTab === 'ACTIVE' && (
         <section className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="ui-sync text-sm text-gray-400 tracking-widest uppercase">Active Missions & Certainty Heartbeats</h2>
+            <h2 className="font-sync text-sm text-gray-400 tracking-widest uppercase">Active Missions & Certainty Heartbeats</h2>
           </div>
 
           <div className="grid gap-8">
             {(!activeMissions || activeMissions.length === 0) ? (
               <div className="p-20 text-center border border-dashed border-white/5 rounded-3xl">
-                <p className="text-gray-500 ui-sync text-[10px] tracking-widest uppercase">No assets currently in warm activation</p>
+                <p className="text-gray-500 font-sync text-[10px] tracking-widest uppercase">No assets currently in warm activation</p>
               </div>
             ) : (
               activeMissions.map((m: any) => {
@@ -1480,7 +1480,7 @@ function OperatorCommandCentre() {
                     <div className="absolute top-0 right-0 p-6 flex gap-4">
                        <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-full">
                           <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                          <span className="ui-sync text-[8px] text-emerald-500 tracking-[0.2em] uppercase">ESCROW_ALLOCATED</span>
+                          <span className="font-sync text-[8px] text-emerald-500 tracking-[0.2em] uppercase">ESCROW_ALLOCATED</span>
                        </div>
                     </div>
 
@@ -1490,32 +1490,32 @@ function OperatorCommandCentre() {
                           <Activity className="w-8 h-8 text-fbblue" />
                         </div>
                         <div>
-                          <h3 className="font-lexend font-light text-3xl text-white uppercase">{m.id}</h3>
+                          <h3 className="font-sync font-light text-3xl text-white uppercase">{m.id}</h3>
                           <p className="text-gray-400 text-xs font-light mt-1 uppercase tracking-wider">{(Array.isArray(m.legs) && m.legs.length > 0 ? (m.legs[0].departure || m.legs[0].from) : m.raw_payload?.departure)} → {(Array.isArray(m.legs) && m.legs.length > 0 ? (m.legs[m.legs.length - 1].arrival || m.legs[m.legs.length - 1].to) : m.raw_payload?.destination)} • {m.operator_aircraft || m.aircraft_class || 'Heavy Jet'}</p>
                         </div>
                       </div>
                       
                       <div className="flex flex-col items-end gap-2">
-                        <span className="ui-sync text-[8px] text-gray-500 tracking-widest uppercase">Mission Phase</span>
-                        <span className="px-4 py-1.5 bg-fbblue/20 text-fbblue text-[10px] ui-sync rounded-lg border border-fbblue/30 font-bold uppercase tracking-widest">{m.status}</span>
+                        <span className="font-sync text-[8px] text-gray-500 tracking-widest uppercase">Charter Phase</span>
+                        <span className="px-4 py-1.5 bg-fbblue/20 text-fbblue text-[10px] font-sync rounded-lg border border-fbblue/30 font-bold uppercase tracking-widest">{m.status}</span>
                       </div>
                     </div>
 
                     <div className="grid md:grid-cols-2 gap-8 border-t border-white/5 pt-8 relative z-10 w-full">
                        <div className="space-y-4">
-                          <h4 className="ui-sync text-fbblue text-[10px] tracking-widest font-bold">MISSION ITINERARY</h4>
+                          <h4 className="font-lexend text-fbblue text-[10px] tracking-widest font-bold">MISSION ITINERARY</h4>
                           {Array.isArray(m.legs) && m.legs.length > 0 ? (
                             <div className="space-y-4">
                               {m.legs.map((leg: any, idx: number) => (
                                  <div key={idx} className="p-4 bg-white/[0.02] border border-white/5 rounded-xl space-y-3">
-                                    <p className="text-gray-500 text-[8px] ui-sync">LEG {idx + 1} • {leg.date || m.raw_payload?.date}</p>
+                                    <p className="text-gray-500 text-[8px] font-lexend">LEG {idx + 1} • {leg.date || m.raw_payload?.date}</p>
                                     <div className="grid grid-cols-2 gap-4">
                                       <div>
-                                         <p className="text-gray-500 text-[8px] ui-sync mb-1">DEPARTURE</p>
+                                         <p className="text-gray-500 text-[8px] font-lexend mb-1">DEPARTURE</p>
                                          <p className="text-xs text-white uppercase">{leg.departure || leg.from}</p>
                                       </div>
                                       <div>
-                                         <p className="text-gray-500 text-[8px] ui-sync mb-1">DESTINATION</p>
+                                         <p className="text-gray-500 text-[8px] font-lexend mb-1">DESTINATION</p>
                                          <p className="text-xs text-white uppercase">{leg.arrival || leg.to}</p>
                                       </div>
                                     </div>
@@ -1525,11 +1525,11 @@ function OperatorCommandCentre() {
                           ) : (
                             <div className="grid grid-cols-2 gap-4">
                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-                                  <p className="text-gray-500 text-[8px] ui-sync mb-1">DEPARTURE</p>
+                                  <p className="text-gray-500 text-[8px] font-lexend mb-1">DEPARTURE</p>
                                   <p className="text-xs text-white uppercase">{m.raw_payload?.departure}</p>
                                </div>
                                <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl">
-                                  <p className="text-gray-500 text-[8px] ui-sync mb-1">DESTINATION</p>
+                                  <p className="text-gray-500 text-[8px] font-lexend mb-1">DESTINATION</p>
                                   <p className="text-xs text-white uppercase">{m.raw_payload?.destination}</p>
                                </div>
                             </div>
@@ -1537,7 +1537,7 @@ function OperatorCommandCentre() {
                        </div>
                        
                        <div className="space-y-4">
-                          <h4 className="ui-sync text-fbblue text-[10px] tracking-widest font-bold">PASSENGER MANIFEST & TAILORING</h4>
+                          <h4 className="font-lexend text-fbblue text-[10px] tracking-widest font-bold">PASSENGER MANIFEST & TAILORING</h4>
                           <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl space-y-3">
                              <div className="flex justify-between items-center border-b border-white/5 pb-2">
                                 <span className="text-white text-[9px] font-mono">PAX: {m.passengers?.length || m.pax || 0}</span>
@@ -1563,7 +1563,7 @@ function OperatorCommandCentre() {
                           
                           {m.mission_customizations && m.mission_customizations.length > 0 && (
                             <div className="p-4 bg-fbblue/5 border border-fbblue/20 rounded-xl space-y-3">
-                               <p className="text-fbblue text-[8px] ui-sync font-bold uppercase tracking-wider">Asset Tailoring (CCI)</p>
+                               <p className="text-fbblue text-[8px] font-sync font-bold uppercase tracking-wider">Asset Tailoring (CCI)</p>
                                <div className="space-y-2">
                                  {m.mission_customizations.map((c: any, i: number) => (
                                     <div key={i} className="bg-black/40 p-3 rounded-lg border border-white/5">
@@ -1590,7 +1590,7 @@ function OperatorCommandCentre() {
                         >
                           <div className="absolute top-0 right-0 p-8">
                              <div className="flex flex-col items-end">
-                                <span className="ui-sync text-[8px] text-amber-500 tracking-widest mb-1 uppercase">Response Window</span>
+                                <span className="font-sync text-[8px] text-amber-500 tracking-widest mb-1 uppercase">Response Window</span>
                                 <span className="text-2xl font-light font-mono text-white tracking-widest">14:59</span>
                              </div>
                           </div>
@@ -1625,7 +1625,7 @@ function OperatorCommandCentre() {
                        <div className={`p-6 rounded-3xl border transition-all ${permitVerification?.status === 'VERIFIED' ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-white/[0.02] border-white/10 hover:border-white/20'}`}>
                           <div className="flex justify-between items-center mb-6">
                              <div className="space-y-1">
-                                <span className="ui-sync text-[8px] text-gray-400 tracking-widest uppercase">Gate 1: T-72 Flight Release</span>
+                                <span className="font-sync text-[8px] text-gray-400 tracking-widest uppercase">Gate 1: T-72 Flight Release</span>
                                 <h4 className="text-sm text-white uppercase tracking-wider">Civil Aviation Permit</h4>
                              </div>
                              {permitVerification?.status === 'VERIFIED' ? (
@@ -1642,10 +1642,10 @@ function OperatorCommandCentre() {
                           {permitVerification ? (
                              <div className="flex justify-between items-end border-t border-white/5 pt-4">
                                 <div>
-                                   <p className="text-[8px] text-gray-500 uppercase ui-sync">Permit Number</p>
+                                   <p className="text-[8px] text-gray-500 uppercase font-sync">Permit Number</p>
                                    <p className="text-[10px] text-white font-mono uppercase">{permitVerification.typed_metadata.permit_number}</p>
                                 </div>
-                                <span className={`text-[8px] ui-sync tracking-widest font-bold ${permitVerification.status === 'VERIFIED' ? 'text-emerald-500' : 'text-amber-500'}`}>[{permitVerification.status}]</span>
+                                <span className={`text-[8px] font-lexend tracking-widest font-bold ${permitVerification.status === 'VERIFIED' ? 'text-emerald-500' : 'text-amber-500'}`}>[{permitVerification.status}]</span>
                              </div>
                           ) : (
                              <p className="text-[10px] text-gray-500 italic font-light uppercase tracking-widest">Awaiting digital evidence upload</p>
@@ -1655,7 +1655,7 @@ function OperatorCommandCentre() {
                        <div className={`p-6 rounded-3xl border transition-all ${fuelVerification?.status === 'VERIFIED' ? 'bg-emerald-500/5 border-emerald-500/30' : 'bg-red-500/5 border-red-500/20'}`}>
                           <div className="flex justify-between items-center mb-6">
                              <div className="space-y-1">
-                                <span className="ui-sync text-[8px] text-red-400 tracking-widest uppercase font-bold">Gate 2: T-24 Fuel Assurance</span>
+                                <span className="font-sync text-[8px] text-red-400 tracking-widest uppercase font-bold">Gate 2: T-24 Fuel Assurance</span>
                                 <h4 className="text-sm text-white uppercase tracking-wider">Fuel Release Evidence</h4>
                              </div>
                              {fuelVerification?.status === 'VERIFIED' ? (
@@ -1672,10 +1672,10 @@ function OperatorCommandCentre() {
                           {fuelVerification ? (
                              <div className="flex justify-between items-end border-t border-white/5 pt-4">
                                 <div>
-                                   <p className="text-[8px] text-gray-500 uppercase ui-sync">Fuel Release #</p>
+                                   <p className="text-[8px] text-gray-500 uppercase font-sync">Fuel Release #</p>
                                    <p className="text-[10px] text-white font-mono uppercase">{fuelVerification.typed_metadata.frn}</p>
                                 </div>
-                                <span className={`text-[8px] ui-sync tracking-widest font-bold ${fuelVerification.status === 'VERIFIED' ? 'text-emerald-500' : 'text-red-500'}`}>[{fuelVerification.status}]</span>
+                                <span className={`text-[8px] font-lexend tracking-widest font-bold ${fuelVerification.status === 'VERIFIED' ? 'text-emerald-500' : 'text-red-500'}`}>[{fuelVerification.status}]</span>
                              </div>
                           ) : (
                              <p className="text-[10px] text-red-400/60 italic font-light uppercase tracking-widest">Immediate action required • T-minus countdown active</p>
@@ -1713,13 +1713,13 @@ function OperatorCommandCentre() {
         <section className="space-y-8">
           <div className="flex justify-between items-center bg-white/[0.01] p-6 rounded-[2rem] border border-white/5 flex-wrap gap-4">
              <div className="space-y-1">
-                <h3 className="ui-sync text-sm text-white font-medium tracking-wide">GLOBAL AIRCRAFT DIRECTORY</h3>
+                <h3 className="font-sync text-sm text-white font-medium tracking-wide">GLOBAL AIRCRAFT DIRECTORY</h3>
                 <p className="text-gray-400 text-xs font-light">Sourced directly from your live verified fleet compliance registry.</p>
              </div>
              <div className="flex gap-2">
                 <button 
                   onClick={() => setActiveTab('OVE_GATE')}
-                  className="ui-sync text-[10px] flex items-center justify-center gap-2 bg-fbblue text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 transition-colors cursor-pointer"
+                  className="font-lexend text-[10px] flex items-center justify-center gap-2 bg-fbblue text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 transition-colors cursor-pointer"
                 >
                    <Plus className="w-3 h-3" /> REGISTER NEW AIRCRAFT
                 </button>
@@ -1750,7 +1750,7 @@ function OperatorCommandCentre() {
                          <Plane className="w-10 h-10 text-fbblue opacity-40 group-hover:scale-110 transition-transform duration-200" />
                       </div>
                       <h4 className="text-white text-sm font-semibold font-mono">{plane.tailNumber}</h4>
-                      <p className="text-[10px] ui-sync text-fbblue mt-1 uppercase font-semibold">
+                      <p className="text-[10px] font-sync text-fbblue mt-1 uppercase font-semibold">
                          {plane.manufacturer} {plane.model}
                       </p>
                       <p className="text-[10px] text-gray-400 mt-1 font-light">
@@ -1767,7 +1767,7 @@ function OperatorCommandCentre() {
         <section className="space-y-8">
           <div className="bg-white/[0.01] p-6 rounded-[2rem] border border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="space-y-1">
-              <h3 className="ui-sync text-sm text-white font-medium tracking-wide">OPERATIONAL FLIGHT AXIS</h3>
+              <h3 className="font-sync text-sm text-white font-medium tracking-wide">OPERATIONAL FLIGHT AXIS</h3>
               <p className="text-gray-400 text-xs font-light">Set your licensed flight operational regions to qualify for automated mission disbursement.</p>
             </div>
             <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-xl">

@@ -102,3 +102,9 @@ body {
   background-color: #1877F2 !important;
   color: white !important;
 }
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-[10px] border border-white/10 rounded-2xl;
+  }
+}

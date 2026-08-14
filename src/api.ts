@@ -30,7 +30,7 @@ async function secureFetch(url: string, options: RequestInit = {}) {
 
 export const missionApi = {
   // Mission Flow
-  createMission: (payload: Partial<Mission>) => 
+  createCharter: (payload: Partial<Mission>) => 
     secureFetch(`${API_BASE.MISSION_CONTROL}/mission/event`, {
       method: 'POST',
       body: JSON.stringify({ event_type: 'INTAKE_SUBMITTED', ...payload }),

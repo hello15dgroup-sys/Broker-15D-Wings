@@ -40,7 +40,8 @@ import {
   Sliders,
   ChevronDown,
   Globe,
-  Award
+  Award,
+  LogOut
 } from 'lucide-react';
 import { formatCurrency, formatToLocalDate } from '../../lib/utils';
 import { WhiteLabelProposalBuilder } from './WhiteLabelProposalBuilder';
@@ -497,6 +498,9 @@ interface BrokerCRMWorkspaceProps {
   onIssueLiveCodeRequest?: (missionCode: string) => void;
   onLaunchVipSession?: (missionCode: string) => void;
   onOpenProposalBuilder?: (deal: DealPipelineItem) => void;
+  hasVerifiedOperator?: boolean;
+  onRequireOperator?: () => void;
+  onSignOut?: () => void;
 }
 
 export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
@@ -504,7 +508,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   brokerCompanyName = '15D Executive Aviation Brokerage',
   onIssueLiveCodeRequest,
   onLaunchVipSession,
-  onOpenProposalBuilder
+  onOpenProposalBuilder,
+  hasVerifiedOperator = false,
+  onRequireOperator,
+  onSignOut
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<
     'pipeline' | 'clients' | 'proposals' | 'history' | 'analytics' | 'messaging' | 'tasks' | 'directory' | 'team'
@@ -675,15 +682,12 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-fbblue animate-ping" />
-              <span className="ui-sync text-[10px] text-fbblue tracking-[0.3em] font-bold uppercase">
+              <span className="font-sync text-[10px] text-fbblue tracking-[0.3em] font-bold uppercase">
                 WHITE-LABEL FLIGHT BROKER CRM
               </span>
             </div>
-            <h2 className="font-sync text-xl md:text-2xl font-bold tracking-wider text-white uppercase flex items-center gap-3">
+            <h2 className="font-sync text-xl md:text-2xl font-bold tracking-wider text-white uppercase flex flex-wrap items-center gap-3">
               <span>BROKER CONTROL CRM</span>
-              <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono tracking-widest uppercase">
-                AOC VERIFICATION FREE WORKSPACE
-              </span>
             </h2>
             <p className="text-xs text-gray-400 font-light">
               Full client pipeline, HNWI preferences, white-label quotes, and one-click execution bridge.
@@ -691,6 +695,29 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <button 
+              onClick={() => {
+                if (!hasVerifiedOperator && onRequireOperator) {
+                  onRequireOperator();
+                } else {
+                  window.open("/vip-booking.html", "_blank");
+                }
+              }} 
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-fbblue hover:bg-fbblue/90 text-white rounded-xl text-[10px] font-bold font-sync uppercase transition-all shadow-[0_0_15px_rgba(24,119,242,0.3)] cursor-pointer"
+            >
+              <Plane className="w-3.5 h-3.5" />
+              <span>BOOK FLIGHT</span>
+            </button>
+
+            {onSignOut && (
+              <button
+                onClick={onSignOut}
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 text-gray-300 hover:text-red-400 rounded-xl text-[10px] font-bold font-sync uppercase transition-all cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>SIGN OUT</span>
+              </button>
+            )}
             <button
               onClick={() => setShowAddDealModal(true)}
               className="px-4 py-2.5 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-[10px] tracking-widest font-bold uppercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 cursor-pointer active:scale-95"
@@ -864,11 +891,11 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               return (
                 <div
                   key={stage}
-                  className="p-4 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md space-y-3 flex flex-col justify-between"
+                  className="p-4 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-[10px] space-y-3 flex flex-col justify-between"
                 >
                   <div className="space-y-1 pb-3 border-b border-white/10">
                     <div className="flex justify-between items-center">
-                      <span className="ui-sync text-[10px] text-fbblue tracking-widest font-bold uppercase">
+                      <span className="font-sync text-[10px] text-fbblue tracking-widest font-bold uppercase">
                         STAGE 0{stageIdx + 1}
                       </span>
                       <span className="px-2 py-0.5 rounded-full bg-white/10 text-[9px] font-mono text-gray-300">
@@ -885,7 +912,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
                   <div className="space-y-3 min-h-[320px]">
                     {stageDeals.length === 0 ? (
-                      <div className="p-4 rounded-xl border border-dashed border-white/10 text-center text-gray-500 text-[10px] font-lexend uppercase tracking-widest">
+                      <div className="p-4 rounded-xl border border-dashed border-white/10 text-center text-gray-500 text-[10px] font-sync uppercase tracking-widest">
                         NO DEALS IN THIS STAGE
                       </div>
                     ) : (
@@ -904,7 +931,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                           </div>
 
                           <div>
-                            <h4 className="font-lexend uppercase text-xs font-bold text-white">
+                            <h4 className="font-sync uppercase text-xs font-bold text-white">
                               {deal.clientName}
                             </h4>
                             <p className="text-[10px] text-gray-300 font-mono flex items-center gap-1.5 pt-0.5">
@@ -933,6 +960,20 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                           </div>
 
                           <div className="pt-2 flex flex-col gap-1.5 border-t border-white/10">
+
+                          {/* Broker-to-Principal Communication Timeline */}
+                          <div className="pt-3 border-t border-white/10 space-y-2">
+                            <h5 className="text-[10px] text-gray-400 font-sync uppercase font-bold tracking-wider mb-2">Communication Timeline</h5>
+                            <div className="space-y-1.5 border-l border-fbblue/30 pl-2 ml-1">
+                                <div className="text-[9px] text-gray-300 font-mono">
+                                    <span className="text-emerald-400">●</span> {deal.lastUpdated} - Proposal Sent to Principal
+                                </div>
+                                <div className="text-[9px] text-gray-300 font-mono">
+                                    <span className="text-fbblue">●</span> Inquiry Received & Structured
+                                </div>
+                            </div>
+                          </div>
+
                             {/* Action Triggers depending on stage */}
                             {stage === 'Inquiry' && (
                               <button
@@ -1010,7 +1051,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       {/* SUB-TAB 2: HNWI & CORPORATE CLIENT PROFILES */}
       {activeSubTab === 'clients' && (
         <div className="space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-[10px]">
             <div className="relative flex-1 max-w-md">
               <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
               <input
@@ -1041,7 +1082,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-lexend uppercase text-sm font-bold text-white">
+                      <h3 className="font-sync uppercase text-sm font-bold text-white">
                         {client.fullName}
                       </h3>
                       <p className="text-[10px] text-gray-400 font-mono pt-0.5">
@@ -1068,14 +1109,14 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             </div>
 
             {/* Client Profile Deep View */}
-            <div className="lg:col-span-2 p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md space-y-6 text-left">
+            <div className="lg:col-span-2 p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-6 text-left">
               {selectedClient ? (
                 <div className="space-y-6">
                   {/* Header */}
                   <div className="flex justify-between items-start pb-4 border-b border-white/10">
                     <div>
                       <div className="flex items-center gap-3">
-                        <h2 className="font-lexend uppercase text-xl font-bold text-white">
+                        <h2 className="font-sync uppercase text-xl font-bold text-white">
                           {selectedClient.fullName}
                         </h2>
                         <span className="px-3 py-1 rounded-full bg-fbblue/20 border border-fbblue/40 text-fbblue text-[10px] font-sync font-bold uppercase">
@@ -1230,7 +1271,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 4: TRIP HISTORY & LOGS */}
       {activeSubTab === 'history' && (
-        <div className="space-y-4 p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md">
+        <div className="space-y-4 p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px]">
           <div className="flex justify-between items-center pb-4 border-b border-white/10">
             <div>
               <h3 className="font-sync text-base font-bold text-white uppercase tracking-wider">
@@ -1291,7 +1332,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               <span className="text-[10px] text-gray-400 font-sync uppercase tracking-widest block">
                 TOTAL CLOSED CHARTER VOLUME
               </span>
-              <p className="text-2xl font-lexend uppercase font-bold text-white font-mono">
+              <p className="text-2xl font-sync uppercase font-bold text-white font-mono">
                 {formatCurrency(totalClosedVolume || 1850000, 'USD')}
               </p>
               <span className="text-[10px] text-emerald-400 font-mono">↑ +24% vs last quarter</span>
@@ -1301,7 +1342,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               <span className="text-[10px] text-gray-400 font-sync uppercase tracking-widest block">
                 NET BROKER COMFLIGHTS
               </span>
-              <p className="text-2xl font-lexend uppercase font-bold text-fbblue font-mono">
+              <p className="text-2xl font-sync uppercase font-bold text-fbblue font-mono">
                 {formatCurrency(totalCommissions || 248500, 'USD')}
               </p>
               <span className="text-[10px] text-fbblue font-mono">Average margin: 13.4%</span>
@@ -1311,7 +1352,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               <span className="text-[10px] text-gray-400 font-sync uppercase tracking-widest block">
                 PROVIDUS NGN CLEARING RAIL
               </span>
-              <p className="text-2xl font-lexend uppercase font-bold text-emerald-400 font-mono">
+              <p className="text-2xl font-sync uppercase font-bold text-emerald-400 font-mono">
                 ₦382,400,000
               </p>
               <span className="text-[10px] text-gray-400 font-mono">Sub-second NUBAN settlement</span>
@@ -1321,7 +1362,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               <span className="text-[10px] text-gray-400 font-sync uppercase tracking-widest block">
                 USDC ESCROW (SOLANA / BASE L2)
               </span>
-              <p className="text-2xl font-lexend uppercase font-bold text-indigo-400 font-mono">
+              <p className="text-2xl font-sync uppercase font-bold text-indigo-400 font-mono">
                 $189,750 USDC
               </p>
               <span className="text-[10px] text-indigo-300 font-mono">Fireblocks Vault Locked</span>
@@ -1332,7 +1373,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 6: MESSAGING */}
       {activeSubTab === 'messaging' && (
-        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md space-y-4 max-w-3xl mx-auto">
+        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-4 max-w-3xl mx-auto">
           <div className="pb-3 border-b border-white/10 flex justify-between items-center">
             <div>
               <h3 className="font-sync text-sm font-bold text-white uppercase">
@@ -1388,7 +1429,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 7: TASKS & ALERTS */}
       {activeSubTab === 'tasks' && (
-        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md space-y-6">
+        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
             <div>
               <h3 className="font-sync text-base font-bold text-white uppercase tracking-wider">
@@ -1469,7 +1510,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 8: FLEET DIRECTORY */}
       {activeSubTab === 'directory' && (
-        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md space-y-4">
+        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-4">
           <div className="pb-4 border-b border-white/10">
             <h3 className="font-sync text-base font-bold text-white uppercase tracking-wider">
               VERIFIED FLEET DIRECTORY (READ-ONLY)
@@ -1490,7 +1531,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                     <span className="px-2 py-0.5 rounded bg-fbblue/20 text-fbblue text-[9px] font-mono font-bold">
                       {air.tailNumber}
                     </span>
-                    <h4 className="font-lexend uppercase text-sm font-bold text-white pt-1">{air.model}</h4>
+                    <h4 className="font-sync uppercase text-sm font-bold text-white pt-1">{air.model}</h4>
                   </div>
                   <span className="text-[9px] text-emerald-400 font-mono font-bold">
                     {air.argusRating}
@@ -1525,7 +1566,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 9: TEAM ACCOUNTS */}
       {activeSubTab === 'team' && (
-        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-md space-y-4">
+        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-4">
           <div className="pb-4 border-b border-white/10 flex justify-between items-center">
             <div>
               <h3 className="font-sync text-base font-bold text-white uppercase tracking-wider">
@@ -1548,7 +1589,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-lexend uppercase text-sm font-bold text-white">{member.fullName}</h4>
+                    <h4 className="font-sync uppercase text-sm font-bold text-white">{member.fullName}</h4>
                     <span className="text-[10px] text-fbblue font-mono">{member.role}</span>
                   </div>
                   <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-mono font-bold">
@@ -1585,7 +1626,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-[10px] flex items-center justify-center p-4"
           >
             <div className="w-full max-w-md p-6 rounded-2xl border border-white/20 bg-black space-y-4 text-left">
               <div className="flex justify-between items-center pb-2 border-b border-white/10">
@@ -1698,7 +1739,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-[10px] flex items-center justify-center p-4"
           >
             <div className="w-full max-w-md p-6 rounded-2xl border border-white/20 bg-black space-y-4 text-left">
               <div className="flex justify-between items-center pb-2 border-b border-white/10">

@@ -13,8 +13,8 @@ const isValidUrl = (url: string | undefined): boolean => {
   }
 };
 
-const supabaseUrl = isValidUrl(rawUrl) ? rawUrl : 'https://placeholder.supabase.co';
-const supabaseAnonKey = rawKey || 'placeholder-anon-key';
+const supabaseUrl = isValidUrl(rawUrl) ? rawUrl : 'https://mhplukffgcxiorpfunyy.supabase.co';
+const supabaseAnonKey = rawKey || 'sb_publishable_fmCwwyGOguTjtD7z0CO62Q_6yVE_XDh';
 
 // Singleton Supabase Client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);

@@ -162,20 +162,20 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-md mx-auto flex flex-col items-center mt-10">
       <div className="w-full space-y-10">
         <div className="text-center space-y-4">
-          <span className="ui-sync text-fbblue text-[10px] tracking-widest block">GROUND INTELLIGENCE</span>
-          <h1 className="font-lexend font-light text-2xl text-white tracking-widest">GIO TARMAC PORTAL</h1>
+          <span className="font-lexend text-fbblue text-[10px] tracking-widest block">GROUND INTELLIGENCE</span>
+          <h1 className="font-sync font-light text-2xl text-white tracking-widest">GIO TARMAC PORTAL</h1>
           <p className="text-gray-400 text-xs font-light leading-relaxed">
             Physical truth layer authentication. Access restricted to actively assigned missions.
           </p>
         </div>
 
         <div className="glass-3 bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] space-y-6 shadow-2xl">
-          {error && <div className="text-red-500 text-xs text-center border border-red-500/30 p-2 rounded bg-red-500/10 ui-sync">{error}</div>}
+          {error && <div className="text-red-500 text-xs text-center border border-red-500/30 p-2 rounded bg-red-500/10 font-lexend">{error}</div>}
           
           {isApplying ? (
             <div className="space-y-4">
               <div>
-                <label className="ui-sync text-[8px] text-gray-500 block ml-1 mb-2">FULL NAME</label>
+                <label className="font-lexend text-[8px] text-gray-500 block ml-1 mb-2">FULL NAME</label>
                 <input 
                   type="text" 
                   value={applyName}
@@ -185,7 +185,7 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
                 />
               </div>
               <div>
-                <label className="ui-sync text-[8px] text-gray-500 block ml-1 mb-2">PHONE NUMBER</label>
+                <label className="font-lexend text-[8px] text-gray-500 block ml-1 mb-2">PHONE NUMBER</label>
                 <input 
                   type="text" 
                   value={applyPhone}
@@ -195,7 +195,7 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
                 />
               </div>
               <div>
-                <label className="ui-sync text-[8px] text-gray-500 block ml-1 mb-2">EMAIL ADDRESS</label>
+                <label className="font-lexend text-[8px] text-gray-500 block ml-1 mb-2">EMAIL ADDRESS</label>
                 <input 
                   type="email" 
                   value={email}
@@ -205,7 +205,7 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
                 />
               </div>
               <div>
-                <label className="ui-sync text-[8px] text-gray-500 block ml-1 mb-2">PRIMARY AIRPORT/LOCATION</label>
+                <label className="font-lexend text-[8px] text-gray-500 block ml-1 mb-2">PRIMARY AIRPORT/LOCATION</label>
                 <input 
                   type="text" 
                   value={applyLocation}
@@ -217,14 +217,14 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
               <button onClick={handleApply} disabled={loading} className="w-full bg-emerald-500 text-black py-4 rounded-xl text-xs hover:bg-emerald-400 transition-colors font-lexend tracking-widest font-bold shadow-lg mt-2">
                 {loading ? <span className="animate-spin">...</span> : 'SUBMIT APPLICATION'}
               </button>
-              <button onClick={() => setIsApplying(false)} className="w-full text-xs text-gray-500 hover:text-white pt-2 ui-sync">
+              <button onClick={() => setIsApplying(false)} className="w-full text-xs text-gray-500 hover:text-white pt-2 font-lexend">
                 BACK TO LOGIN
               </button>
             </div>
           ) : (
             <div className="space-y-4">
               <div>
-                <label className="ui-sync text-[8px] text-gray-500 block ml-1 mb-2">GIO IDENTITY (EMAIL)</label>
+                <label className="font-lexend text-[8px] text-gray-500 block ml-1 mb-2">GIO IDENTITY (EMAIL)</label>
                 <input 
                   type="email" 
                   value={email}
@@ -234,7 +234,7 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
                 />
               </div>
               <div>
-                <label className="ui-sync text-[8px] text-gray-500 block ml-1 mb-2">GIO ACCESS HASH</label>
+                <label className="font-lexend text-[8px] text-gray-500 block ml-1 mb-2">GIO ACCESS HASH</label>
                 <input 
                   type="password" 
                   value={password}
@@ -251,7 +251,7 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
                 {loading ? <span className="animate-spin">...</span> : 'AUTHENTICATE PROTOCOL'}
               </button>
               
-              <button onClick={() => setIsApplying(true)} className="w-full text-xs text-fbblue hover:text-fbblue/80 pt-2 ui-sync">
+              <button onClick={() => setIsApplying(true)} className="w-full text-xs text-fbblue hover:text-fbblue/80 pt-2 font-lexend">
                 APPLY FOR GIO CLEARANCE
               </button>
             </div>
@@ -259,7 +259,7 @@ function GIOLogin({ onLogin }: { onLogin: () => void; key?: string }) {
 
           <div className="flex items-center gap-2 justify-center pt-4">
             <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span className="text-[9px] text-gray-500 ui-sync tracking-widest">End-to-End Encrypted</span>
+            <span className="text-[9px] text-gray-500 font-lexend tracking-widest">End-to-End Encrypted</span>
           </div>
         </div>
       </div>
@@ -399,16 +399,16 @@ function GIODashboard() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-7xl mx-auto space-y-8">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/5 pb-8">
         <div>
-          <span className="ui-sync text-fbblue mb-2 block tracking-widest text-[10px]">GROUND INTELLIGENCE OFFICER</span>
-          <h1 className="font-lexend font-light text-3xl md:text-5xl tracking-tight text-white/90">{agent?.name ? agent.name.toUpperCase() : 'AGENT'}</h1>
+          <span className="font-lexend text-fbblue mb-2 block tracking-widest text-[10px]">GROUND INTELLIGENCE OFFICER</span>
+          <h1 className="font-sync font-light text-3xl md:text-5xl tracking-tight text-white/90">{agent?.name ? agent.name.toUpperCase() : 'AGENT'}</h1>
           <div className="flex flex-wrap gap-4 mt-6 items-center">
             <div className="glass-3 bg-white/[0.02] px-4 py-2 rounded-lg flex items-center gap-2 border border-white/5">
               <MapPin className="w-3 h-3 text-emerald-500" />
-              <span className="ui-sync text-[8px] text-emerald-500 tracking-widest">ACTIVE DUTY</span>
+              <span className="font-lexend text-[8px] text-emerald-500 tracking-widest">ACTIVE DUTY</span>
             </div>
             {missions && missions.length > 0 && (
               <select 
-                className="glass-3 bg-black px-4 py-2 rounded-lg ui-sync text-[8px] text-fbblue tracking-widest border border-white/5 outline-none"
+                className="glass-3 bg-black px-4 py-2 rounded-lg font-lexend text-[8px] text-fbblue tracking-widest border border-white/5 outline-none"
                 value={activeMission?.id || ''}
                 onChange={(e) => setSelectedMissionId(e.target.value)}
               >
@@ -422,16 +422,16 @@ function GIODashboard() {
         
         <div className="flex items-center gap-4">
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => setActiveTab('COMMAND')} className={`px-5 py-3 rounded-lg text-[10px] ui-sync tracking-widest transition-colors ${activeTab === 'COMMAND' ? 'bg-fbblue text-white' : 'glass-3 bg-white/[0.02] text-gray-400 hover:text-white'}`}>
+            <button onClick={() => setActiveTab('COMMAND')} className={`px-5 py-3 rounded-lg text-[10px] font-lexend tracking-widest transition-colors ${activeTab === 'COMMAND' ? 'bg-fbblue text-white' : 'glass-3 bg-white/[0.02] text-gray-400 hover:text-white'}`}>
               ICC LINK
             </button>
-            <button onClick={() => setActiveTab('VAULT')} className={`px-5 py-3 rounded-lg text-[10px] ui-sync tracking-widest transition-colors ${activeTab === 'VAULT' ? 'bg-fbblue text-white' : 'glass-3 bg-white/[0.02] text-gray-400 hover:text-white'}`}>
+            <button onClick={() => setActiveTab('VAULT')} className={`px-5 py-3 rounded-lg text-[10px] font-lexend tracking-widest transition-colors ${activeTab === 'VAULT' ? 'bg-fbblue text-white' : 'glass-3 bg-white/[0.02] text-gray-400 hover:text-white'}`}>
               VAULT
             </button>
-            <button onClick={() => setActiveTab('HISTORY')} className={`px-5 py-3 rounded-lg text-[10px] ui-sync tracking-widest transition-colors ${activeTab === 'HISTORY' ? 'bg-fbblue text-white' : 'glass-3 bg-white/[0.02] text-gray-400 hover:text-white'}`}>
+            <button onClick={() => setActiveTab('HISTORY')} className={`px-5 py-3 rounded-lg text-[10px] font-lexend tracking-widest transition-colors ${activeTab === 'HISTORY' ? 'bg-fbblue text-white' : 'glass-3 bg-white/[0.02] text-gray-400 hover:text-white'}`}>
               HISTORY
             </button>
-            <button onClick={() => setActiveTab('SETTINGS')} className={`px-5 py-3 rounded-lg text-[10px] ui-sync tracking-widest transition-colors ${activeTab === 'SETTINGS' ? 'bg-fbblue text-white' : 'glass-3 bg-white/[0.02] text-gray-400 hover:text-white'}`}>
+            <button onClick={() => setActiveTab('SETTINGS')} className={`px-5 py-3 rounded-lg text-[10px] font-lexend tracking-widest transition-colors ${activeTab === 'SETTINGS' ? 'bg-fbblue text-white' : 'glass-3 bg-white/[0.02] text-gray-400 hover:text-white'}`}>
               SETTINGS
             </button>
           </div>
@@ -445,9 +445,9 @@ function GIODashboard() {
           <div className="glass-3 bg-white/[0.01] border border-white/5 rounded-[2.5rem] p-8 flex flex-col justify-between overflow-y-auto max-h-[600px] scrollbar-hide">
             <div>
               <div className="flex justify-between items-center mb-6">
-                <span className="ui-sync text-[10px] text-gray-500 tracking-widest block">GCO BOOTSTRAP TASKS</span>
+                <span className="font-lexend text-[10px] text-gray-500 tracking-widest block">GCO BOOTSTRAP TASKS</span>
                 {(!tasks || tasks.length === 0) && (
-                  <button onClick={() => initTasksMutation.mutate()} className="text-[9px] ui-sync text-fbblue border border-fbblue/30 px-2 py-1 rounded">INIT TASKS</button>
+                  <button onClick={() => initTasksMutation.mutate()} className="text-[9px] font-lexend text-fbblue border border-fbblue/30 px-2 py-1 rounded">INIT TASKS</button>
                 )}
               </div>
               
@@ -459,7 +459,7 @@ function GIODashboard() {
                     className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl cursor-pointer hover:border-fbblue/30 transition-colors flex items-center justify-between"
                   >
                     <div>
-                      <p className="text-[9px] ui-sync text-gray-500 mb-1">{task.phase}</p>
+                      <p className="text-[9px] font-lexend text-gray-500 mb-1">{task.phase}</p>
                       <span className="text-sm font-light text-white">{task.task_name}</span>
                     </div>
                     {task.is_completed ? (
@@ -472,7 +472,7 @@ function GIODashboard() {
               </div>
 
               <div className="mt-8">
-                 <span className="ui-sync text-[10px] text-gray-500 tracking-widest block mb-4">DIGITAL VERIFICATIONS</span>
+                 <span className="font-lexend text-[10px] text-gray-500 tracking-widest block mb-4">DIGITAL VERIFICATIONS</span>
                  <div className="space-y-3">
                     {['Vehicle Alignment', 'Climate Control Status', 'Manifest Handover'].map(v => {
                        const isVerified = verifications?.some((ver: any) => ver.verification_type === v);
@@ -480,9 +480,9 @@ function GIODashboard() {
                          <div key={v} className="flex justify-between items-center bg-black/40 p-3 rounded-xl border border-white/5">
                            <span className="text-xs font-light text-gray-300">{v}</span>
                            {isVerified ? (
-                              <span className="ui-sync text-[9px] text-emerald-500">CONFIRMED</span>
+                              <span className="font-lexend text-[9px] text-emerald-500">CONFIRMED</span>
                            ) : (
-                              <button onClick={() => verifyMutation.mutate(v)} className="ui-sync text-[9px] text-white/50 border border-white/10 px-2 py-1 rounded hover:bg-white/5">VERIFY</button>
+                              <button onClick={() => verifyMutation.mutate(v)} className="font-lexend text-[9px] text-white/50 border border-white/10 px-2 py-1 rounded hover:bg-white/5">VERIFY</button>
                            )}
                          </div>
                        )
@@ -504,7 +504,7 @@ function GIODashboard() {
                    <h3 className="text-sm font-medium text-white">STRATEGIC COMMAND (P2P DO CHAT)</h3>
                    <div className="flex items-center gap-2 mt-1">
                      <span className="flex w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse" />
-                     <span className="ui-sync text-[8px] text-gray-400 tracking-widest">SECURE LINK ESTABLISHED</span>
+                     <span className="font-lexend text-[8px] text-gray-400 tracking-widest">SECURE LINK ESTABLISHED</span>
                    </div>
                  </div>
                </div>
@@ -519,7 +519,7 @@ function GIODashboard() {
                       <div className={`${isMe ? 'bg-fbblue rounded-tr-sm text-white' : 'bg-white/[0.05] rounded-tl-sm text-gray-200'} p-4 rounded-2xl text-sm font-light`}>
                         {chat.message}
                       </div>
-                      <span className={`text-[9px] ui-sync text-gray-500 mt-1 block ${isMe ? 'text-right mr-1' : 'ml-1'}`}>
+                      <span className={`text-[9px] font-lexend text-gray-500 mt-1 block ${isMe ? 'text-right mr-1' : 'ml-1'}`}>
                         {chat.sender_id || chat.sender_role} • {new Date(chat.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}Z
                       </span>
                     </div>
@@ -559,7 +559,7 @@ function GIODashboard() {
         <div className="glass-3 bg-white/[0.01] border border-white/5 rounded-[2.5rem] p-10 min-h-[500px]">
            <div className="flex items-center gap-4 mb-8">
              <Database className="w-6 h-6 text-fbblue" />
-             <h2 className="ui-sync text-sm tracking-widest">SECURE EVIDENCE VAULT</h2>
+             <h2 className="font-sync text-sm tracking-widest">SECURE EVIDENCE VAULT</h2>
            </div>
            
            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -575,7 +575,7 @@ function GIODashboard() {
                   </div>
                   <div>
                     <h3 className="text-sm font-light mb-1 truncate">{doc.name}</h3>
-                    <div className="flex justify-between text-[10px] text-gray-500 ui-sync">
+                    <div className="flex justify-between text-[10px] text-gray-500 font-lexend">
                       <span>{doc.time}</span>
                       <span>{doc.size}</span>
                     </div>
@@ -588,17 +588,17 @@ function GIODashboard() {
 
       {activeTab === 'HISTORY' && (
         <div className="glass-3 bg-white/[0.01] border border-white/5 rounded-[2.5rem] p-10 min-h-[500px]">
-           <h2 className="ui-sync text-sm tracking-widest mb-8">MISSION LOGS</h2>
+           <h2 className="font-sync text-sm tracking-widest mb-8">MISSION LOGS</h2>
            <div className="space-y-4">
              {missions?.map((mission: any) => (
                 <div key={mission.id} className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-white/[0.02] border border-white/5 rounded-2xl gap-4">
                   <div className="flex items-center gap-6">
-                     <span className="ui-sync text-fbblue text-[10px]">{mission.id}</span>
+                     <span className="font-lexend text-fbblue text-[10px]">{mission.id}</span>
                      <span className="text-sm text-white/80">{mission.departure_airport} → {mission.destination_airport}</span>
                      <span className="text-xs text-gray-500 font-light">{new Date(mission.created_at).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto">
-                     <span className="ui-sync text-[10px] text-emerald-500">{mission.status}</span>
+                     <span className="font-lexend text-[10px] text-emerald-500">{mission.status}</span>
                      <ChevronRight className="w-4 h-4 text-gray-500" />
                   </div>
                 </div>
@@ -609,7 +609,7 @@ function GIODashboard() {
 
       {activeTab === 'SETTINGS' && (
         <div className="glass-3 bg-white/[0.01] border border-white/5 rounded-[2.5rem] p-10 min-h-[500px] max-w-2xl">
-           <h2 className="ui-sync text-sm tracking-widest mb-8">GIO PREFERENCES</h2>
+           <h2 className="font-sync text-sm tracking-widest mb-8">GIO PREFERENCES</h2>
            
            <div className="space-y-8">
              <div className="flex items-center justify-between border-b border-white/5 pb-6">
@@ -619,7 +619,7 @@ function GIODashboard() {
                  </div>
                  <div>
                    <h3 className="text-lg">{agent?.name || 'Agent'}</h3>
-                   <span className="text-[10px] ui-sync text-gray-500">Tier 1 clearance</span>
+                   <span className="text-[10px] font-lexend text-gray-500">Tier 1 clearance</span>
                  </div>
                </div>
                <button className="text-xs bg-white/[0.05] border border-white/10 px-4 py-2 rounded-lg">Update Profile</button>

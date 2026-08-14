@@ -100,7 +100,7 @@ export default function PaymentReceiptForm({ missionId, onSuccess, onSkip }: Pay
   return (
     <div className="p-8 space-y-8">
       <div className="space-y-4">
-        <h3 className="font-lexend font-light text-2xl text-white">EVIDENCE OF TRANSFER</h3>
+        <h3 className="font-sync font-light text-2xl text-white">EVIDENCE OF TRANSFER</h3>
         <p className="text-gray-400 text-xs font-light leading-relaxed">
           To accelerate mission activation, please upload your swift copy or transaction receipt. Alternatively, you may skip this step if your bank uses direct settlement with our clearing partner.
         </p>

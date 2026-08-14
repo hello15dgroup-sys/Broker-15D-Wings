@@ -354,7 +354,7 @@ export default {
     
     if (missionIdMatch) {
       const missionId = missionIdMatch[1];
-      // Get the DO instance specifically for this Mission ID (Edge Database mapping)
+      // Get the DO instance specifically for this Booking ID (Edge Database mapping)
       const id = env.MISSION_DO.idFromName(missionId);
       const stub = env.MISSION_DO.get(id);
 

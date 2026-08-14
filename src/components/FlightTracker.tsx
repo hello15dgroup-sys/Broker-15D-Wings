@@ -432,7 +432,7 @@ export const FlightTracker: React.FC<FlightTrackerProps> = ({ mission }) => {
         </svg>
 
         {/* Floating Mini HUD readout directly on top of the SVG map */}
-        <div className="absolute top-4 left-4 bg-black/75 backdrop-blur-md border border-white/10 rounded-xl px-3 py-2 flex flex-col gap-0.5 pointer-events-none">
+        <div className="absolute top-4 left-4 bg-black/75 backdrop-blur-[10px] border border-white/10 rounded-xl px-3 py-2 flex flex-col gap-0.5 pointer-events-none">
           <span className="text-[8px] text-gray-500 font-mono tracking-widest uppercase">GPS SECTOR</span>
           <span className="text-[10px] text-white font-mono font-medium flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
@@ -440,7 +440,7 @@ export const FlightTracker: React.FC<FlightTrackerProps> = ({ mission }) => {
           </span>
         </div>
 
-        <div className="absolute top-4 right-4 bg-black/75 backdrop-blur-md border border-white/10 rounded-xl px-3.5 py-2 flex flex-col gap-0.5 pointer-events-none text-right">
+        <div className="absolute top-4 right-4 bg-black/75 backdrop-blur-[10px] border border-white/10 rounded-xl px-3.5 py-2 flex flex-col gap-0.5 pointer-events-none text-right">
           <span className="text-[8px] text-gray-500 font-mono tracking-widest uppercase">PROGRESS RATIO</span>
           <span className="text-sm text-emerald-400 font-mono font-bold tracking-tight">
             {formattedPercent}%

@@ -50,7 +50,7 @@ export default function MissionChat({ missionId, role, senderId }: MissionChatPr
     <div className="flex flex-col border border-white/5 rounded-2xl overflow-hidden bg-black/20 h-[400px]">
       <div className="bg-white/[0.02] p-3 border-b border-white/5 flex items-center gap-2">
         <ShieldCheck className="w-4 h-4 text-fbblue" />
-        <h5 className="ui-sync text-[10px] text-fbblue tracking-widest">SECURE P2P COMMS (DO CHAT)</h5>
+        <h5 className="font-lexend text-[10px] text-fbblue tracking-widest">SECURE P2P COMMS (DO CHAT)</h5>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {chats?.map((chat: any) => {
@@ -60,7 +60,7 @@ export default function MissionChat({ missionId, role, senderId }: MissionChatPr
               <div className={`${isMe ? 'bg-fbblue rounded-tr-sm text-white' : 'bg-white/[0.05] rounded-tl-sm text-gray-200'} p-3 rounded-2xl text-xs font-light`}>
                 {chat.message}
               </div>
-              <span className={`text-[8px] ui-sync text-gray-500 mt-1 block`}>
+              <span className={`text-[8px] font-lexend text-gray-500 mt-1 block`}>
                 {chat.sender_id || chat.sender_role} • {new Date(chat.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}Z
               </span>
             </div>

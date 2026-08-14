@@ -59,7 +59,7 @@ export function MissionClockWidget({ mission }: { mission: any }) {
         }
       } catch (err) {
         console.warn(
-          "Mission Clocks DO sync unavailable, falling back to local heuristic calculation.",
+          "Charter Clocks DO sync unavailable, falling back to local heuristic calculation.",
         );
       }
 
@@ -123,7 +123,7 @@ export function MissionClockWidget({ mission }: { mission: any }) {
   const isCritical = timeLeft.hours < 72 && timeLeft.hours >= 48;
 
   return (
-    <div className="bg-[#0b0c10] border border-white/10 rounded-2xl p-6 backdrop-blur-xl relative overflow-hidden mb-6">
+    <div className="bg-[#0b0c10] border border-white/10 rounded-2xl p-6 backdrop-blur-[10px] relative overflow-hidden mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-fbblue" />

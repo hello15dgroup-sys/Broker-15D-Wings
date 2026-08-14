@@ -63,12 +63,12 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-fbblue animate-pulse" />
-            <span className="ui-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
+            <span className="font-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
               MODULE 3 & 4 — BOOKING CODE & 3-TIER EXECUTION
             </span>
           </div>
           <h3 className="font-sync text-lg md:text-xl font-bold tracking-wider text-white uppercase">
-            Issue Mission Code & AOC Carrier
+            Issue Booking Code & AOC Carrier
           </h3>
           <p className="text-xs text-gray-400 font-light">
             Attach verified airline operator to release booking mission code & passenger intake link.
@@ -86,7 +86,7 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
         {/* Left Column: AOC Selection & Tier Matrix */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+            <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
               SELECT AIRLINE OPERATOR (AOC REGISTRY)
             </label>
             <select
@@ -105,7 +105,7 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
           {/* 3-Tier Execution Matrix Info Box */}
           <div className="space-y-2 p-4 rounded-2xl bg-black/60 border border-white/10 text-xs">
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
-              <span className="ui-sync text-[9px] text-gray-400 uppercase flex items-center gap-1.5">
+              <span className="font-sync text-[9px] text-gray-400 uppercase flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-fbblue" /> EXECUTION TIER MATRIX
               </span>
               <span className="font-mono text-fbblue font-semibold">{selectedOperator.aocNumber}</span>
@@ -129,14 +129,14 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
             className="w-full py-3.5 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-            <span>{isGenerating ? 'GENERATING CODE...' : 'ISSUE NEW MISSION CODE'}</span>
+            <span>{isGenerating ? 'GENERATING CODE...' : 'ISSUE NEW BOOKING CODE'}</span>
           </button>
         </div>
 
         {/* Right Column: Code & VIP Intake Link */}
         <div className="space-y-4 p-6 rounded-2xl bg-black/70 border border-white/15 flex flex-col justify-between">
           <div className="space-y-3">
-            <span className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+            <span className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
               OFFICIAL MISSION BOOKING CODE
             </span>
             <div className="p-4 rounded-xl bg-fbblue/10 border border-fbblue/30 flex items-center justify-between">
@@ -149,7 +149,7 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+              <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
                 VIP PASSENGER INTAKE LINK (FOR CLIENT)
               </label>
               <div className="p-3 rounded-xl bg-black border border-white/10 text-xs font-mono text-gray-300 truncate">

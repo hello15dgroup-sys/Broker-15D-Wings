@@ -23,7 +23,7 @@ export const FastSplineCanvas: React.FC<FastSplineCanvasProps> = ({ scene, class
   }, []);
 
   // Mobile fast vector flight radar alternative
-  if (isMobileDevice) {
+  if (false) {
     return (
       <div className={`relative w-full h-full overflow-hidden bg-gradient-to-b from-[#07090e] via-[#0b101c] to-[#07090e] ${className}`}>
         {/* Animated radar grid lines */}
@@ -46,7 +46,7 @@ export const FastSplineCanvas: React.FC<FastSplineCanvasProps> = ({ scene, class
 
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center space-y-1.5 opacity-60">
-            <span className="ui-sync text-[8px] text-fbblue tracking-[0.3em] font-bold block uppercase">
+            <span className="font-sync text-[8px] text-fbblue tracking-[0.3em] font-bold block uppercase">
               15D WINGS RADAR
             </span>
             <span className="text-[10px] text-gray-400 font-mono">
@@ -62,7 +62,7 @@ export const FastSplineCanvas: React.FC<FastSplineCanvasProps> = ({ scene, class
     return (
       <div className={`relative w-full h-full flex items-center justify-center bg-[#07090e] ${className}`}>
         <div className="text-center space-y-2 p-6 rounded-2xl bg-white/[0.02] border border-white/5">
-          <span className="ui-sync text-[9px] text-fbblue tracking-[0.3em] font-bold uppercase block">
+          <span className="font-sync text-[9px] text-fbblue tracking-[0.3em] font-bold uppercase block">
             AERO ENGINE ACTIVE
           </span>
           <p className="text-xs text-gray-400 font-mono">Fallback graphics active</p>
@@ -74,9 +74,9 @@ export const FastSplineCanvas: React.FC<FastSplineCanvasProps> = ({ scene, class
   return (
     <div className={`relative w-full h-full ${className}`}>
       {!isLoaded && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#07090e]/80 backdrop-blur-sm z-10 transition-opacity duration-500">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#07090e]/80 backdrop-blur-[10px] z-10 transition-opacity duration-500">
           <div className="w-8 h-8 rounded-full border-2 border-fbblue/20 border-t-fbblue animate-spin mb-3" />
-          <span className="ui-sync text-[8px] text-fbblue tracking-[0.3em] font-bold uppercase">
+          <span className="font-sync text-[8px] text-fbblue tracking-[0.3em] font-bold uppercase">
             LOADING 3D ENGINE...
           </span>
         </div>

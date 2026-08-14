@@ -286,7 +286,7 @@ export default function PassengerManifestForm({ missionId, onSuccess, theme = 'd
         {passengers.map((p, index) => (
           <div key={p.id} className="space-y-8 p-8 rounded-3xl border relative group transition-all glass-vip border-white/10 shadow-xl">
             <div className="flex justify-between items-center border-b pb-4 border-white/10">
-              <h3 className="ui-sync text-fbblue text-[10px] tracking-[0.3em] font-bold uppercase">Passenger {index + 1}</h3>
+              <h3 className="font-sync text-fbblue text-[10px] tracking-[0.3em] font-bold uppercase">Passenger {index + 1}</h3>
               {passengers.length > 1 && (
                 <button 
                   type="button" 
@@ -443,7 +443,7 @@ export default function PassengerManifestForm({ missionId, onSuccess, theme = 'd
             <div className="space-y-6 pt-6 border-t border-white/5 bg-white/[0.01] p-6 rounded-2xl border border-white/[0.05] mt-6">
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
-                <h4 className="ui-sync text-slate-300 text-[9px] tracking-[0.2em] font-bold uppercase">
+                <h4 className="font-sync text-slate-300 text-[9px] tracking-[0.2em] font-bold uppercase">
                   Next of Kin Requirements (Mandatory Sub-Section)
                 </h4>
               </div>

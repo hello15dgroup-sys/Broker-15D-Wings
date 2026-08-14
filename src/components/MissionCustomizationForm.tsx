@@ -317,7 +317,7 @@ export default function MissionCustomizationForm({ missionId, currentCustomizati
   };
 
   return (
-    <div className="bg-[#090d16] border border-white/10 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 w-full max-w-2xl mx-auto relative overflow-hidden backdrop-blur-xl shadow-2xl">
+    <div className="bg-[#090d16] border border-white/10 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 w-full max-w-2xl mx-auto relative overflow-hidden backdrop-blur-[10px] shadow-2xl">
       <div className="absolute top-0 right-0 w-64 h-64 bg-fbblue/5 rounded-full filter blur-[120px] pointer-events-none" />
 
       <div className="flex justify-between items-start mb-6">

@@ -133,7 +133,7 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-fbblue animate-pulse" />
-            <span className="ui-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
+            <span className="font-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
               MODULE 1 — NATIVE DECISION ENGINE
             </span>
           </div>
@@ -170,7 +170,7 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 py-6">
         {/* Departure */}
         <div className="space-y-2">
-          <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+          <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
             DEPARTURE CITY (ORIGIN)
           </label>
           <div className="relative">
@@ -193,7 +193,7 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
 
         {/* Destination */}
         <div className="space-y-2">
-          <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+          <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
             DESTINATION CITY
           </label>
           <div className="relative">
@@ -216,7 +216,7 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
 
         {/* Aircraft Selection */}
         <div className="space-y-2">
-          <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+          <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
             AIRCRAFT CLASS
           </label>
           <div className="relative">
@@ -265,7 +265,7 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
       {/* Decision Results Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-2xl bg-black/60 border border-white/10 my-2">
         <div className="space-y-1">
-          <span className="text-[9px] text-gray-400 ui-sync uppercase block flex items-center gap-1">
+          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
             <Compass className="w-3 h-3 text-fbblue" /> AIR DISTANCE
           </span>
           <span className="text-xl font-mono font-bold text-white">
@@ -274,7 +274,7 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
         </div>
 
         <div className="space-y-1">
-          <span className="text-[9px] text-gray-400 ui-sync uppercase block flex items-center gap-1">
+          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
             <Clock className="w-3 h-3 text-fbblue" /> FLIGHT DURATION
           </span>
           <span className="text-xl font-mono font-bold text-fbblue">
@@ -283,7 +283,7 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
         </div>
 
         <div className="space-y-1">
-          <span className="text-[9px] text-gray-400 ui-sync uppercase block flex items-center gap-1">
+          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
             <Fuel className="w-3 h-3 text-amber-400" /> EST. FUEL BURN
           </span>
           <span className="text-xl font-mono font-bold text-amber-300">
@@ -292,7 +292,7 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
         </div>
 
         <div className="space-y-1">
-          <span className="text-[9px] text-gray-400 ui-sync uppercase block flex items-center gap-1">
+          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
             <DollarSign className="w-3 h-3 text-emerald-400" /> BASELINE WHOLESALE
           </span>
           <span className="text-xl font-mono font-bold text-emerald-400">

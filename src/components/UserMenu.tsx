@@ -81,7 +81,7 @@ export default function UserMenu() {
             className="absolute right-0 mt-3 w-56 bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden py-2 touch-manipulation"
           >
             <div className="px-4 py-3 border-b border-white/5 mb-1">
-               <p className="text-[10px] ui-sync tracking-widest text-fbblue">SYSTEM ACCESS</p>
+               <p className="text-[10px] font-lexend tracking-widest text-fbblue">SYSTEM ACCESS</p>
             </div>
             
             <button className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-light text-gray-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer active:bg-white/10">

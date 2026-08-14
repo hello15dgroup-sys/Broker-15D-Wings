@@ -1,6 +1,6 @@
 {
-  "name": "15D WINGS PORTAL",
-  "description": "VIP Flight Portal",
+  "name": "15D Wings Flight Broker",
+  "description": "15D Wings Flight Broker",
   "requestFramePermissions": ["geolocation", "microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

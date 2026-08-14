@@ -882,13 +882,13 @@ export default function OVEGateway({ operatorId, onStateUpdated }: OVEGatewayPro
              <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-3">
                 <button 
                    onClick={handleAutoFillSimulator}
-                   className="w-full sm:w-auto bg-amber-500/10 border border-amber-500/20 text-amber-500 hover:bg-amber-500/20 text-[10px] ui-sync font-bold py-2 px-4 rounded-lg cursor-pointer active:scale-95 transition-all text-center uppercase tracking-widest font-mono"
+                   className="w-full sm:w-auto bg-amber-500/10 border border-amber-500/20 text-amber-500 hover:bg-amber-500/20 text-[10px] font-sync font-bold py-2 px-4 rounded-lg cursor-pointer active:scale-95 transition-all text-center uppercase tracking-widest font-mono"
                 >
                    Auto-Fill Simulator Docs
                  </button>
                  <button 
                     onClick={handleClearProfile}
-                    className="w-full sm:w-auto bg-red-500/10 border border-red-500/25 text-red-400 hover:bg-red-500/20 text-[10px] ui-sync font-bold py-2 px-4 rounded-lg cursor-pointer active:scale-95 transition-all text-center uppercase tracking-widest font-mono"
+                    className="w-full sm:w-auto bg-red-500/10 border border-red-500/25 text-red-400 hover:bg-red-500/20 text-[10px] font-sync font-bold py-2 px-4 rounded-lg cursor-pointer active:scale-95 transition-all text-center uppercase tracking-widest font-mono"
                  >
                     Clear & Leave Spaces Empty
                 </button>

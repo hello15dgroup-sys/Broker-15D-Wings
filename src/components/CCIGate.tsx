@@ -26,7 +26,7 @@ export default function CCIGate({ mission }: { mission: Mission }) {
   return (
     <div className="space-y-12">
       <header>
-        <span className="ui-sync text-gold mb-2 block">CUSTOMIZATION GATE</span>
+        <span className="font-lexend text-gold mb-2 block">CUSTOMIZATION GATE</span>
         <h3 className="title-monument text-white text-2xl">DEFINE EXPERIENCE LAYERS</h3>
         <p className="text-gray-500 mt-4 max-w-xl">
           To preserve execution certainty, preferences are declared upfront. These parameters affect the <strong>Customization Complexity Index (CCI)</strong>.
@@ -45,7 +45,7 @@ export default function CCIGate({ mission }: { mission: Mission }) {
             }`}
           >
             <div className="flex justify-between items-start mb-6">
-              <span className={`ui-sync text-[8px] ${selected.includes(exp.id) ? 'text-fbblue' : 'text-gray-500'}`}>
+              <span className={`font-lexend text-[8px] ${selected.includes(exp.id) ? 'text-fbblue' : 'text-gray-500'}`}>
                 {exp.id}
               </span>
               {selected.includes(exp.id) ? <CheckCircle2 className="w-5 h-5 text-fbblue" /> : <Circle className="w-5 h-5 text-white/10" />}
@@ -66,10 +66,10 @@ export default function CCIGate({ mission }: { mission: Mission }) {
 
       <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
         <div>
-          <span className="ui-sync text-gray-500 text-[8px] block mb-1">TOTAL CUSTOMIZATION LOAD</span>
+          <span className="font-lexend text-gray-500 text-[8px] block mb-1">TOTAL CUSTOMIZATION LOAD</span>
           <p className="text-white font-mono text-2xl">${selected.reduce((acc, id) => acc + (EXPERIENCES.find(e => e.id === id)?.fee || 0), 0)}</p>
         </div>
-        <button className="bg-white text-nearblack ui-sync px-12 py-5 rounded-full hover:bg-fbblue hover:text-white transition-all shadow-2xl">
+        <button className="bg-white text-nearblack font-lexend px-12 py-5 rounded-full hover:bg-fbblue hover:text-white transition-all shadow-2xl">
           LOCK PARAMETERS & GENERATE PRICING
         </button>
       </div>

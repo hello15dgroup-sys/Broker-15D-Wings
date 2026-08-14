@@ -69,7 +69,7 @@ export default function BookingForm() {
          return;
       }
       
-      // Navigate to portal with the Mission ID
+      // Navigate to portal with the Booking ID
       navigate(`/portal?missionId=${missionId}`);
     } catch (err) {
       console.error(err);
@@ -82,7 +82,7 @@ export default function BookingForm() {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 text-nearblack dark:text-offwhite">
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-2">
-          <label className="ui-sync text-fbblue block">FULL NAME</label>
+          <label className="font-lexend text-fbblue block">FULL NAME</label>
           <input 
             {...register('fullName')}
             className="w-full bg-white/[0.02] border-b border-gray-300 dark:border-white/20 py-4 outline-none focus:border-fbblue transition-all"
@@ -92,7 +92,7 @@ export default function BookingForm() {
         </div>
         
         <div className="space-y-2">
-          <label className="ui-sync text-fbblue block">EMAIL ADDRESS</label>
+          <label className="font-lexend text-fbblue block">EMAIL ADDRESS</label>
           <input 
             {...register('email')}
             className="w-full bg-white/[0.02] border-b border-gray-300 dark:border-white/20 py-4 outline-none focus:border-fbblue transition-all"
@@ -102,7 +102,7 @@ export default function BookingForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="ui-sync text-fbblue block">PHONE NUMBER</label>
+          <label className="font-lexend text-fbblue block">PHONE NUMBER</label>
           <input 
             {...register('phone')}
             className="w-full bg-white/[0.02] border-b border-gray-300 dark:border-white/20 py-4 outline-none focus:border-fbblue transition-all"
@@ -112,7 +112,7 @@ export default function BookingForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="ui-sync text-fbblue block">DEPARTURE</label>
+          <label className="font-lexend text-fbblue block">DEPARTURE</label>
 
           <input 
             {...register('departure')}
@@ -123,7 +123,7 @@ export default function BookingForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="ui-sync text-fbblue block">DESTINATION</label>
+          <label className="font-lexend text-fbblue block">DESTINATION</label>
           <input 
             {...register('destination')}
             className="w-full bg-white/[0.02] border-b border-gray-300 dark:border-white/20 py-4 outline-none focus:border-fbblue transition-all"
@@ -133,7 +133,7 @@ export default function BookingForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="ui-sync text-fbblue block">PASSENGERS</label>
+          <label className="font-lexend text-fbblue block">PASSENGERS</label>
           <input 
             type="number"
             {...register('passengers', { valueAsNumber: true })}
@@ -142,7 +142,7 @@ export default function BookingForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="ui-sync text-fbblue block">AIRCRAFT CLASS</label>
+          <label className="font-lexend text-fbblue block">AIRCRAFT CLASS</label>
           <select 
             {...register('aircraftClass')}
             className="w-full bg-white/[0.02] border-b border-gray-300 dark:border-white/20 py-4 outline-none focus:border-fbblue appearance-none transition-all"
@@ -155,7 +155,7 @@ export default function BookingForm() {
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <label className="ui-sync text-fbblue block">EXECUTION DATE</label>
+          <label className="font-lexend text-fbblue block">EXECUTION DATE</label>
           <div className="custom-datepicker-wrapper">
           <Controller
             control={control}
@@ -181,7 +181,7 @@ export default function BookingForm() {
         disabled={loading}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="w-full bg-nearblack dark:bg-fbblue text-white py-6 rounded-2xl ui-sync tracking-[0.5em] shadow-2xl relative overflow-hidden"
+        className="w-full bg-nearblack dark:bg-fbblue text-white py-6 rounded-2xl font-lexend tracking-[0.5em] shadow-2xl relative overflow-hidden"
       >
         {loading ? "CALCULATING FEASIBILITY..." : "TRIGGER MISSION ANALYSIS"}
         <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 animate-pulse" />

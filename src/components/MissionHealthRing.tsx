@@ -36,7 +36,7 @@ export default function MissionHealthRing({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="ui-sync text-[6px] text-gray-500">MHI</span>
+        <span className="font-lexend text-[6px] text-gray-500">MHI</span>
         <div 
           className="w-2 h-2 rounded-full mt-1" 
           style={{ backgroundColor: status.color, boxShadow: `0 0 10px ${status.color}` }} 

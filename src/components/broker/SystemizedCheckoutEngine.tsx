@@ -65,7 +65,7 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-fbblue animate-pulse" />
-            <span className="ui-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
+            <span className="font-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
               MODULE 5 — CHECKOUT & PAYMENT ROUTING
             </span>
           </div>
@@ -88,7 +88,7 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
         {/* Left Side: Currency & Urgency Rules */}
         <div className="space-y-5">
           <div className="space-y-2">
-            <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+            <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
               PAYMENT CURRENCY SELECTION
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -126,11 +126,11 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
           </div>
 
           <div className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-2 text-xs">
-            <div className="flex justify-between items-center text-gray-400 text-[10px] ui-sync">
+            <div className="flex justify-between items-center text-gray-400 text-[10px] font-lexend">
               <span>TIME TO DEPARTURE</span>
               <span className="font-mono text-fbblue font-bold">{hoursToDeparture} HOURS ({hoursToDeparture < 48 ? 'URGENT <48h' : 'STANDARD'})</span>
             </div>
-            <div className="flex justify-between items-center text-gray-400 text-[10px] ui-sync">
+            <div className="flex justify-between items-center text-gray-400 text-[10px] font-lexend">
               <span>AUTOMATED RAIL SELECTED</span>
               <span className="font-mono text-emerald-400 font-bold">{activeRail.replace(/_/g, ' ')}</span>
             </div>
@@ -154,7 +154,7 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
             <div className="space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="ui-sync text-[9px] text-fbblue tracking-widest block font-bold">
+                  <span className="font-lexend text-[9px] text-fbblue tracking-widest block font-bold">
                     ENGINE A: LOCAL NGN RAILS
                   </span>
                   <h4 className="text-base font-bold text-white flex items-center gap-2 mt-1">
@@ -197,7 +197,7 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
             <div className="space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="ui-sync text-[9px] text-fbblue tracking-widest block font-bold">
+                  <span className="font-lexend text-[9px] text-fbblue tracking-widest block font-bold">
                     ENGINE B: STABLECOIN ESCROW RAILS
                   </span>
                   <h4 className="text-base font-bold text-white flex items-center gap-2 mt-1">

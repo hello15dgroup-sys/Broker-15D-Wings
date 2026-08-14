@@ -58,7 +58,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-fbblue animate-pulse" />
-              <span className="ui-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
+              <span className="font-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
                 OPERATIONAL INTEGRITY INDEX (OII)
               </span>
             </div>
@@ -72,7 +72,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
 
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <span className="ui-sync text-[8px] text-gray-400 block tracking-widest">OII SCORE</span>
+              <span className="font-lexend text-[8px] text-gray-400 block tracking-widest">OII SCORE</span>
               <span className="text-2xl font-mono font-bold text-emerald-400">{totalScore} / 100</span>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -146,7 +146,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
         <div className="p-6 rounded-[2rem] border border-white/10 glass-vip bg-black/80 space-y-4">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="ui-sync text-[9px] text-gray-400 tracking-widest block font-bold">
+              <span className="font-lexend text-[9px] text-gray-400 tracking-widest block font-bold">
                 REGIONAL SUPPLY DENSITY GATE
               </span>
               <h4 className="text-base font-bold text-white uppercase font-sync">
@@ -187,7 +187,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
         <div className="p-6 rounded-[2rem] border border-white/10 glass-vip bg-black/80 space-y-4">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="ui-sync text-[9px] text-fbblue tracking-widest block font-bold">
+              <span className="font-lexend text-[9px] text-fbblue tracking-widest block font-bold">
                 BROKER ACTIVITY RETENTION ENGINE
               </span>
               <h4 className="text-base font-bold text-white uppercase font-sync">
@@ -235,7 +235,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
 
       {/* AOC Onboarding Modal */}
       {showOperatorModal && (
-        <div className="fixed inset-0 z-[250] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[250] bg-black/90 backdrop-blur-[10px] flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-[#090e1a] rounded-3xl border border-white/20 p-6 space-y-5">
             <h4 className="text-lg font-bold text-white font-sync uppercase">Onboard AOC Operator</h4>
             <form onSubmit={handleOnboardSubmit} className="space-y-4 text-left">
@@ -283,7 +283,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
 
       {/* App Credits Modal */}
       {showCreditsModal && (
-        <div className="fixed inset-0 z-[250] bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[250] bg-black/90 backdrop-blur-[10px] flex items-center justify-center p-4">
           <div className="w-full max-w-md bg-[#090e1a] rounded-3xl border border-white/20 p-6 space-y-5 text-left">
             <h4 className="text-lg font-bold text-white font-sync uppercase">Buy App Credits</h4>
             <p className="text-xs text-gray-300 font-light">

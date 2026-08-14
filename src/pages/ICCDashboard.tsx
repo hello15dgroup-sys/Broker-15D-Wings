@@ -274,20 +274,20 @@ function ICCLogin({ onLogin }: { onLogin: (role: 'STRATEGIC_AUTHORITY' | 'MISSIO
           <div className="w-16 h-16 mx-auto mb-6 bg-white/[0.03] border border-white/10 rounded-2xl flex items-center justify-center">
               <Command className="w-8 h-8 text-white/80" />
           </div>
-          <h2 className="font-lexend font-light text-white text-2xl tracking-widest">ICC COMMAND</h2>
-          <p className="ui-sync text-gray-400 tracking-[0.2em] text-[8px]">SUPER ADMIN ACCESS</p>
+          <h2 className="font-sync font-light text-white text-2xl tracking-widest">ICC COMMAND</h2>
+          <p className="font-lexend text-gray-400 tracking-[0.2em] text-[8px]">SUPER ADMIN ACCESS</p>
         </div>
 
-        <div className="p-8 md:p-10 rounded-[2rem] w-full space-y-6 bg-white/[0.02] border border-white/[0.05] shadow-2xl backdrop-blur-md">
-          {error && <div className="text-red-500 text-xs text-center border border-red-500/30 p-2 rounded bg-red-500/10 ui-sync">{error}</div>}
+        <div className="p-8 md:p-10 rounded-[2rem] w-full space-y-6 bg-white/[0.02] border border-white/[0.05] shadow-2xl backdrop-blur-[10px]">
+          {error && <div className="text-red-500 text-xs text-center border border-red-500/30 p-2 rounded bg-red-500/10 font-lexend">{error}</div>}
           <div className="flex bg-white/[0.03] p-1 rounded-xl mb-6">
-             <button onClick={() => setIsSuperAdmin(true)} className={`flex-1 py-3 rounded-lg text-[10px] ui-sync tracking-widest transition-colors ${isSuperAdmin ? 'bg-fbblue text-white' : 'text-gray-500 hover:text-white'}`}>AUTHORITY</button>
-             <button onClick={() => setIsSuperAdmin(false)} className={`flex-1 py-3 rounded-lg text-[10px] ui-sync tracking-widest transition-colors ${!isSuperAdmin ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-white'}`}>ARCHITECT</button>
+             <button onClick={() => setIsSuperAdmin(true)} className={`flex-1 py-3 rounded-lg text-[10px] font-lexend tracking-widest transition-colors ${isSuperAdmin ? 'bg-fbblue text-white' : 'text-gray-500 hover:text-white'}`}>AUTHORITY</button>
+             <button onClick={() => setIsSuperAdmin(false)} className={`flex-1 py-3 rounded-lg text-[10px] font-lexend tracking-widest transition-colors ${!isSuperAdmin ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-white'}`}>ARCHITECT</button>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="ui-sync text-[8px] text-gray-500 block ml-1 mb-2">NETWORK EMAIL</label>
+              <label className="font-lexend text-[8px] text-gray-500 block ml-1 mb-2">NETWORK EMAIL</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
                 <input 
@@ -300,7 +300,7 @@ function ICCLogin({ onLogin }: { onLogin: (role: 'STRATEGIC_AUTHORITY' | 'MISSIO
               </div>
             </div>
             <div>
-               <label className="ui-sync text-[8px] text-gray-500 block ml-1 mb-2">ACCESS HASH</label>
+               <label className="font-lexend text-[8px] text-gray-500 block ml-1 mb-2">ACCESS HASH</label>
                <div className="relative">
                  <Key className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
                  <input 
@@ -661,26 +661,26 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-7xl mx-auto space-y-8 md:space-y-12">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
-            <span className="ui-sync text-fbblue block tracking-[0.3em] text-[10px]">INTEGRATED COMMAND CENTER</span>
-            <h1 className="font-lexend font-light text-4xl md:text-6xl tracking-tight text-white/90">DASHBOARD</h1>
+            <span className="font-lexend text-fbblue block tracking-[0.3em] text-[10px]">INTEGRATED COMMAND CENTER</span>
+            <h1 className="font-sync font-light text-4xl md:text-6xl tracking-tight text-white/90">DASHBOARD</h1>
             <div className="flex flex-wrap gap-3 mt-4">
-              <span className="glass-3 px-4 py-2 rounded-lg ui-sync text-[8px] text-emerald-500 bg-emerald-500/10 border border-emerald-500/20">SYSTEM: ONLINE</span>
-              <span className="glass-3 px-4 py-2 rounded-lg ui-sync text-[8px] text-fbblue bg-fbblue/10 border border-fbblue/20">{role.replace('_', ' ')}</span>
+              <span className="glass-3 px-4 py-2 rounded-lg font-lexend text-[8px] text-emerald-500 bg-emerald-500/10 border border-emerald-500/20">SYSTEM: ONLINE</span>
+              <span className="glass-3 px-4 py-2 rounded-lg font-lexend text-[8px] text-fbblue bg-fbblue/10 border border-fbblue/20">{role.replace('_', ' ')}</span>
             </div>
           </div>
           
           <div className="flex items-center justify-between md:justify-end gap-4 mt-4 md:mt-0 w-full md:w-auto">
             <div className="bg-white/[0.03] p-1 rounded-xl flex gap-1 overflow-x-auto pb-2 md:pb-0 whitespace-nowrap scrollbar-hide">
-              <button onClick={() => setActiveTab('MISSIONS')} className={`px-6 py-3 rounded-lg flex items-center justify-center gap-2 text-[10px] ui-sync tracking-widest transition-colors ${activeTab === 'MISSIONS' ? 'bg-fbblue text-white' : 'text-gray-500 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('MISSIONS')} className={`px-6 py-3 rounded-lg flex items-center justify-center gap-2 text-[10px] font-lexend tracking-widest transition-colors ${activeTab === 'MISSIONS' ? 'bg-fbblue text-white' : 'text-gray-500 hover:text-white'}`}>
                 MISSIONS & PAYMENTS
               </button>
-              <button onClick={() => setActiveTab('OPERATORS')} className={`px-6 py-3 rounded-lg text-[10px] ui-sync tracking-widest transition-colors ${activeTab === 'OPERATORS' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('OPERATORS')} className={`px-6 py-3 rounded-lg text-[10px] font-lexend tracking-widest transition-colors ${activeTab === 'OPERATORS' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-white'}`}>
                 OPERATOR GOVERNANCE
               </button>
-              <button onClick={() => setActiveTab('LEADS')} className={`px-6 py-3 rounded-lg text-[10px] ui-sync tracking-widest transition-colors ${activeTab === 'LEADS' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('LEADS')} className={`px-6 py-3 rounded-lg text-[10px] font-lexend tracking-widest transition-colors ${activeTab === 'LEADS' ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-white'}`}>
                 ONBOARDING LEADS
               </button>
-              <button onClick={() => setActiveTab('GIO')} className={`px-6 py-3 rounded-lg text-[10px] ui-sync tracking-widest transition-colors ${activeTab === 'GIO' ? 'bg-gold/20 text-gold' : 'text-gray-500 hover:text-white'}`}>
+              <button onClick={() => setActiveTab('GIO')} className={`px-6 py-3 rounded-lg text-[10px] font-lexend tracking-widest transition-colors ${activeTab === 'GIO' ? 'bg-gold/20 text-gold' : 'text-gray-500 hover:text-white'}`}>
                 GIO INTEL
               </button>
             </div>
@@ -691,16 +691,16 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
       {activeTab === 'MISSIONS' && (
         <div className="space-y-8">
            <div className="flex justify-between items-center">
-            <h2 className="ui-sync text-gray-400 text-sm tracking-widest ml-2 uppercase">Command Registry</h2>
+            <h2 className="font-sync text-gray-400 text-sm tracking-widest ml-2 uppercase">Command Registry</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
              <div className="glass-vip p-6 rounded-[2rem] border border-white/5 space-y-4">
-                <p className="ui-sync text-[8px] text-fbblue tracking-widest">ACTIVE AIRSPACE</p>
+                <p className="font-lexend text-[8px] text-fbblue tracking-widest">ACTIVE AIRSPACE</p>
                 <p className="text-3xl font-light">{missions?.filter(m => m.status === 'ACTIVATED' || m.status === 'EXECUTING').length || 0}</p>
              </div>
              <div className="glass-vip p-6 rounded-[2rem] border border-white/5 space-y-4">
-                <p className="ui-sync text-[8px] text-amber-500 tracking-widest">AWAITING VERIFICATION</p>
+                <p className="font-lexend text-[8px] text-amber-500 tracking-widest">AWAITING VERIFICATION</p>
                 <p className="text-3xl font-light">{missions?.filter(m => m.payment_status === 'AWAITING_VERIFICATION').length || 0}</p>
              </div>
           </div>
@@ -740,19 +740,19 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                         {isAwaitingPayment && (
                           <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                              {m.payment_receipt_url && (
-                               <a href={m.payment_receipt_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-[10px] ui-sync hover:bg-white/5 transition-colors">
+                               <a href={m.payment_receipt_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 text-[10px] font-lexend hover:bg-white/5 transition-colors">
                                  <ExternalLink className="w-3 h-3" /> RECEIPT
                                </a>
                              )}
-                             <button onClick={() => handleVerifyPayment(m.id, 'VERIFIED', m.client_name, m.client_email)} className="px-4 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-[10px] ui-sync hover:bg-emerald-500/40">VERIFY</button>
-                             <button onClick={() => handleVerifyPayment(m.id, 'FAILED', m.client_name, m.client_email)} className="px-4 py-2 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] ui-sync hover:bg-rose-500/40">FAIL</button>
+                             <button onClick={() => handleVerifyPayment(m.id, 'VERIFIED', m.client_name, m.client_email)} className="px-4 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-[10px] font-lexend hover:bg-emerald-500/40">VERIFY</button>
+                             <button onClick={() => handleVerifyPayment(m.id, 'FAILED', m.client_name, m.client_email)} className="px-4 py-2 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded-lg text-[10px] font-lexend hover:bg-rose-500/40">FAIL</button>
                           </div>
                         )}
                         
                         {m.status === 'OPERATOR_REVIEW' && (
                            <button 
                              onClick={(e) => { e.stopPropagation(); handleActivateMission(m.id); }}
-                             className="px-6 py-2 bg-white text-black font-bold rounded-lg text-[10px] ui-sync hover:bg-blue-500 hover:text-white transition-all shadow-md flex items-center gap-2"
+                             className="px-6 py-2 bg-white text-black font-bold rounded-lg text-[10px] font-lexend hover:bg-blue-500 hover:text-white transition-all shadow-md flex items-center gap-2"
                            >
                              <Send className="w-3 h-3" /> ACTIVATE MISSION
                            </button>
@@ -783,19 +783,19 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
 
       {activeTab === 'OPERATORS' && (
         <div className="space-y-6">
-          <h2 className="ui-sync text-gray-400 text-sm tracking-widest ml-2 uppercase">OPERATOR GOVERNANCE</h2>
+          <h2 className="font-sync text-gray-400 text-sm tracking-widest ml-2 uppercase">OPERATOR GOVERNANCE</h2>
           
           <div className="grid md:grid-cols-3 gap-6 mb-8">
              <div className="glass-vip p-6 rounded-[2rem] border border-white/5 space-y-4">
-                <p className="ui-sync text-[8px] text-gray-400 tracking-widest">ISSUED ACCESS CODES</p>
+                <p className="font-lexend text-[8px] text-gray-400 tracking-widest">ISSUED ACCESS CODES</p>
                 <p className="text-3xl font-light">{accessCodes?.length || 0}</p>
              </div>
              <div className="glass-vip p-6 rounded-[2rem] border border-white/5 space-y-4">
-                <p className="ui-sync text-[8px] text-amber-500 tracking-widest">UNREGISTERED (PENDING SETUP)</p>
+                <p className="font-lexend text-[8px] text-amber-500 tracking-widest">UNREGISTERED (PENDING SETUP)</p>
                 <p className="text-3xl font-light">{(accessCodes?.length || 0) - (operators?.length || 0)}</p>
              </div>
              <div className="glass-vip p-6 rounded-[2rem] border border-white/5 space-y-4">
-                <p className="ui-sync text-[8px] text-emerald-500 tracking-widest">VERIFIED OPERATORS</p>
+                <p className="font-lexend text-[8px] text-emerald-500 tracking-widest">VERIFIED OPERATORS</p>
                 <p className="text-3xl font-light">{operators?.filter(op => op.verification_status === 'VERIFIED').length || 0}</p>
              </div>
           </div>
@@ -820,7 +820,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                          <p className="text-[10px] font-mono text-gray-500 mt-2">Access Code: {op.access_code} • System ID: {op.id}</p>
                        </div>
                        <div className="flex items-center gap-2">
-                         <span className={`text-[10px] ui-sync px-3 py-1 rounded border ${isUnderReview ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : (op.verification_status === 'VERIFIED' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-gray-500/20 text-gray-400 border-gray-500/30')}`}>
+                         <span className={`text-[10px] font-lexend px-3 py-1 rounded border ${isUnderReview ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : (op.verification_status === 'VERIFIED' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-gray-500/20 text-gray-400 border-gray-500/30')}`}>
                            {isUnderReview ? 'AWAITING REVIEW' : op.verification_status}
                          </span>
                          {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
@@ -829,7 +829,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                      
                      <div className="grid md:grid-cols-2 gap-4 mt-2">
                        <div className="bg-black/40 p-4 rounded-xl border border-white/5">
-                         <h4 className="text-[10px] ui-sync text-gray-500 mb-2">WIRE TRANSFER DETAILS</h4>
+                         <h4 className="text-[10px] font-lexend text-gray-500 mb-2">WIRE TRANSFER DETAILS</h4>
                          <div className="text-xs space-y-1 font-mono text-gray-300">
                            <p>Bank: {op.wire_bank_name || op.financial_coordination?.bankName || 'N/A'}</p>
                            <p>Routing: {op.wire_routing_number || 'N/A'}</p>
@@ -840,7 +840,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                          </div>
                        </div>
                        <div className="bg-black/40 p-4 rounded-xl border border-white/5">
-                         <h4 className="text-[10px] ui-sync text-gray-500 mb-2">COMPLIANCE SCORES</h4>
+                         <h4 className="text-[10px] font-lexend text-gray-500 mb-2">COMPLIANCE SCORES</h4>
                          <div className="text-xs space-y-1 font-mono text-gray-300">
                            <p>Status: {op.compliance_status || 'PENDING'}</p>
                            <p>Score: {op.compliance_score || 0}/100</p>
@@ -864,7 +864,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                          {/* Operator Workspace iframe portal */}
                          <div className="space-y-3">
                            <div className="flex justify-between items-center">
-                             <h4 className="text-[10px] ui-sync text-fbblue font-mono uppercase tracking-widest">INTERACTIVE COMPLIANCE GATEWAY & INTERFACE iFRAME</h4>
+                             <h4 className="text-[10px] font-sync text-fbblue font-mono uppercase tracking-widest">INTERACTIVE COMPLIANCE GATEWAY & INTERFACE iFRAME</h4>
                              <span className="text-[8px] font-mono text-gray-500">SECURE ISOLATED SANDBOX PREVIEW</span>
                            </div>
                            <div className="relative border border-white/10 rounded-2xl bg-black overflow-hidden shadow-2xl h-[550px]">
@@ -880,7 +880,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                      
                      {isUnderReview && (
                        <div className="flex gap-4 mt-2">
-                         <button onClick={() => handleApproveOperator(op.id, op.contact_email, op.name)} className="px-6 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-[10px] ui-sync hover:bg-emerald-500/30 cursor-pointer">
+                         <button onClick={() => handleApproveOperator(op.id, op.contact_email, op.name)} className="px-6 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-[10px] font-lexend hover:bg-emerald-500/30 cursor-pointer">
                            APPROVE VERIFICATION
                          </button>
                        </div>
@@ -895,7 +895,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
 
       {activeTab === 'LEADS' && (
          <div className="space-y-6">
-           <h2 className="ui-sync text-gray-400 text-sm tracking-widest ml-2 uppercase">OPERATOR ONBOARDING LEADS</h2>
+           <h2 className="font-sync text-gray-400 text-sm tracking-widest ml-2 uppercase">OPERATOR ONBOARDING LEADS</h2>
            <div className="grid gap-4">
              {!leads || leads.length === 0 ? (
                <div className="p-12 border border-dashed border-white/10 rounded-2xl text-center text-gray-500 text-sm">No pending leads.</div>
@@ -907,14 +907,14 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                        <h3 className="text-lg text-white/90">{lead.company_name}</h3>
                        <p className="text-sm text-gray-400">{lead.email}</p>
                      </div>
-                     <span className="text-[10px] ui-sync px-3 py-1 bg-white/10 text-white rounded">
+                     <span className="text-[10px] font-lexend px-3 py-1 bg-white/10 text-white rounded">
                        {lead.status}
                      </span>
                    </div>
                    
                    <div className="grid md:grid-cols-2 gap-4">
                      <div className="bg-black/40 p-4 rounded-xl border border-white/5">
-                       <h4 className="text-[10px] ui-sync text-gray-500 mb-2">WIRE DETAILS</h4>
+                       <h4 className="text-[10px] font-lexend text-gray-500 mb-2">WIRE DETAILS</h4>
                        <div className="text-xs space-y-1 font-mono text-gray-300">
                          <p>Bank: {lead.wire_bank_name || 'N/A'}</p>
                          <p>Routing: {lead.wire_routing_number || 'N/A'}</p>
@@ -923,7 +923,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                        </div>
                      </div>
                      <div className="bg-black/40 p-4 rounded-xl border border-white/5">
-                       <h4 className="text-[10px] ui-sync text-gray-500 mb-2">AOC PAYLOAD</h4>
+                       <h4 className="text-[10px] font-lexend text-gray-500 mb-2">AOC PAYLOAD</h4>
                        <pre className="text-[10px] font-mono text-gray-400 overflow-x-auto whitespace-pre-wrap max-h-24">
                          {JSON.stringify(lead.aoc_payload, null, 2)}
                        </pre>
@@ -932,7 +932,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                    
                    {lead.status === 'PENDING_REVIEW' && (
                      <div className="pt-2">
-                       <button onClick={() => handleApproveLead(lead.id, lead.email)} className="px-6 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-[10px] ui-sync hover:bg-emerald-500/30">
+                       <button onClick={() => handleApproveLead(lead.id, lead.email)} className="px-6 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-[10px] font-lexend hover:bg-emerald-500/30">
                          MARK VERIFIED
                        </button>
                      </div>
@@ -946,7 +946,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
 
       {activeTab === 'GIO' && (
         <div className="space-y-6">
-          <h2 className="ui-sync text-gray-400 text-sm tracking-widest ml-2 uppercase">GIO INTEL AGENTS</h2>
+          <h2 className="font-sync text-gray-400 text-sm tracking-widest ml-2 uppercase">GIO INTEL AGENTS</h2>
           
           {gioApplicants && gioApplicants.length > 0 && (
             <div className="glass-vip p-6 rounded-2xl border border-fbblue/20 bg-fbblue/5 mb-8">
@@ -962,7 +962,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                     </div>
                     <button 
                       onClick={() => handleApproveGioApplicant(app.id, app.email, app.name)}
-                      className="mt-2 md:mt-0 px-6 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-[10px] ui-sync hover:bg-emerald-500/30 whitespace-nowrap"
+                      className="mt-2 md:mt-0 px-6 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-[10px] font-lexend hover:bg-emerald-500/30 whitespace-nowrap"
                     >
                       APPROVE & PROVISION
                     </button>
@@ -1000,7 +1000,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
               </div>
               <button 
                 onClick={handleCreateGio}
-                className="px-6 py-3 bg-gold/20 text-gold border border-gold/30 rounded-xl text-xs ui-sync hover:bg-gold/30 whitespace-nowrap"
+                className="px-6 py-3 bg-gold/20 text-gold border border-gold/30 rounded-xl text-xs font-lexend hover:bg-gold/30 whitespace-nowrap"
               >
                 PROVISION ACCESS
               </button>
@@ -1016,7 +1016,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <p className="text-sm font-light text-white/90">{agent.label}</p>
-                        <p className="text-[10px] ui-sync text-gray-500 mt-1">STATUS: {agent.active ? 'ACTIVE' : 'REVOKED'}</p>
+                        <p className="text-[10px] font-lexend text-gray-500 mt-1">STATUS: {agent.active ? 'ACTIVE' : 'REVOKED'}</p>
                       </div>
                       <div className={`w-2 h-2 rounded-full ${agent.active ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                     </div>
@@ -1041,7 +1041,7 @@ function ICCMain({ role, setRole }: { role: 'STRATEGIC_AUTHORITY' | 'MISSION_ARC
               initial={{ opacity: 0, y: -20, scale: 0.95, x: 20 }}
               animate={{ opacity: 1, y: 0, scale: 1, x: 0 }}
               exit={{ opacity: 0, scale: 0.9, x: 50, transition: { duration: 0.2 } }}
-              className="pointer-events-auto bg-[#0c0c10]/95 border border-amber-500/30 rounded-2xl p-5 shadow-[0_10px_30px_rgba(245,158,11,0.15)] backdrop-blur-xl flex flex-col gap-3"
+              className="pointer-events-auto bg-[#0c0c10]/95 border border-amber-500/30 rounded-2xl p-5 shadow-[0_10px_30px_rgba(245,158,11,0.15)] backdrop-blur-[10px] flex flex-col gap-3"
             >
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
@@ -1150,7 +1150,7 @@ function MissionExpandedView({ mission, refetchMissions }: { mission: any, refet
     <div className="mt-6 pt-6 border-t border-white/5" onClick={e => e.stopPropagation()}>
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-4 text-sm font-light">
-           <h5 className="ui-sync text-[10px] text-gray-500 tracking-widest mb-2">MISSION DETAILS</h5>
+           <h5 className="font-lexend text-[10px] text-gray-500 tracking-widest mb-2">MISSION DETAILS</h5>
            <p className="text-gray-300">Client: <span className="text-white">{mission.client_name || 'N/A'}</span></p>
            <p className="text-gray-300">Email: <span className="text-white">{mission.client_email}</span></p>
            <p className="text-gray-300">Phone: <span className="text-white">{mission.client_phone || 'N/A'}</span></p>
@@ -1159,7 +1159,7 @@ function MissionExpandedView({ mission, refetchMissions }: { mission: any, refet
            <p className="text-gray-300">Selected Tail: <span className="text-white">{mission.selected_aircraft_tail || 'None'}</span></p>
         </div>
         <div className="space-y-4 text-sm font-light">
-           <h5 className="ui-sync text-[10px] text-gray-500 tracking-widest mb-2">FINANCIALS & ROUTING</h5>
+           <h5 className="font-lexend text-[10px] text-gray-500 tracking-widest mb-2">FINANCIALS & ROUTING</h5>
            <p className="text-gray-300">Status: <span className="text-white">{mission.status}</span></p>
            <p className="text-gray-300">Payment: <span className="text-white">{mission.payment_status}</span></p>
            <p className="text-gray-300">Est. Cost: <span className="text-white">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(mission.estimated_lower || 0)} - {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(mission.estimated_upper || 0)}</span></p>
@@ -1256,7 +1256,7 @@ function MissionExpandedView({ mission, refetchMissions }: { mission: any, refet
             
            {mission.mission_customizations && mission.mission_customizations.length > 0 && (
               <div className="mt-4">
-                <h5 className="ui-sync text-[10px] text-gray-500 tracking-widest mb-2">CUSTOMIZATIONS</h5>
+                <h5 className="font-lexend text-[10px] text-gray-500 tracking-widest mb-2">CUSTOMIZATIONS</h5>
                 <div className="space-y-2">
                   {mission.mission_customizations.map((c: any) => (
                     <div key={c.id} className="bg-black/30 p-3 rounded-lg text-xs">
@@ -1274,7 +1274,7 @@ function MissionExpandedView({ mission, refetchMissions }: { mission: any, refet
             )}
            {mission.payment_receipt_url && (
              <div className="bg-black/30 p-3 rounded-lg border border-white/5 mt-4">
-               <p className="ui-sync text-[8px] text-gray-500 tracking-widest mb-2">PAYMENT RECEIPT</p>
+               <p className="font-lexend text-[8px] text-gray-500 tracking-widest mb-2">PAYMENT RECEIPT</p>
                <a href={mission.payment_receipt_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-fbblue hover:text-white transition-colors text-xs">
                  <ExternalLink className="w-3 h-3" /> View Receipt Document
                </a>
@@ -1286,24 +1286,24 @@ function MissionExpandedView({ mission, refetchMissions }: { mission: any, refet
       {/* Live Verifications & Comms Section */}
       <div className="mt-8 grid md:grid-cols-2 gap-6 border-t border-white/5 pt-6">
         <div>
-           <h5 className="ui-sync text-[10px] text-emerald-500 tracking-widest mb-4">GCO LIVE VERIFICATIONS</h5>
+           <h5 className="font-lexend text-[10px] text-emerald-500 tracking-widest mb-4">GCO LIVE VERIFICATIONS</h5>
            <div className="space-y-2 mb-6">
               {tasks?.map((task: any) => (
                  <div key={task.id} className="flex justify-between items-center bg-black/40 p-3 rounded-xl border border-white/5">
                    <div className="flex gap-2 items-center">
                      {task.is_completed ? <CheckCircle className="w-4 h-4 text-emerald-500" /> : <div className="w-4 h-4 rounded-full border border-gray-600" />}
                      <div>
-                       <p className="text-[9px] ui-sync text-gray-500">{task.phase}</p>
+                       <p className="text-[9px] font-lexend text-gray-500">{task.phase}</p>
                        <span className="text-xs font-light text-white">{task.task_name}</span>
                      </div>
                    </div>
-                   {task.is_completed && <span className="ui-sync text-[8px] text-gray-400">{new Date(task.completed_at).toLocaleTimeString()}Z</span>}
+                   {task.is_completed && <span className="font-lexend text-[8px] text-gray-400">{new Date(task.completed_at).toLocaleTimeString()}Z</span>}
                  </div>
               ))}
               {(!tasks || tasks.length === 0) && <p className="text-xs text-gray-500">No verification tasks bootstrapped yet.</p>}
            </div>
 
-           <h5 className="ui-sync text-[10px] text-emerald-500 tracking-widest mb-4">DIGITAL TRIGGERS</h5>
+           <h5 className="font-lexend text-[10px] text-emerald-500 tracking-widest mb-4">DIGITAL TRIGGERS</h5>
            <div className="space-y-2">
               {verifications?.map((v: any) => (
                  <div key={v.id} className="flex justify-between items-center bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">
@@ -1311,7 +1311,7 @@ function MissionExpandedView({ mission, refetchMissions }: { mission: any, refet
                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
                      <span className="text-xs font-light text-emerald-400">{v.verification_type}</span>
                    </div>
-                   <span className="ui-sync text-[8px] text-emerald-500">{new Date(v.confirmed_at).toLocaleTimeString()}Z</span>
+                   <span className="font-lexend text-[8px] text-emerald-500">{new Date(v.confirmed_at).toLocaleTimeString()}Z</span>
                  </div>
               ))}
               {(!verifications || verifications.length === 0) && <p className="text-xs text-gray-500">No triggers fired.</p>}
@@ -1320,7 +1320,7 @@ function MissionExpandedView({ mission, refetchMissions }: { mission: any, refet
 
         <div className="flex flex-col border border-white/5 rounded-2xl overflow-hidden bg-black/20 h-[400px]">
            <div className="bg-white/[0.02] p-3 border-b border-white/5">
-              <h5 className="ui-sync text-[10px] text-fbblue tracking-widest">SECURE P2P COMMS (DO CHAT)</h5>
+              <h5 className="font-lexend text-[10px] text-fbblue tracking-widest">SECURE P2P COMMS (DO CHAT)</h5>
            </div>
            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {chats?.map((chat: any) => {
@@ -1330,7 +1330,7 @@ function MissionExpandedView({ mission, refetchMissions }: { mission: any, refet
                       <div className={`${isMe ? 'bg-fbblue rounded-tr-sm text-white' : 'bg-white/[0.05] rounded-tl-sm text-gray-200'} p-3 rounded-2xl text-xs font-light`}>
                         {chat.message}
                       </div>
-                      <span className={`text-[8px] ui-sync text-gray-500 mt-1 block`}>
+                      <span className={`text-[8px] font-lexend text-gray-500 mt-1 block`}>
                         {chat.sender_id || chat.sender_role} • {new Date(chat.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}Z
                       </span>
                     </div>

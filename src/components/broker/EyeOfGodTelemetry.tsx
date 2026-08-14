@@ -39,7 +39,7 @@ export const EyeOfGodTelemetry: React.FC = () => {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-fbblue animate-pulse" />
-            <span className="ui-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
+            <span className="font-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
               MODULE 8 — EYE OF GOD TELEMETRY
             </span>
           </div>
@@ -60,21 +60,21 @@ export const EyeOfGodTelemetry: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6">
         <div className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-1">
-          <span className="text-[9px] text-gray-400 ui-sync uppercase block flex items-center gap-1">
+          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
             <Cpu className="w-3.5 h-3.5 text-fbblue" /> HARDWARE CANVAS HASH
           </span>
           <span className="text-sm font-mono font-bold text-fbblue">{canvasHash}</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-1">
-          <span className="text-[9px] text-gray-400 ui-sync uppercase block flex items-center gap-1">
+          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
             <Globe className="w-3.5 h-3.5 text-emerald-400" /> CLIENT IP ADDRESS
           </span>
           <span className="text-sm font-mono font-bold text-white">{ipAddress}</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-1">
-          <span className="text-[9px] text-gray-400 ui-sync uppercase block flex items-center gap-1">
+          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> ANTI-POACHING STATUS
           </span>
           <span className="text-sm font-mono font-bold text-emerald-400">ENFORCED (100%)</span>
@@ -83,7 +83,7 @@ export const EyeOfGodTelemetry: React.FC = () => {
 
       {/* Terminal Telemetry Log */}
       <div className="p-4 rounded-2xl bg-black/90 border border-white/15 space-y-3">
-        <div className="flex items-center justify-between pb-2 border-b border-white/10 text-[10px] ui-sync text-gray-400">
+        <div className="flex items-center justify-between pb-2 border-b border-white/10 text-[10px] font-lexend text-gray-400">
           <span className="flex items-center gap-1.5">
             <Terminal className="w-3.5 h-3.5 text-fbblue" /> SYSTEM TELEMETRY AUDIT LOG
           </span>

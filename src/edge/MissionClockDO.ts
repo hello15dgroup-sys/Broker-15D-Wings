@@ -19,7 +19,7 @@ export class MissionClockDO implements DurableObject {
     if (url.pathname.endsWith("/schedule")) {
       const payload = await request.json() as any;
       await this.handleScheduling(payload);
-      return new Response(JSON.stringify({ success: true, message: "Mission scheduled in Clock Engine" }), {
+      return new Response(JSON.stringify({ success: true, message: "Charter scheduled in Clock Engine" }), {
           headers: { "Content-Type": "application/json" }
       });
     }
@@ -183,7 +183,7 @@ export class MissionClockDO implements DurableObject {
 
       // Notify Client
       const cancelMsg = "It is with deep regret we inform you that Mission allocation has been withdrawn due to uncleared funds at the T-48 regulatory gate. We remain at your disposal for future scheduling.";
-      await this.sendWarning(missionId, "T-48", "Mission Execution Cancelled", cancelMsg);
+      await this.sendWarning(missionId, "T-48", "Charter Execution Cancelled", cancelMsg);
       
       // Notify ICC
       if (this.env.ICC_DO) {

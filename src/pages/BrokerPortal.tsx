@@ -17,6 +17,7 @@ import {
   AlertCircle,
   Bell,
   ArrowLeft,
+  LogOut,
 } from "lucide-react";
 import { formatCurrency, calculateFlightTime, formatToLocalDate } from "../lib/utils";
 const Spline = lazy(() => import("@splinetool/react-spline"));
@@ -39,7 +40,7 @@ import { SystemizedCheckoutEngine } from "../components/broker/SystemizedCheckou
 import { OperationalIntegrityIndex } from "../components/broker/OperationalIntegrityIndex";
 import { EyeOfGodTelemetry } from "../components/broker/EyeOfGodTelemetry";
 import { BrokerCRMWorkspace } from "../components/broker/BrokerCRMWorkspace";
-import { FastSplineCanvas } from "../components/broker/FastSplineCanvas";
+import { PremiumBookFlightPanel } from "../components/broker/PremiumBookFlightPanel";
 
 import heavyJetImg from "../assets/images/heavy_challenger_650_1780611482208.png";
 import vljImg from "../assets/images/vlj_phenom_100_1780611441744.png";
@@ -511,10 +512,86 @@ interface NotificationItem {
   read: boolean;
 }
 
+const countriesList = [
+  { name: "Nigeria", code: "+234", flag: "🇳🇬" },
+  { name: "United Kingdom", code: "+44", flag: "🇬🇧" },
+  { name: "United States", code: "+1", flag: "🇺🇸" },
+  { name: "United Arab Emirates", code: "+971", flag: "🇦🇪" },
+  { name: "South Africa", code: "+27", flag: "🇿🇦" },
+  { name: "France", code: "+33", flag: "🇫🇷" },
+  { name: "Germany", code: "+49", flag: "🇩🇪" },
+  { name: "Canada", code: "+1", flag: "🇨🇦" },
+  { name: "Australia", code: "+61", flag: "🇦🇺" },
+  { name: "Saudi Arabia", code: "+966", flag: "🇸🇦" },
+  { name: "Qatar", code: "+974", flag: "🇶🇦" },
+  { name: "Singapore", code: "+65", flag: "🇸🇬" },
+  { name: "Switzerland", code: "+41", flag: "🇨🇭" },
+  { name: "Netherlands", code: "+31", flag: "🇳🇱" },
+  { name: "China", code: "+86", flag: "🇨🇳" },
+  { name: "Japan", code: "+81", flag: "🇯🇵" },
+  { name: "India", code: "+91", flag: "🇮🇳" },
+  { name: "Brazil", code: "+55", flag: "🇧🇷" },
+  { name: "Egypt", code: "+20", flag: "🇪🇬" },
+  { name: "Ghana", code: "+233", flag: "🇬🇭" },
+  { name: "Kenya", code: "+254", flag: "🇰🇪" },
+  { name: "Rwanda", code: "+250", flag: "🇷🇼" },
+  { name: "Ethiopia", code: "+251", flag: "🇪🇹" },
+  { name: "Mali", code: "+223", flag: "🇲🇱" },
+  { name: "Morocco", code: "+212", flag: "🇲🇦" },
+  { name: "Uganda", code: "+256", flag: "🇺🇬" },
+  { name: "Cameroon", code: "+237", flag: "🇨🇲" },
+  { name: "Gambia", code: "+220", flag: "🇬🇲" },
+  { name: "Sierra Leone", code: "+232", flag: "🇸🇱" },
+  { name: "Senegal", code: "+221", flag: "🇸🇳" },
+  { name: "Ivory Coast", code: "+225", flag: "🇨🇮" },
+  { name: "Liberia", code: "+231", flag: "🇱🇷" },
+  { name: "Angola", code: "+244", flag: "🇦🇴" },
+  { name: "Tanzania", code: "+255", flag: "🇹🇿" },
+  { name: "Zambia", code: "+260", flag: "🇿🇲" },
+  { name: "Zimbabwe", code: "+263", flag: "🇿🇼" },
+  { name: "Turkey", code: "+90", flag: "🇹🇷" },
+  { name: "Belgium", code: "+32", flag: "🇧🇪" },
+  { name: "Italy", code: "+39", flag: "🇮🇹" },
+  { name: "Spain", code: "+34", flag: "🇪🇸" },
+  { name: "Sweden", code: "+46", flag: "🇸🇪" },
+  { name: "Norway", code: "+47", flag: "🇳🇴" },
+  { name: "Denmark", code: "+45", flag: "🇩🇰" },
+  { name: "Finland", code: "+358", flag: "🇫🇮" },
+  { name: "Russia", code: "+7", flag: "🇷🇺" },
+  { name: "Ukraine", code: "+380", flag: "🇺🇦" },
+  { name: "Ireland", code: "+353", flag: "🇮🇪" },
+  { name: "Austria", code: "+43", flag: "🇦🇹" },
+  { name: "Greece", code: "+30", flag: "🇬🇷" },
+  { name: "Portugal", code: "+351", flag: "🇵🇹" },
+  { name: "Mexico", code: "+52", flag: "🇲🇽" },
+  { name: "Argentina", code: "+54", flag: "🇦🇷" },
+  { name: "Colombia", code: "+57", flag: "🇨🇴" },
+  { name: "Chile", code: "+56", flag: "🇨🇱" },
+  { name: "Peru", code: "+51", flag: "🇵🇪" },
+  { name: "Indonesia", code: "+62", flag: "🇮🇩" },
+  { name: "Malaysia", code: "+60", flag: "🇲🇾" },
+  { name: "Thailand", code: "+66", flag: "🇹🇭" },
+  { name: "Philippines", code: "+63", flag: "🇵🇭" },
+  { name: "Vietnam", code: "+84", flag: "🇻🇳" },
+  { name: "New Zealand", code: "+64", flag: "🇳🇿" },
+  { name: "Pakistan", code: "+92", flag: "🇵🇰" },
+  { name: "Bangladesh", code: "+880", flag: "🇧🇩" },
+  { name: "Kuwait", code: "+965", flag: "🇰🇼" },
+  { name: "Oman", code: "+968", flag: "🇴🇲" },
+  { name: "Bahrain", code: "+973", flag: "🇧🇭" },
+  { name: "Jordan", code: "+962", flag: "🇯🇴" },
+  { name: "Lebanon", code: "+961", flag: "🇱🇧" },
+  { name: "Iraq", code: "+964", flag: "🇮🇶" }
+].sort((a, b) => a.name.localeCompare(b.name));
+
 export default function BrokerPortal() {
   const [searchParams, setSearchParams] = useSearchParams();
   const missionId = searchParams.get("missionId");
-  const sessionVerified = searchParams.get("verified") === "true";
+  const [sessionVerified, setSessionVerified] = useState(
+    searchParams.get("verified") === "true" || sessionStorage.getItem("broker_verified") === "true"
+  );
+  const [hasVerifiedOperator, setHasVerifiedOperator] = useState(false);
+
 
   const [authStep, setAuthStep] = useState<'LOGIN' | 'SIGNUP' | 'SMS_OTP'>('LOGIN');
   const [inputId, setInputId] = useState(missionId || "");
@@ -522,6 +599,8 @@ export default function BrokerPortal() {
   const [inputPassword, setInputPassword] = useState("");
   const [inputPhone, setInputPhone] = useState("");
   const [countryCode, setCountryCode] = useState("+234");
+  const [countrySearch, setCountrySearch] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [otpDigits, setOtpDigits] = useState<string[]>(["1", "5", "9", "3", "8", "2"]);
   const [authError, setAuthError] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -670,6 +749,29 @@ export default function BrokerPortal() {
     refetchInterval: 5000,
   });
 
+  const defaultMission = {
+    id: missionId || "15D-001",
+    status: localStatus || "ACCEPTED",
+    payment_status: localPaymentStatus || "PAID",
+    departure_airport: "DNMM",
+    arrival_airport: "EGLL",
+    departure_city: "Lagos",
+    arrival_city: "London",
+    departure_date: new Date().toISOString(),
+    aircraft_type: "Challenger 605",
+    operator_aircraft: "Bombardier Challenger 605",
+    gross_operator_quote: 65000,
+    upfront_deposit: 15000,
+    outstanding_balance: 50000,
+    passenger_count: 6,
+    mission_aircraft: dbFlightAircraft || {
+      aircraft_name: "Bombardier Challenger 605",
+      tail_number: "5N-B15D",
+      model: "Challenger 605",
+      category: "Heavy Jet"
+    }
+  };
+
   const mission = rawFlight
     ? {
         ...rawFlight,
@@ -677,7 +779,7 @@ export default function BrokerPortal() {
         payment_status: localPaymentStatus || rawFlight.payment_status,
         mission_aircraft: dbFlightAircraft || rawFlight.mission_aircraft,
       }
-    : null;
+    : defaultMission;
 
   // Fetch global fleet inventory for specifications parsing
   const { data: dbAircrafts } = useQuery({
@@ -949,38 +1051,14 @@ export default function BrokerPortal() {
     setShowAIOnboarding(false);
   };
 
-  const handleDirectSignIn = async () => {
+    const handleDirectSignIn = async () => {
     setAuthError("");
     setIsAuthenticating(true);
-    try {
-      let targetId = inputId.trim().toUpperCase();
-      let targetEmail = inputEmail.trim().toLowerCase() || "broker@charterdesk.com";
-
-      if (!targetId) {
-        const { data: firstFlight } = await supabase
-          .from("missions")
-          .select("id, client_email")
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (firstFlight && firstFlight.id) {
-          targetId = firstFlight.id;
-          if (firstFlight.client_email) {
-            targetEmail = firstFlight.client_email;
-          }
-        } else {
-          targetId = "15D-001";
-        }
-      }
-
-      sessionStorage.setItem(`15d_email_${targetId}`, targetEmail);
-      setSearchParams({ missionId: targetId, verified: "true" });
-    } catch (err: any) {
-      setAuthError("Sign in failed. Please try again.");
-    } finally {
-      setIsAuthenticating(false);
-    }
+    setTimeout(() => {
+        sessionStorage.setItem("broker_verified", "true");
+        setSessionVerified(true);
+        setIsAuthenticating(false);
+    }, 800);
   };
 
   const handleProceedToOtp = () => {
@@ -1018,6 +1096,8 @@ export default function BrokerPortal() {
       }
 
       sessionStorage.setItem(`15d_email_${targetId}`, targetEmail);
+      sessionStorage.setItem("broker_verified", "true");
+      setSessionVerified(true);
       setSearchParams({ missionId: targetId, verified: "true" });
     } catch (err: any) {
       setAuthError("Verification failed. Please try again.");
@@ -1142,29 +1222,25 @@ export default function BrokerPortal() {
     setShowReceiptUpload(true);
   };
 
-  if (!missionId || !sessionVerified) {
+  
+  if (!sessionVerified) {
     return (
       <div className="relative min-h-screen bg-[#07090e] text-white flex items-center justify-center p-4 md:p-6 font-lexend overflow-hidden">
-        {/* Fast 3D / Radar canvas background - Optimized for both Desktop & Mobile */}
-        <div className="absolute inset-0 z-0 opacity-50 pointer-events-none">
-          <FastSplineCanvas scene="https://prod.spline.design/BAU4reX5eINJeOJx/scene.splinecode" />
-        </div>
-
         <div className="z-10 w-full max-w-md flex flex-col items-center pt-8 md:pt-14 pb-12">
           {/* Header branding above card */}
           <div className="text-center space-y-3 mb-8 md:mb-12">
-            <span className="ui-sync text-[10px] text-gray-400 tracking-[0.38em] font-bold block">
+            <span className="font-sync text-[10px] text-gray-400 tracking-[0.38em] font-bold block uppercase">
               15D WINGS
             </span>
             <h2 className="font-sync font-light text-xl md:text-2xl tracking-[0.25em] text-white uppercase pt-1">
               {authStep === 'LOGIN' ? 'FLIGHT BROKER' : authStep === 'SIGNUP' ? 'CREATE BROKER ACCOUNT' : 'SMS VERIFICATION'}
             </h2>
-            <p className="ui-sync text-fbblue tracking-[0.3em] text-[9px] uppercase font-semibold pt-1">
+            <p className="font-sync text-fbblue tracking-[0.3em] text-[9px] uppercase font-semibold pt-1">
               {authStep === 'LOGIN' ? 'BROKER PORTAL LOGIN' : authStep === 'SIGNUP' ? 'PHASE 1 REGISTRATION' : 'MOBILE OTP VERIFICATION'}
             </p>
           </div>
 
-          <div className="p-8 md:p-10 rounded-[2.5rem] w-full space-y-6 border border-white/10 glass-vip shadow-[0_0_60px_rgba(0,0,0,0.85)] backdrop-blur-2xl relative overflow-hidden mt-2">
+          <div className="p-8 md:p-10 rounded-[2.5rem] w-full space-y-6 border border-white/10 glass-vip shadow-[0_0_60px_rgba(0,0,0,0.85)] backdrop-blur-[10px] relative overflow-hidden mt-2">
             <AnimatePresence mode="wait">
               {authStep === 'LOGIN' ? (
                 <motion.div
@@ -1201,7 +1277,7 @@ export default function BrokerPortal() {
                   {/* Email & Password Fields */}
                   <div className="space-y-4 text-left">
                     <div className="space-y-1.5">
-                      <label className="ui-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
                         EMAIL ADDRESS
                       </label>
                       <input
@@ -1214,7 +1290,7 @@ export default function BrokerPortal() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="ui-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
                         PASSWORD
                       </label>
                       <input
@@ -1226,22 +1302,6 @@ export default function BrokerPortal() {
                         }}
                         className="w-full border border-white/10 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-black/60 text-white focus:border-fbblue focus:bg-white/[0.05] placeholder:text-gray-600"
                         placeholder="••••••••••••••••"
-                      />
-                    </div>
-
-                    {/* Optional Access Code Line */}
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between items-center">
-                        <label className="ui-sync text-[8px] text-gray-500 block ml-1 tracking-widest uppercase">
-                          FLIGHT FLIGHT REF (OPTIONAL)
-                        </label>
-                      </div>
-                      <input
-                        type="text"
-                        value={inputId}
-                        onChange={(e) => setInputId(e.target.value.toUpperCase())}
-                        className="w-full border border-white/10 rounded-2xl px-4 py-2.5 font-mono text-xs outline-none transition-all bg-black/40 text-gray-300 focus:border-fbblue placeholder:text-gray-600 uppercase"
-                        placeholder="e.g. 15D-001"
                       />
                     </div>
                   </div>
@@ -1286,7 +1346,7 @@ export default function BrokerPortal() {
                 >
                   <div className="space-y-4">
                     <div className="space-y-1.5">
-                      <label className="ui-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
                         WORK EMAIL ADDRESS
                       </label>
                       <input
@@ -1299,7 +1359,7 @@ export default function BrokerPortal() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="ui-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
                         PASSWORD
                       </label>
                       <input
@@ -1312,22 +1372,59 @@ export default function BrokerPortal() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="ui-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
                         MOBILE PHONE NUMBER (FOR SMS OTP)
                       </label>
                       <div className="flex gap-2">
-                        <select
-                          value={countryCode}
-                          onChange={(e) => setCountryCode(e.target.value)}
-                          className="bg-black/70 border border-white/10 rounded-2xl px-3 py-3.5 text-xs font-mono text-white outline-none focus:border-fbblue transition-all cursor-pointer shrink-0"
-                        >
-                          <option value="+234">🇳🇬 +234</option>
-                          <option value="+1">🇺🇸 +1</option>
-                          <option value="+971">🇦🇪 +971</option>
-                          <option value="+44">🇬🇧 +44</option>
-                          <option value="+33">🇫🇷 +33</option>
-                          <option value="+27">🇿🇦 +27</option>
-                        </select>
+                        <div className="relative shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className="flex items-center gap-2 px-4 py-3.5 bg-black/60 border border-white/10 hover:border-fbblue rounded-2xl text-xs font-mono text-white outline-none transition-all cursor-pointer"
+                          >
+                            <span>{countriesList.find(c => c.code === countryCode)?.flag || "🇳🇬"}</span>
+                            <span>{countryCode}</span>
+                          </button>
+
+                          <AnimatePresence>
+                            {isDropdownOpen && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="absolute bottom-full left-0 mb-2 w-72 bg-slate-950 border border-white/15 rounded-2xl shadow-2xl z-[100] overflow-hidden backdrop-blur-xl"
+                              >
+                                <div className="p-3 border-b border-white/5 flex items-center gap-2 bg-black/40">
+                                  <input
+                                    type="text"
+                                    placeholder="Search country..."
+                                    value={countrySearch}
+                                    onChange={(e) => setCountrySearch(e.target.value)}
+                                    className="w-full bg-transparent text-xs outline-none text-white placeholder:text-gray-600 font-lexend"
+                                  />
+                                </div>
+                                <div className="max-h-56 overflow-y-auto py-1.5">
+                                  {countriesList
+                                    .filter(c => c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.includes(countrySearch))
+                                    .map((c, i) => (
+                                      <button
+                                        key={i}
+                                        type="button"
+                                        onClick={() => {
+                                          setCountryCode(c.code);
+                                          setIsDropdownOpen(false);
+                                        }}
+                                        className="w-full flex items-center justify-between px-4 py-3 text-xs text-left text-gray-300 hover:bg-fbblue hover:text-white transition-colors"
+                                      >
+                                        <span className="font-lexend font-medium">{c.flag} {c.name}</span>
+                                        <span className="font-mono text-gray-500">{c.code}</span>
+                                      </button>
+                                    ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
                         <input
                           type="tel"
                           value={inputPhone}
@@ -1374,14 +1471,14 @@ export default function BrokerPortal() {
                   className="space-y-5 text-left"
                 >
                   <div className="space-y-1.5">
-                    <label className="ui-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                    <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
                       PHONE NUMBER ({countryCode} {inputPhone || "801 234 5678"})
                     </label>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="ui-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
                         SMS VERIFICATION CODE
                       </label>
                       <span className="text-[9px] text-fbblue font-mono">DEMO PIN: 159382</span>
@@ -1446,16 +1543,7 @@ export default function BrokerPortal() {
 
 
 
-  if (isLoading || !mission) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col items-center justify-center space-y-6 font-lexend relative transition-colors duration-500">
-        <div className="w-8 h-8 rounded-full border border-fbblue/20 border-t-fbblue animate-spin" />
-        <p className="ui-sync text-gray-400 tracking-[0.3em] text-[10px]">
-          LOADING...
-        </p>
-      </div>
-    );
-  }
+
 
   const { dep, dest } = parseLegs(mission);
   const statusText = translateStatus(mission.status);
@@ -1534,7 +1622,7 @@ export default function BrokerPortal() {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-white/10"></div>
             </div>
-            <div className="relative flex justify-center text-[10px] ui-sync tracking-widest">
+            <div className="relative flex justify-center text-[10px] font-lexend tracking-widest">
               <span className="bg-[#111] px-2 text-gray-500">OR</span>
             </div>
           </div>
@@ -1566,7 +1654,7 @@ export default function BrokerPortal() {
               initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-              className="pointer-events-auto w-full p-4 rounded-2xl glass-vip border shadow-2xl flex items-start gap-3 backdrop-blur-md"
+              className="pointer-events-auto w-full p-4 rounded-2xl glass-vip border shadow-2xl flex items-start gap-3 backdrop-blur-[10px]"
               style={{
                 borderColor:
                   t.type === "success"
@@ -1611,9 +1699,6 @@ export default function BrokerPortal() {
         </AnimatePresence>
       </div>
 
-      <div className="absolute -inset-10 z-0 opacity-40 pointer-events-none">
-        <FastSplineCanvas scene="https://prod.spline.design/IRiKQPrmc8XrbtI1/scene.splinecode" />
-      </div>
       <div className="relative z-10 w-full h-full">
         <AnimatePresence>
           {showAIOnboarding && (
@@ -1621,7 +1706,7 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm"
+              className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 px-4 backdrop-blur-[10px]"
             >
               <motion.div
                 initial={{ y: 20, scale: 0.95 }}
@@ -1657,13 +1742,13 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex flex-col"
+              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col"
             >
               <div className="flex justify-between items-center p-4 md:px-8 border-b border-white/10 bg-black">
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setShowExperienceIframe(false)}
-                    className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl flex items-center gap-2 text-xs font-lexend uppercase tracking-wider transition-all border border-white/15 cursor-pointer active:scale-95 shadow-md"
+                    className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl flex items-center gap-2 text-xs font-sync uppercase tracking-wider transition-all border border-white/15 cursor-pointer active:scale-95 shadow-md"
                     title="Back to Broker Portal"
                   >
                     <ArrowLeft className="w-4 h-4 text-white" />
@@ -1692,42 +1777,22 @@ export default function BrokerPortal() {
           )}
 
           {showBookFlightIframe && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex flex-col"
-            >
-              <div className="flex justify-between items-center p-4 md:px-8 border-b border-white/10 bg-black">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setShowBookFlightIframe(false)}
-                    className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl flex items-center gap-2 text-xs font-lexend uppercase tracking-wider transition-all border border-white/15 cursor-pointer active:scale-95 shadow-md"
-                    title="Back to Broker Portal"
-                  >
-                    <ArrowLeft className="w-4 h-4 text-white" />
-                    <span className="hidden sm:inline">BACK</span>
-                  </button>
-                  <h3 className="text-white font-sync tracking-widest text-sm uppercase">
-                    BOOK FLIGHT — FLY 15D WINGS
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setShowBookFlightIframe(false)}
-                  className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
-                  title="Close"
-                >
-                  <X className="w-5 h-5 text-white" />
-                </button>
-              </div>
-              <div className="flex-1 w-full bg-black">
-                <iframe
-                  src="https://fly.15dwings.com.ng"
-                  className="w-full h-full border-none"
-                  title="Fly 15D Wings"
-                />
-              </div>
-            </motion.div>
+            <PremiumBookFlightPanel
+              onClose={() => setShowBookFlightIframe(false)}
+              sessionVerified={sessionVerified}
+              onLoginRequest={() => {
+                setShowBookFlightIframe(false);
+                setAuthStep("LOGIN");
+                setSessionVerified(false);
+              }}
+              onSuccess={(reqId) => {
+                setShowBookFlightIframe(false);
+                setSearchParams({ missionId: reqId, verified: "true" });
+                setSessionVerified(true);
+                sessionStorage.setItem("broker_verified", "true");
+                refetch();
+              }}
+            />
           )}
 
           {showRescheduleIframe && (
@@ -1735,7 +1800,7 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 overflow-y-auto"
+              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
             >
               <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-black rounded-3xl border border-white/10 shadow-2xl flex flex-col my-auto scrollbar-hide">
                 <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black sticky top-0 z-10">
@@ -1770,7 +1835,7 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 overflow-y-auto"
+              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
             >
               <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-black rounded-3xl border border-white/10 shadow-2xl flex flex-col my-auto scrollbar-hide">
                 <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black sticky top-0 z-10">
@@ -1804,7 +1869,7 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 overflow-y-auto"
+              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
             >
               <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-black rounded-3xl border border-white/10 shadow-2xl flex flex-col my-auto scrollbar-hide">
                 <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black sticky top-0 z-10">
@@ -1841,7 +1906,7 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4"
+              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col items-center justify-center p-4"
             >
               <div className="w-full max-w-lg glass-vip rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
                 <div className="flex justify-end p-4">
@@ -1918,23 +1983,9 @@ export default function BrokerPortal() {
         <div className="max-w-4xl mx-auto space-y-12">
           <header className="flex flex-row items-start justify-between gap-4 pt-4 w-full">
             <div className="space-y-2 text-left">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-fbblue animate-pulse" />
-                <span className="ui-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
-                  15D WINGS — BROKER BROKER CONTROL
-                </span>
-              </div>
               <h1 className="font-sync text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white uppercase">
                 FLIGHT CONCIERGE DESK
               </h1>
-              <div className="flex items-center gap-3 pt-1">
-                <span className="px-3 py-1 rounded-full bg-fbblue/20 border border-fbblue/40 text-fbblue text-[9px] font-mono tracking-wider uppercase font-bold">
-                  ACTIVE BROKER DESK
-                </span>
-                <span className="text-gray-500 text-[10px] font-mono">
-                  FLIGHT REF: <strong className="text-white">{mission.id}</strong>
-                </span>
-              </div>
             </div>
             <div className="flex items-center gap-3">
               {/* Book Flight iFrame Trigger */}
@@ -1972,7 +2023,7 @@ export default function BrokerPortal() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onClick={() => setShowNotifications(false)}
-                  className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm"
+                  className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-[10px]"
                 />
 
                 {/* Sidebar Panel */}
@@ -1991,7 +2042,7 @@ export default function BrokerPortal() {
                           <Bell className="w-4 h-4 text-fbblue" />
                           Unified Alerts
                         </h3>
-                        <p className="ui-sync text-[8px] text-gray-500 tracking-[0.2em] uppercase">
+                        <p className="font-sync text-[8px] text-gray-500 tracking-[0.2em] uppercase">
                           System Alerts • Directives • Chat
                         </p>
                       </div>
@@ -2096,7 +2147,7 @@ export default function BrokerPortal() {
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide border-b border-white/10">
             <button
               onClick={() => setActiveTab('crm_workspace')}
-              className={`px-4 py-3 rounded-2xl text-xs font-lexend tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'crm_workspace'
                   ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
                   : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
@@ -2106,7 +2157,7 @@ export default function BrokerPortal() {
             </button>
             <button
               onClick={() => setActiveTab('proposal_builder')}
-              className={`px-4 py-3 rounded-2xl text-xs font-lexend tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'proposal_builder'
                   ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
                   : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
@@ -2116,7 +2167,7 @@ export default function BrokerPortal() {
             </button>
             <button
               onClick={() => setActiveTab('booking_code')}
-              className={`px-4 py-3 rounded-2xl text-xs font-lexend tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'booking_code'
                   ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
                   : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
@@ -2126,7 +2177,7 @@ export default function BrokerPortal() {
             </button>
             <button
               onClick={() => setActiveTab('checkout_engine')}
-              className={`px-4 py-3 rounded-2xl text-xs font-lexend tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'checkout_engine'
                   ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
                   : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
@@ -2136,7 +2187,7 @@ export default function BrokerPortal() {
             </button>
             <button
               onClick={() => setActiveTab('operational_radar')}
-              className={`px-4 py-3 rounded-2xl text-xs font-lexend tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'operational_radar'
                   ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
                   : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
@@ -2146,7 +2197,7 @@ export default function BrokerPortal() {
             </button>
             <button
               onClick={() => setActiveTab('telemetry_vault')}
-              className={`px-4 py-3 rounded-2xl text-xs font-lexend tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'telemetry_vault'
                   ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
                   : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
@@ -2156,13 +2207,24 @@ export default function BrokerPortal() {
             </button>
             <button
               onClick={() => setActiveTab('status')}
-              className={`px-4 py-3 rounded-2xl text-xs font-lexend tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'status'
                   ? 'bg-white text-black border-white'
                   : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
               }`}
             >
               7. Flight Details
+            </button>
+            <button
+              onClick={() => {
+                sessionStorage.removeItem("broker_verified");
+                setSessionVerified(false);
+                showToast("Signed out successfully. Returning to login portal.", "info");
+              }}
+              className="px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 flex items-center gap-1.5 ml-auto cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
             </button>
           </div>
 
@@ -2172,6 +2234,13 @@ export default function BrokerPortal() {
               <BrokerCRMWorkspace
                 missionId={mission.id}
                 brokerCompanyName={brokerCompany || "15D Executive Aviation Brokerage"}
+                hasVerifiedOperator={hasVerifiedOperator}
+                onRequireOperator={() => setShowAOCModal(true)}
+                onSignOut={() => {
+                  sessionStorage.removeItem("broker_verified");
+                  setSessionVerified(false);
+                  showToast("Signed out successfully. Returning to login portal.", "info");
+                }}
               />
             </motion.div>
           )}
@@ -2343,7 +2412,7 @@ export default function BrokerPortal() {
                   </div>
 
                   <div>
-                    <span className="text-[10px] text-gray-500 block mb-6 font-lexend uppercase tracking-widest">
+                    <span className="text-[10px] text-gray-500 block mb-6 font-sync uppercase tracking-widest">
                       ITINERARY & LOGISTICS
                     </span>
 
@@ -2362,7 +2431,7 @@ export default function BrokerPortal() {
                                 <div className="absolute left-[11px] top-3 bottom-0 w-px bg-fbblue/30" />
                                 <div className="absolute left-1.5 top-1.5 w-2 h-2 rounded-full bg-fbblue ring-4 ring-[#0a0a0a]" />
                                 <div>
-                                  <p className="text-[9px] text-fbblue mb-1 tracking-widest uppercase ui-sync font-bold">
+                                  <p className="text-[9px] text-fbblue mb-1 tracking-widest uppercase font-sync font-bold">
                                     {i === 0
                                       ? "ORIGIN"
                                       : `LEG ${i + 1} DEPARTURE`}{" "}
@@ -2394,7 +2463,7 @@ export default function BrokerPortal() {
                                   <div className="absolute left-[11px] top-3 bottom-0 w-px bg-fbblue/30 border-l-2 border-dashed border-[#0a0a0a]" />
                                   <div className="absolute left-[9px] top-1.5 w-1.5 h-1.5 rounded-full bg-gray-500 ring-4 ring-[#0a0a0a]" />
                                   <div>
-                                    <p className="text-[9px] text-gray-400 mb-1 tracking-widest uppercase ui-sync font-bold">
+                                    <p className="text-[9px] text-gray-400 mb-1 tracking-widest uppercase font-sync font-bold">
                                       LEG {i + 1} ARRIVAL (Est. Flight: {ft})
                                     </p>
                                     <p className="text-sm font-light text-white/90">
@@ -2421,7 +2490,7 @@ export default function BrokerPortal() {
                                 >
                                   <div className="absolute left-[9px] top-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-4 ring-[#0a0a0a]" />
                                   <div>
-                                    <p className="text-[9px] text-emerald-500 mb-1 tracking-widest uppercase ui-sync font-bold">
+                                    <p className="text-[9px] text-emerald-500 mb-1 tracking-widest uppercase font-sync font-bold">
                                       FINAL DESTINATION (Est. Flight: {ft})
                                     </p>
                                     <p className="text-sm font-light text-white/90">
@@ -2444,7 +2513,7 @@ export default function BrokerPortal() {
                         <div className="flex gap-4 items-start">
                           <MapPin className="w-4 h-4 text-fbblue/50 mt-1 shrink-0" />
                           <div>
-                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-widest ui-sync">
+                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-widest font-sync">
                               DEPARTURE
                             </p>
                             <p className="text-sm font-light text-white/90">
@@ -2456,7 +2525,7 @@ export default function BrokerPortal() {
                         <div className="flex gap-4 items-start">
                           <MapPin className="w-4 h-4 text-fbblue/50 mt-1 shrink-0" />
                           <div>
-                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-widest ui-sync">
+                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-widest font-sync">
                               ARRIVAL
                             </p>
                             <p className="text-sm font-light text-white/90">
@@ -2475,7 +2544,7 @@ export default function BrokerPortal() {
                         <div className="flex gap-3 items-center mt-6 pt-6 border-t border-white/5">
                           <Clock className="w-4 h-4 text-fbblue/50" />
                           <div>
-                            <p className="text-[10px] text-gray-500 ui-sync tracking-widest">
+                            <p className="text-[10px] text-gray-500 font-lexend tracking-widest">
                               EST. DIRECT DURATION
                             </p>
                             <p className="text-xs mt-0.5 text-white">
@@ -2494,7 +2563,7 @@ export default function BrokerPortal() {
                       <div className="flex flex-col gap-4 mt-6 pt-6 border-t border-white/5">
                         <div className="flex items-center gap-3">
                           <Clock className="w-4 h-4 text-fbblue/50" />
-                          <span className="text-[10px] text-gray-500 ui-sync tracking-widest uppercase">
+                          <span className="text-[10px] text-gray-500 font-sync tracking-widest uppercase">
                             Multi-Leg Duration Overview
                           </span>
                         </div>
@@ -2533,7 +2602,7 @@ export default function BrokerPortal() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative overflow-hidden rounded-[2.5rem] p-8 md:p-12 border border-blue-500/30 shadow-2xl backdrop-blur-md"
+                className="relative overflow-hidden rounded-[2.5rem] p-8 md:p-12 border border-blue-500/30 shadow-2xl backdrop-blur-[10px]"
                 style={{
                   background:
                     "linear-gradient(135deg, #050a12 0%, #111a2e 100%)",
@@ -2554,7 +2623,7 @@ export default function BrokerPortal() {
                       TRANSITIONAL ACTIVATION SECURED
                     </h2>
                   </div>
-                  <div className="px-5 py-3 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-lexend uppercase tracking-widest font-bold text-center">
+                  <div className="px-5 py-3 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-sync uppercase tracking-widest font-bold text-center">
                     AWAITING ADMINISTRATIVE VERIFICATION
                   </div>
                 </div>
@@ -2575,12 +2644,12 @@ export default function BrokerPortal() {
 
                   <div className="grid md:grid-cols-2 gap-8 pt-4">
                     <div className="space-y-6">
-                      <h3 className="ui-sync text-[10px] text-gray-500 tracking-widest">
+                      <h3 className="font-sync text-[10px] text-gray-500 tracking-widest">
                         FLIGHT SPECIFICATIONS
                       </h3>
                       <div className="space-y-4">
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-lexend uppercase">
+                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
                             ROUTE
                           </span>
                           <span className="text-sm font-light text-white/90">
@@ -2588,7 +2657,7 @@ export default function BrokerPortal() {
                           </span>
                         </div>
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-lexend uppercase">
+                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
                             SCHEDULED DEPARTURE
                           </span>
                           <span className="text-sm font-light text-white/90">
@@ -2596,7 +2665,7 @@ export default function BrokerPortal() {
                           </span>
                         </div>
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-lexend uppercase">
+                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
                             AIRCRAFT RESOURCE
                           </span>
                           <span className="text-sm font-light text-white/90 uppercase tracking-wider font-sync">
@@ -2607,7 +2676,7 @@ export default function BrokerPortal() {
                     </div>
 
                     <div className="space-y-6 p-6 rounded-3xl bg-black/50 border border-white/5">
-                      <h3 className="ui-sync text-[10px] text-fbblue tracking-widest">
+                      <h3 className="font-sync text-[10px] text-fbblue tracking-widest">
                         FINANCIAL SETTLEMENT (V-2 HYBRID)
                       </h3>
                       <div className="space-y-3">
@@ -2662,7 +2731,7 @@ export default function BrokerPortal() {
                             </span>
                           </div>
                           <div className="text-right">
-                            <span className="text-white font-lexend uppercase block text-lg">
+                            <span className="text-white font-sync uppercase block text-lg">
                               {mission.gross_operator_quote
                                 ? formatCurrency(mission.gross_operator_quote)
                                 : "TBD"}
@@ -2680,7 +2749,7 @@ export default function BrokerPortal() {
                             </span>
                           </div>
                           <div className="text-right">
-                            <span className="text-emerald-500 font-lexend uppercase block text-lg">
+                            <span className="text-emerald-500 font-sync uppercase block text-lg">
                               {mission.gross_operator_quote
                                 ? formatCurrency(mission.outstanding_balance)
                                 : "TBD"}
@@ -2754,7 +2823,7 @@ export default function BrokerPortal() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative overflow-hidden rounded-[2.5rem] p-8 md:p-12 border border-emerald-500/30 shadow-2xl backdrop-blur-md"
+                className="relative overflow-hidden rounded-[2.5rem] p-8 md:p-12 border border-emerald-500/30 shadow-2xl backdrop-blur-[10px]"
                 style={{
                   background:
                     "linear-gradient(135deg, #030a06 0%, #0d1e11 100%)",
@@ -2775,14 +2844,14 @@ export default function BrokerPortal() {
                       FLIGHT FULLY ACTIVATED
                     </h2>
                   </div>
-                  <div className="px-5 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-lexend uppercase tracking-widest font-bold text-center">
+                  <div className="px-5 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-sync uppercase tracking-widest font-bold text-center">
                     ACTIVATION SECURED & VERIFIED
                   </div>
                 </div>
 
                 <div className="relative z-10 space-y-10">
                   <div className="text-center space-y-4">
-                    <span className="ui-sync text-[10px] text-gray-400 tracking-widest uppercase block mb-1">
+                    <span className="font-sync text-[10px] text-gray-400 tracking-widest uppercase block mb-1">
                       COUNTDOWN TO FLIGHT DEPARTURE
                     </span>
                     <FlightCountdown dateStr={depDateStr} mission={mission} />
@@ -2793,12 +2862,12 @@ export default function BrokerPortal() {
 
                   <div className="grid md:grid-cols-2 gap-8 pt-4">
                     <div className="space-y-6">
-                      <h3 className="ui-sync text-[10px] text-gray-400 tracking-widest">
+                      <h3 className="font-sync text-[10px] text-gray-400 tracking-widest">
                         ACTIVATED DETAILS
                       </h3>
                       <div className="space-y-4">
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-lexend uppercase">
+                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
                             ROUTE
                           </span>
                           <span className="text-sm font-light text-white/90">
@@ -2806,7 +2875,7 @@ export default function BrokerPortal() {
                           </span>
                         </div>
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-lexend uppercase">
+                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
                             SCHEDULED DEPARTURE
                           </span>
                           <span className="text-sm font-light text-white/90">
@@ -2814,7 +2883,7 @@ export default function BrokerPortal() {
                           </span>
                         </div>
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-lexend uppercase">
+                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
                             AIRCRAFT SPECIFICATION
                           </span>
                           <span className="text-sm font-light text-white/90 uppercase tracking-wider font-sync">
@@ -2825,7 +2894,7 @@ export default function BrokerPortal() {
                     </div>
 
                     <div className="space-y-6 p-6 rounded-3xl bg-black/40 border border-white/5">
-                      <h3 className="ui-sync text-[10px] text-emerald-500 tracking-widest">
+                      <h3 className="font-sync text-[10px] text-emerald-500 tracking-widest">
                         FINANCIAL RESOLUTION
                       </h3>
                       <div className="space-y-3">
@@ -2855,7 +2924,7 @@ export default function BrokerPortal() {
                         </div>
                         <div className="flex justify-between text-sm font-medium pt-3 border-t border-white/10">
                           <span className="text-white">Active Balance:</span>
-                          <span className="text-emerald-400 font-lexend uppercase">
+                          <span className="text-emerald-400 font-sync uppercase">
                             FULLY CONFIRMED ($0.00 DUE)
                           </span>
                         </div>
@@ -2911,15 +2980,15 @@ export default function BrokerPortal() {
                         1. Customize Your Flight
                       </h4>
                       {mission.payment_status === "AWAITING_VERIFICATION" ? (
-                        <span className="text-[10px] text-red-500 font-lexend uppercase font-bold tracking-wider flex items-center gap-1">
+                        <span className="text-[10px] text-red-500 font-sync uppercase font-bold tracking-wider flex items-center gap-1">
                           🔒 LOCKED
                         </span>
                       ) : isConfigLocked ? (
-                        <span className="text-[10px] text-fbblue tracking-wider font-lexend uppercase">
+                        <span className="text-[10px] text-fbblue tracking-wider font-sync uppercase">
                           LOCKED
                         </span>
                       ) : (
-                        <span className="text-[10px] text-fbblue tracking-wider font-lexend uppercase">
+                        <span className="text-[10px] text-fbblue tracking-wider font-sync uppercase">
                           AWAITING
                         </span>
                       )}
@@ -2953,13 +3022,13 @@ export default function BrokerPortal() {
                     <div className="flex justify-between items-center mb-2">
                       <h4 className="text-sm text-white">2. Passenger List</h4>
                       {mission.payment_status === "AWAITING_VERIFICATION" ? (
-                        <span className="text-[10px] text-red-500 font-lexend uppercase font-bold tracking-wider flex items-center gap-1">
+                        <span className="text-[10px] text-red-500 font-sync uppercase font-bold tracking-wider flex items-center gap-1">
                           🔒 LOCKED
                         </span>
                       ) : manifestUploaded ? (
                         <CheckCircle2 className="w-4 h-4 text-fbblue" />
                       ) : (
-                        <span className="text-[10px] text-gray-500 tracking-wider font-lexend uppercase">
+                        <span className="text-[10px] text-gray-500 tracking-wider font-sync uppercase">
                           PENDING
                         </span>
                       )}
@@ -3002,7 +3071,7 @@ export default function BrokerPortal() {
                       <h4 className="text-sm text-white">
                         3. Flight Activation Commitment
                       </h4>
-                      <span className="text-[10px] text-fbblue tracking-wider font-lexend uppercase">
+                      <span className="text-[10px] text-fbblue tracking-wider font-sync uppercase">
                         {manifestUploaded &&
                         isConfigLocked &&
                         mission.status !== "AWAITING_CONFIRMATION"
@@ -3037,7 +3106,7 @@ export default function BrokerPortal() {
                         className="p-8 rounded-[2rem] space-y-8 glass-vip border border-white/10 shadow-2xl"
                       >
                         <div>
-                          <span className="ui-sync text-gold text-[8px] mb-2 block">
+                          <span className="font-lexend text-gold text-[8px] mb-2 block">
                             YOUR PLANE
                           </span>
                           <h4 className="text-lg font-light mb-4">
@@ -3159,7 +3228,7 @@ export default function BrokerPortal() {
                                         !isConfigLocked &&
                                         setShowAircraftIframe(true)
                                       }
-                                      className="ui-sync text-[9px] bg-white text-black px-6 py-3 rounded-full hover:bg-fbblue hover:text-white transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.2)] font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                                      className="font-lexend text-[9px] bg-white text-black px-6 py-3 rounded-full hover:bg-fbblue hover:text-white transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.2)] font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                       {isConfigLocked
                                         ? `LINKED: ${asset.name.toUpperCase()}`
@@ -3227,7 +3296,7 @@ export default function BrokerPortal() {
                           {isWithin72Hours || isConfigLocked ? (
                             <div className="mt-4 p-5 rounded-2xl bg-black/40 border border-fbblue/20 space-y-2">
                               <div className="flex justify-between items-center">
-                                <span className="ui-sync text-[8px] text-fbblue font-bold uppercase tracking-widest">
+                                <span className="font-sync text-[8px] text-fbblue font-bold uppercase tracking-widest">
                                   ITINERARY PROTOCOL ACTIVE
                                 </span>
                               </div>
@@ -3251,7 +3320,7 @@ export default function BrokerPortal() {
                           )}
 
                           <div className="mt-6 pt-6 border-t border-white/5">
-                            <span className="ui-sync text-fbblue text-[8px] mb-2 block uppercase tracking-widest">
+                            <span className="font-sync text-fbblue text-[8px] mb-2 block uppercase tracking-widest">
                               Customization & In-Flight Amenities
                             </span>
                             <p className="text-xs text-gray-400 font-light mb-4">
@@ -3267,7 +3336,7 @@ export default function BrokerPortal() {
                                 !isConfigLocked &&
                                 setShowCustomizationModal(true)
                               }
-                              className="w-full bg-black border border-white/10 text-white py-4 rounded-xl text-xs font-bold font-lexend uppercase tracking-widest hover:border-fbblue/50 hover:bg-white/5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="w-full bg-black border border-white/10 text-white py-4 rounded-xl text-xs font-bold font-sync uppercase tracking-widest hover:border-fbblue/50 hover:bg-white/5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               {isConfigLocked
                                 ? "FLIGHT LOCKED & READY"
@@ -3276,7 +3345,7 @@ export default function BrokerPortal() {
                           </div>
                         </div>
                         <div className="border-t border-white/5 pt-6">
-                          <span className="ui-sync text-fbblue text-[8px] mb-2 block uppercase tracking-widest">
+                          <span className="font-sync text-fbblue text-[8px] mb-2 block uppercase tracking-widest">
                             Experiential Upgrade
                           </span>
                           <p className="text-xs text-gray-400 font-light mb-4 text-balance">
@@ -3289,7 +3358,7 @@ export default function BrokerPortal() {
                             onClick={() =>
                               !isConfigLocked && setShowExperienceIframe(true)
                             }
-                            className="w-full bg-white text-black py-4 rounded-xl text-xs font-bold font-lexend uppercase tracking-widest hover:bg-gray-200 transition-all shadow-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-white text-black py-4 rounded-xl text-xs font-bold font-sync uppercase tracking-widest hover:bg-gray-200 transition-all shadow-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {isConfigLocked
                               ? "EXPERIENTIAL UPGRADES SECURED"
@@ -3322,7 +3391,7 @@ export default function BrokerPortal() {
                               setIsConfigLocked(true);
                               setActiveTab("manifest");
                             }}
-                            className="w-full bg-white/[0.05] text-white border border-white/10 py-4 rounded-xl text-xs font-light hover:bg-white/10 transition-all mt-4 font-lexend uppercase tracking-widest"
+                            className="w-full bg-white/[0.05] text-white border border-white/10 py-4 rounded-xl text-xs font-light hover:bg-white/10 transition-all mt-4 font-sync uppercase tracking-widest"
                           >
                             {isConfigLocked
                               ? "CONFIGURATION LOCKED"
@@ -3412,10 +3481,10 @@ export default function BrokerPortal() {
                         >
                           <div className="absolute top-0 right-0 w-64 h-64 bg-fbblue/10 blur-[60px] rounded-full pointer-events-none" />
                           <div className="flex justify-between items-start mb-10 relative z-10">
-                            <span className="font-lexend uppercase tracking-widest text-white/80 text-xs font-bold">
+                            <span className="font-sync uppercase tracking-widest text-white/80 text-xs font-bold">
                               15D WINGS
                             </span>
-                            <span className="ui-sync text-[8px] text-white/40 tracking-[0.5em]">
+                            <span className="font-lexend text-[8px] text-white/40 tracking-[0.5em]">
                               FLIGHT ACTIVATION
                             </span>
                           </div>
@@ -3424,7 +3493,7 @@ export default function BrokerPortal() {
                             <div className="relative z-10 space-y-6">
                               <div className="flex items-center gap-3">
                                 <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-                                <h4 className="text-red-500 font-lexend uppercase tracking-widest text-sm">
+                                <h4 className="text-red-500 font-sync uppercase tracking-widest text-sm">
                                   PAYMENT VERIFICATION REJECTED
                                 </h4>
                               </div>
@@ -3451,7 +3520,7 @@ export default function BrokerPortal() {
                               <div className="pt-4 border-t border-white/5">
                                 <button
                                   onClick={handlePaymentAlert}
-                                  className="px-6 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold font-lexend uppercase tracking-widest transition-all cursor-pointer shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+                                  className="px-6 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold font-sync uppercase tracking-widest transition-all cursor-pointer shadow-[0_0_15px_rgba(239,68,68,0.3)]"
                                 >
                                   RE-UPLOAD RECEIPT PROOF
                                 </button>
@@ -3482,7 +3551,7 @@ export default function BrokerPortal() {
                             </div>
                           ) : mission.payment_status === "CONFIRMING" ? (
                             <div className="relative z-10 space-y-4">
-                              <h4 className="text-fbblue font-lexend uppercase tracking-widest text-sm">
+                              <h4 className="text-fbblue font-sync uppercase tracking-widest text-sm">
                                 PAYMENT IN REVIEW
                               </h4>
                               <p className="text-gray-400 text-xs font-light leading-relaxed">
@@ -3493,7 +3562,7 @@ export default function BrokerPortal() {
                           ) : mission.payment_status === "CONFIRMED" ? (
                             <div className="relative z-10 space-y-6">
                               <div className="space-y-2">
-                                <h4 className="text-emerald-500 font-lexend uppercase tracking-widest text-sm">
+                                <h4 className="text-emerald-500 font-sync uppercase tracking-widest text-sm">
                                   ACTIVATION SECURED
                                 </h4>
                                 <p className="text-white font-lexend font-light text-2xl">
@@ -3545,7 +3614,7 @@ export default function BrokerPortal() {
                                     <div className="border-t border-white/10 pt-4 space-y-4">
                                       <div className="space-y-2">
                                         <span className="text-gray-500 font-mono text-[9px] block">MATCHED SPECIFICATION</span>
-                                        <p className="text-white text-sm font-semibold font-lexend uppercase tracking-wide flex items-center gap-2">
+                                        <p className="text-white text-sm font-semibold font-sync uppercase tracking-wide flex items-center gap-2">
                                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                                           {mission.raw_payload?.tail_number || "5N-BGE / Gulfstream G550"}
                                         </p>
@@ -3596,7 +3665,7 @@ export default function BrokerPortal() {
                                             href={mission.raw_payload?.virtual_tour_url} 
                                             target="_blank" 
                                             rel="noreferrer"
-                                            className="flex items-center justify-center gap-2 w-full py-2.5 bg-fbblue hover:bg-blue-600 text-white font-bold rounded-xl text-[10px] font-lexend uppercase tracking-widest transition-colors mt-2 text-center"
+                                            className="flex items-center justify-center gap-2 w-full py-2.5 bg-fbblue hover:bg-blue-600 text-white font-bold rounded-xl text-[10px] font-sync uppercase tracking-widest transition-colors mt-2 text-center"
                                           >
                                             LAUNCH 3D VIRTUAL CABIN TOUR
                                           </a>
@@ -3611,7 +3680,7 @@ export default function BrokerPortal() {
                             <>
                               <div className="mb-6 relative z-10 space-y-4">
                                 <div>
-                                  <p className="ui-sync text-fbblue text-[8px] mb-2 tracking-[0.3em]">
+                                  <p className="font-lexend text-fbblue text-[8px] mb-2 tracking-[0.3em]">
                                     PLATFORM ACTIVATION DEPOSIT
                                   </p>
                                   <p className="text-white font-lexend font-light text-4xl">
@@ -3622,7 +3691,7 @@ export default function BrokerPortal() {
                                 </div>
                                 {mission.estimated_lower && (
                                   <div className="pt-2 border-t border-white/10">
-                                    <p className="ui-sync text-gray-400 text-[8px] mb-1 tracking-[0.3em]">
+                                    <p className="font-lexend text-gray-400 text-[8px] mb-1 tracking-[0.3em]">
                                       FULL ESTIMATED PRICE RANGE
                                     </p>
                                     <p className="text-white font-lexend text-sm">
@@ -3666,7 +3735,7 @@ export default function BrokerPortal() {
                                 </p>
 
                                 <div className="bg-black/50 p-4 rounded-xl border border-white/5 space-y-3 mt-4">
-                                  <span className="ui-sync text-[8px] text-gray-400 tracking-widest block border-b border-white/5 pb-2">
+                                  <span className="font-lexend text-[8px] text-gray-400 tracking-widest block border-b border-white/5 pb-2">
                                     WIRE INSTRUCTIONS (USD INTERNATIONAL)
                                   </span>
                                   <div className="flex justify-between text-xs font-light">
@@ -3698,7 +3767,7 @@ export default function BrokerPortal() {
                                     <span className="text-white">FIDTNGLA</span>
                                   </div>
                                   <div className="mt-2 pt-2 border-t border-white/5 space-y-2">
-                                    <span className="ui-sync text-[8px] text-gray-500 tracking-widest block">
+                                    <span className="font-lexend text-[8px] text-gray-500 tracking-widest block">
                                       INTERMEDIARY BANK
                                     </span>
                                     <div className="flex justify-between text-[10px] font-light">
@@ -3776,14 +3845,14 @@ export default function BrokerPortal() {
                                 </label>
 
                                 <div className="flex justify-between items-end pt-2">
-                                  <div className="text-[8px] text-white/60 ui-sync tracking-widest uppercase">
+                                  <div className="text-[8px] text-white/60 font-sync tracking-widest uppercase">
                                     {mission.client_name || "EXECUTIVE"}
                                   </div>
                                   <button
                                     id="payment-btn"
                                     disabled={!isAgreed}
                                     onClick={handlePaymentAlert}
-                                    className="px-6 py-4 bg-fbblue text-white rounded-xl text-xs font-medium hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_0_15px_rgba(24,119,242,0.3)] disabled:shadow-none font-lexend uppercase tracking-widest font-bold"
+                                    className="px-6 py-4 bg-fbblue text-white rounded-xl text-xs font-medium hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_0_15px_rgba(24,119,242,0.3)] disabled:shadow-none font-sync uppercase tracking-widest font-bold"
                                   >
                                     I HAVE MADE PAYMENT
                                   </button>
@@ -3803,7 +3872,7 @@ export default function BrokerPortal() {
           <div className="pt-8 pb-12">
             <div className="p-6 rounded-[2rem] border border-white/5 bg-white/[0.01]">
               <div className="flex justify-between items-center mb-6">
-                <span className="ui-sync text-gray-500 text-[8px]">
+                <span className="font-lexend text-gray-500 text-[8px]">
                   ARCHITECTURE LOGS
                 </span>
                 <span className="text-[10px] text-gray-600">LIVE FEED</span>
@@ -3842,7 +3911,7 @@ export default function BrokerPortal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/80 backdrop-blur-md p-4"
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/80 backdrop-blur-[10px] p-4"
           >
             <motion.div
               initial={{ scale: 0.95 }}
@@ -3863,6 +3932,113 @@ export default function BrokerPortal() {
                 }}
                 onClose={() => setShowCustomizationModal(false)}
               />
+            </motion.div>
+          </motion.div>
+        )}
+
+        {showAOCModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-[10px] p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border border-white/10 glass-vip bg-gradient-to-br from-[#0a1220]/95 via-black/95 to-[#050810]/95 shadow-[0_0_60px_rgba(0,0,0,0.85)] space-y-6 text-left relative"
+            >
+              <button
+                onClick={() => setShowAOCModal(false)}
+                className="absolute top-6 right-6 text-gray-400 hover:text-white transition-all cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-8 h-8 text-fbblue" />
+                <div>
+                  <h2 className="font-sync font-bold text-lg md:text-xl tracking-wider uppercase text-white">
+                    OPERATOR VERIFICATION REQUIRED
+                  </h2>
+                  <p className="font-lexend text-xs text-fbblue">
+                    Verification Gateway & AOC Onboarding
+                  </p>
+                </div>
+              </div>
+
+              <p className="font-lexend text-xs text-gray-300 leading-relaxed">
+                Your broker account must be verified by a licensed operator before using flight booking and proposal features. Please onboard a licensed operator below to activate your full workspace.
+              </p>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setHasVerifiedOperator(true);
+                  setShowAOCModal(false);
+                  showToast("Licensed operator successfully onboarded and verified!", "success");
+                }}
+                className="space-y-4 pt-2"
+              >
+                <div className="space-y-1.5">
+                  <label className="font-sync text-[10px] uppercase text-gray-400 font-bold tracking-wider">
+                    OPERATOR / AIRLINE NAME
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={operatorName}
+                    onChange={(e) => setOperatorName(e.target.value)}
+                    placeholder="e.g. ExecuJet Executive Aviation"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 font-lexend focus:outline-none focus:border-fbblue"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-sync text-[10px] uppercase text-gray-400 font-bold tracking-wider">
+                    AIR OPERATOR CERTIFICATE (AOC) / LICENSE NUMBER
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={operatorAocNumber}
+                    onChange={(e) => setOperatorAocNumber(e.target.value)}
+                    placeholder="e.g. AOC-2026-9041"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 font-lexend focus:outline-none focus:border-fbblue"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-sync text-[10px] uppercase text-gray-400 font-bold tracking-wider">
+                    AIRCRAFT TAIL NUMBER
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={operatorEmail}
+                    onChange={(e) => setOperatorEmail(e.target.value)}
+                    placeholder="e.g. 5N-B15D"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 font-lexend focus:outline-none focus:border-fbblue"
+                  />
+                </div>
+
+                <div className="pt-4 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowAOCModal(false)}
+                    className="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-lexend text-xs transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-3 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold uppercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] cursor-pointer"
+                  >
+                    ONBOARD A LICENSED OPERATOR
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </motion.div>
         )}

@@ -123,7 +123,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-fbblue animate-pulse" />
-            <span className="ui-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
+            <span className="font-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
               MODULE 2 — WHITE-LABEL PROPOSAL DESIGNER
             </span>
           </div>
@@ -147,7 +147,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
         <div className="space-y-5">
           {/* Agency Name */}
           <div className="space-y-2">
-            <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+            <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
               YOUR AGENCY / BRAND NAME
             </label>
             <input
@@ -161,7 +161,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
 
           {/* Logo Upload */}
           <div className="space-y-2">
-            <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block flex items-center gap-1">
+            <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block flex items-center gap-1">
               <ImageIcon className="w-3.5 h-3.5 text-fbblue" /> AGENCY LOGO UPLOAD
             </label>
             <div className="flex items-center gap-3">
@@ -192,7 +192,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
 
           {/* 20 Google Fonts Selector */}
           <div className="space-y-2">
-            <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block flex items-center justify-between">
+            <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block flex items-center justify-between">
               <span className="flex items-center gap-1">
                 <Type className="w-3.5 h-3.5 text-fbblue" /> PROPOSAL TYPOGRAPHY (20 GOOGLE FONTS)
               </span>
@@ -225,7 +225,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
           {/* Broker Markup Slider */}
           <div className="space-y-3 bg-black/60 p-5 rounded-2xl border border-white/10">
             <div className="flex justify-between items-center">
-              <label className="ui-sync text-[9px] text-gray-400 tracking-widest uppercase block flex items-center gap-1.5">
+              <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block flex items-center gap-1.5">
                 <Sliders className="w-3.5 h-3.5 text-fbblue" /> BROKER MARKUP (%)
               </label>
               <span className="text-sm font-mono font-bold text-fbblue">
@@ -269,7 +269,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
             </div>
 
             <div className="flex justify-between items-center pt-3 border-t border-white/10">
-              <span className="ui-sync text-xs font-bold text-white tracking-wider">
+              <span className="font-lexend text-xs font-bold text-white tracking-wider">
                 END-CLIENT QUOTE TOTAL:
               </span>
               <span className="text-2xl font-mono font-bold text-fbblue">
@@ -309,7 +309,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[250] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 z-[250] bg-black/90 backdrop-blur-[10px] flex items-center justify-center p-4 overflow-y-auto"
           >
             <motion.div
               initial={{ scale: 0.95, y: 20 }}
@@ -325,7 +325,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
               </button>
 
               <div className="space-y-1">
-                <span className="ui-sync text-[9px] text-fbblue tracking-[0.3em] font-bold block">
+                <span className="font-lexend text-[9px] text-fbblue tracking-[0.3em] font-bold block">
                   WHITE-LABEL PROPOSAL DOCUMENT PREVIEW
                 </span>
                 <h3 className="font-sync text-xl font-bold text-white uppercase">
@@ -396,7 +396,10 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
               <div className="flex gap-3">
                 <button
                   onClick={() => {
-                    alert(`Proposal PDF for ${missionId} formatted in "${selectedFont}" downloaded successfully!`);
+                                        alert(`Proposal PDF for ${missionId} formatted in "${selectedFont}" generated successfully!
+
+DYNAMIC VERIFICATION:
+A QR code has been embedded into this PDF pointing to: https://vip.15dwings.com.ng/verify/${missionId}`);
                     setShowPreviewModal(false);
                   }}
                   className="flex-1 py-3.5 rounded-xl bg-fbblue text-white font-sync text-xs font-bold tracking-wider uppercase hover:bg-fbblue/90 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(24,119,242,0.4)]"

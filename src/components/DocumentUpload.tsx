@@ -59,7 +59,7 @@ export default function DocumentUpload({ missionId }: { missionId: string }) {
               <p className="text-[10px] text-gray-500 leading-relaxed">{doc.description}</p>
             </div>
             <div className="pt-4 flex items-center justify-between">
-              <span className={`ui-sync text-[8px] ${isUploaded ? 'text-emerald-500' : 'text-gray-600'}`}>{isUploading ? 'UPLOADING...' : isUploaded ? 'VERIFIED' : 'AWAITING'}</span>
+              <span className={`font-lexend text-[8px] ${isUploaded ? 'text-emerald-500' : 'text-gray-600'}`}>{isUploading ? 'UPLOADING...' : isUploaded ? 'VERIFIED' : 'AWAITING'}</span>
               {isUploaded ? <ShieldCheck className="w-4 h-4 text-emerald-500" /> : <ShieldCheck className="w-4 h-4 text-white/10" />}
             </div>
           </label>

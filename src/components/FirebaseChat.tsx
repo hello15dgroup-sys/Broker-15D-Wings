@@ -75,7 +75,7 @@ export const FirebaseChat = ({ missionId }: { missionId: string }) => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="bg-[#0f172a]/90 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl w-[350px] h-[500px] flex flex-col mb-4 overflow-hidden"
+            className="bg-[#0f172a]/90 backdrop-blur-[10px] border border-white/10 shadow-2xl rounded-2xl w-[350px] h-[500px] flex flex-col mb-4 overflow-hidden"
           >
             <div className="bg-white/5 border-b border-white/10 p-4 flex justify-between items-center">
               <div className="flex items-center gap-2">

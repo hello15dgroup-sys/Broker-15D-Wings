@@ -100,7 +100,7 @@ export default function VoiceAssistant() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
              <div className={`w-2 h-2 rounded-full ${isListening ? 'bg-fbblue animate-pulse' : 'bg-white/20'}`} />
-             <span className="ui-sync text-[10px] tracking-[0.2em] text-gray-400 uppercase font-bold">Operations Support AI</span>
+             <span className="font-sync text-[10px] tracking-[0.2em] text-gray-400 uppercase font-bold">Operations Support AI</span>
           </div>
           <Sparkles className="w-4 h-4 text-fbblue/40" />
         </div>
