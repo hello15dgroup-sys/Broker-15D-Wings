@@ -18,6 +18,8 @@ import {
   Bell,
   ArrowLeft,
   LogOut,
+  ExternalLink,
+  Lock,
 } from "lucide-react";
 import { formatCurrency, calculateFlightTime, formatToLocalDate } from "../lib/utils";
 const Spline = lazy(() => import("@splinetool/react-spline"));
@@ -2940,932 +2942,123 @@ export default function BrokerPortal() {
                 </div>
               </motion.div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <h3 className="text-lg font-light text-white/90 mb-6 border-b border-white/5 pb-4">
-                    Execution Progression
-                  </h3>
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-8 md:p-10 rounded-[2.5rem] border border-white/10 glass-vip bg-gradient-to-br from-black/80 via-[#0a1220]/90 to-black/90 shadow-2xl space-y-8 relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-96 h-96 bg-fbblue/5 blur-3xl pointer-events-none rounded-full" />
 
-                  <div className="flex items-center space-x-2 mb-8">
-                    <div
-                      className={`h-1.5 flex-1 rounded-full transition-all duration-700 ${!isSetupPhase || activeTab !== "customization" ? "bg-fbblue shadow-[0_0_10px_rgba(24,119,242,0.5)]" : "bg-fbblue/20"}`}
-                    />
-                    <div
-                      className={`h-1.5 flex-1 rounded-full transition-all duration-700 ${manifestUploaded ? "bg-fbblue shadow-[0_0_10px_rgba(24,119,242,0.5)]" : "bg-white/10"}`}
-                    />
-                    <div
-                      className={`h-1.5 flex-1 rounded-full transition-all duration-700 ${mission.payment_status === "CONFIRMED" || mission.payment_status === "CONFIRMING" ? "bg-fbblue shadow-[0_0_10px_rgba(24,119,242,0.5)]" : "bg-white/10"}`}
-                    />
-                  </div>
-
-                  {/* Step 1: Customization */}
-                  <div
-                    className={`p-6 rounded-2xl border transition-all ${
-                      mission.payment_status === "AWAITING_VERIFICATION"
-                        ? "opacity-40 cursor-not-allowed border-red-500/10"
-                        : activeTab === "customization"
-                        ? "bg-fbblue/10 border-fbblue/30 shadow-[0_0_20px_rgba(24,119,242,0.1)]"
-                        : "glass-vip border-white/10 hover:border-white/20"
-                    } cursor-pointer`}
-                    onClick={() => {
-                      if (mission.payment_status === "AWAITING_VERIFICATION") {
-                        showToast("Navigation is locked during Awaiting Payment Verification (APV) phase.", "warning");
-                        return;
-                      }
-                      setActiveTab("customization");
-                    }}
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-sm text-white">
-                        1. Customize Your Flight
-                      </h4>
-                      {mission.payment_status === "AWAITING_VERIFICATION" ? (
-                        <span className="text-[10px] text-red-500 font-sync uppercase font-bold tracking-wider flex items-center gap-1">
-                          🔒 LOCKED
-                        </span>
-                      ) : isConfigLocked ? (
-                        <span className="text-[10px] text-fbblue tracking-wider font-sync uppercase">
-                          LOCKED
-                        </span>
-                      ) : (
-                        <span className="text-[10px] text-fbblue tracking-wider font-sync uppercase">
-                          AWAITING
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-400 font-medium font-sync mt-1 uppercase tracking-wider">
-                      {mission.payment_status === "AWAITING_VERIFICATION"
-                        ? "Secured during audit"
-                        : isConfigLocked
-                        ? "Flight fully customized"
-                        : "Choose plane and options"}
-                    </p>
-                  </div>
-
-                  {/* Step 2: Passenger Manifest */}
-                  <div
-                    className={`p-6 rounded-2xl border transition-all ${
-                      mission.payment_status === "AWAITING_VERIFICATION"
-                        ? "opacity-40 cursor-not-allowed border-red-500/10"
-                        : activeTab === "manifest"
-                        ? "bg-fbblue/10 border-fbblue/30 shadow-[0_0_20px_rgba(24,119,242,0.1)]"
-                        : "glass-vip border-white/10 hover:border-white/20"
-                    } cursor-pointer`}
-                    onClick={() => {
-                      if (mission.payment_status === "AWAITING_VERIFICATION") {
-                        showToast("Navigation is locked during Awaiting Payment Verification (APV) phase.", "warning");
-                        return;
-                      }
-                      setActiveTab("manifest");
-                    }}
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="text-sm text-white">2. Passenger List</h4>
-                      {mission.payment_status === "AWAITING_VERIFICATION" ? (
-                        <span className="text-[10px] text-red-500 font-sync uppercase font-bold tracking-wider flex items-center gap-1">
-                          🔒 LOCKED
-                        </span>
-                      ) : manifestUploaded ? (
-                        <CheckCircle2 className="w-4 h-4 text-fbblue" />
-                      ) : (
-                        <span className="text-[10px] text-gray-500 tracking-wider font-sync uppercase">
-                          PENDING
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 font-light">
-                      {mission.payment_status === "AWAITING_VERIFICATION"
-                        ? "Secured during audit"
-                        : "Who is flying? Please add passengers."}
-                    </p>
-                  </div>
-
-                  {/* Step 3: Funding */}
-                  <div
-                    className={`p-6 rounded-2xl border transition-all ${activeTab === "status" ? "bg-fbblue/10 border-fbblue/30 shadow-[0_0_20px_rgba(24,119,242,0.1)]" : "glass-vip border-white/10 hover:border-white/20"} cursor-pointer`}
-                    onClick={() => {
-                      if (mission.payment_status === "AWAITING_VERIFICATION") {
-                        setActiveTab("status");
-                        return;
-                      }
-                      if (!isConfigLocked) {
-                        showToast(
-                          "Please complete the steps in sequence. Lock your flight configuration in Step 1 first.",
-                          "warning",
-                        );
-                        setActiveTab("customization");
-                        return;
-                      }
-                      if (!manifestUploaded) {
-                        showToast(
-                          "Please complete your Passenger Manifest in Step 2 before moving to Step 3.",
-                          "warning",
-                        );
-                        setActiveTab("manifest");
-                        return;
-                      }
-                      setActiveTab("status");
-                    }}
-                  >
-                    <div className="flex justify-between items-center mb-4">
-                      <h4 className="text-sm text-white">
-                        3. Flight Activation Commitment
-                      </h4>
-                      <span className="text-[10px] text-fbblue tracking-wider font-sync uppercase">
-                        {manifestUploaded &&
-                        isConfigLocked &&
-                        mission.status !== "AWAITING_CONFIRMATION"
-                          ? "ACTION REQUIRED"
-                          : "LOCKED"}
+                {/* Top Status Banner */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/10">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2.5 h-2.5 rounded-full bg-fbblue animate-pulse" />
+                      <span className="font-sync text-[10px] text-fbblue font-bold tracking-[0.25em] uppercase">
+                        MISSION FLIGHT ID: {mission.id}
                       </span>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-2xl font-light text-white/90">
-                        {dynamicDeposit ? formatCurrency(dynamicDeposit) : "—"}
-                      </p>
-                      <p className="text-[9px] text-gray-500 font-sync tracking-widest uppercase">
-                        Estimated Flight Deposit
-                      </p>
-                    </div>
+                    <h2 className="font-sync text-xl md:text-2xl font-bold tracking-wider text-white uppercase">
+                      {dep} ➔ {dest}
+                    </h2>
+                    <p className="text-xs text-gray-400 font-light">
+                      Scheduled Departure: <span className="text-white font-mono">{parseDate(mission)}</span>
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <span className="px-4 py-2 rounded-full bg-fbblue/10 border border-fbblue/20 text-fbblue text-xs font-mono tracking-wider uppercase font-semibold">
+                      STATUS: {mission.status.replace(/_/g, " ")}
+                    </span>
+                    <a
+                      href={`https://vip.15dwings.com.ng/verify/${mission.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-5 py-2.5 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 cursor-pointer"
+                    >
+                      <span>PAY & ACTIVATE ON VIP PORTAL</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
                   </div>
                 </div>
 
-                {}
-                <div>
-                  <h3 className="text-lg font-light text-transparent mb-6 border-b border-transparent pb-4 select-none">
-                    Action
-                  </h3>
+                {/* Grid of Key Mission Details */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Aircraft Profile */}
+                  <div className="p-6 rounded-2xl bg-black/60 border border-white/10 space-y-3">
+                    <span className="font-sync text-[9px] text-gray-400 uppercase tracking-widest block">
+                      AIRCRAFT ALLOCATION
+                    </span>
+                    <div className="space-y-1">
+                      <h4 className="font-sync text-sm font-bold text-white uppercase">{specificAircraftName}</h4>
+                      <p className="text-xs text-fbblue font-mono font-semibold">{mission.aircraft_class || "HEAVY JET"}</p>
+                    </div>
+                    <div className="pt-2 border-t border-white/5 text-[11px] text-gray-400 space-y-1">
+                      <div className="flex justify-between">
+                        <span>Passenger Capacity:</span>
+                        <span className="font-mono text-white font-bold">{mission.passengers || mission.pax || mission.raw_payload?.passengers || 8} Pax</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Luggage Protocol:</span>
+                        <span className="font-mono text-white font-bold">Standard Jet Hold</span>
+                      </div>
+                    </div>
+                  </div>
 
-                  <AnimatePresence mode="wait">
-                    {activeTab === "customization" && (
-                      <motion.div
-                        key="customization"
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="p-8 rounded-[2rem] space-y-8 glass-vip border border-white/10 shadow-2xl"
+                  {/* Financial Overview */}
+                  <div className="p-6 rounded-2xl bg-black/60 border border-white/10 space-y-3">
+                    <span className="font-sync text-[9px] text-gray-400 uppercase tracking-widest block">
+                      FINANCIAL ESTIMATION
+                    </span>
+                    <div className="space-y-1">
+                      <h4 className="font-sync text-xl font-bold text-white">
+                        {dynamicDeposit ? formatCurrency(dynamicDeposit) : "—"}
+                      </h4>
+                      <p className="text-[10px] text-gray-400 font-mono uppercase">Estimated Upfront Activation Deposit</p>
+                    </div>
+                    <div className="pt-2 border-t border-white/5 text-[11px] text-gray-400 space-y-1">
+                      <div className="flex justify-between">
+                        <span>Total Flight Estimate:</span>
+                        <span className="font-mono text-white font-bold">{formatCurrency(dynamicDeposit + remainingBalance)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Escrow Status:</span>
+                        <span className="font-mono text-fbblue font-bold">AWAITING ESCROW FUNDING</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quick Actions & Handoff */}
+                  <div className="p-6 rounded-2xl bg-black/60 border border-white/10 flex flex-col justify-between space-y-4">
+                    <div>
+                      <span className="font-sync text-[9px] text-gray-400 uppercase tracking-widest block mb-2">
+                        EXECUTIVE ACTIONS
+                      </span>
+                      <p className="text-xs text-gray-300 leading-relaxed font-light">
+                        To lock charter operation and release tail allocations, proceed to the VIP portal to settle the principal and flight activation deposit.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <a
+                        href={`https://vip.15dwings.com.ng/verify/${mission.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(24,119,242,0.3)] cursor-pointer"
                       >
-                        <div>
-                          <span className="font-lexend text-gold text-[8px] mb-2 block">
-                            YOUR PLANE
-                          </span>
-                          <h4 className="text-lg font-light mb-4">
-                            {isConfigLocked
-                              ? "Flight Locked & Ready"
-                              : "Choose A Plane"}
-                          </h4>
-                          <div className="relative h-44 rounded-2xl overflow-hidden mb-4 border border-white/10 group shadow-2xl">
-                            {(() => {
-                              let asset = getAircraftDisplayDetails(
-                                mission.operator_aircraft ||
-                                  mission.aircraft_class,
-                              );
-                              let hasAircraft = !!(
-                                mission.operator_aircraft ||
-                                mission.aircraft_class
-                              );
-
-                              if (hasAircraft && matchingAircraft) {
-                                let matchedImage = asset.image;
-                                try {
-                                  if (
-                                    Array.isArray(matchingAircraft.images) &&
-                                    matchingAircraft.images.length > 0
-                                  ) {
-                                    matchedImage = matchingAircraft.images[0];
-                                  } else if (
-                                    typeof matchingAircraft.images ===
-                                      "string" &&
-                                    matchingAircraft.images.length > 0
-                                  ) {
-                                    const parsed = JSON.parse(
-                                      matchingAircraft.images,
-                                    );
-                                    if (
-                                      Array.isArray(parsed) &&
-                                      parsed.length > 0
-                                    )
-                                      matchedImage = parsed[0];
-                                    else matchedImage = matchingAircraft.images;
-                                  } else if (matchingAircraft.image) {
-                                    matchedImage = matchingAircraft.image;
-                                  }
-                                } catch (e) {
-                                  if (
-                                    typeof matchingAircraft.images ===
-                                      "string" &&
-                                    matchingAircraft.images.startsWith("http")
-                                  ) {
-                                    matchedImage = matchingAircraft.images;
-                                  }
-                                }
-                                asset = {
-                                  ...asset,
-                                  name: specificAircraftName,
-                                  class:
-                                    matchingAircraft.Type ||
-                                    matchingAircraft.type ||
-                                    matchingAircraft.Category ||
-                                    matchingAircraft.category ||
-                                    asset.class,
-                                  image: matchedImage,
-                                  specs: {
-                                    pax:
-                                      matchingAircraft.Max_Passengers ||
-                                      matchingAircraft.capacity ||
-                                      matchingAircraft.max_passengers ||
-                                      asset.specs.pax,
-                                    range: matchingAircraft.range_nm
-                                      ? `${matchingAircraft.range_nm} NM`
-                                      : asset.specs.range,
-                                    speed: matchingAircraft.Cruise_Speed_KTAS
-                                      ? `${matchingAircraft.Cruise_Speed_KTAS} KTAS`
-                                      : asset.specs.speed,
-                                  },
-                                };
-                              }
-                              return (
-                                <>
-                                  <img
-                                    src={asset.image}
-                                    className="w-full h-full object-cover opacity-80 transition-all duration-500 group-hover:scale-105"
-                                    alt={asset.name}
-                                    referrerPolicy="no-referrer"
-                                  />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-
-                                  <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
-                                    <div className="text-left">
-                                      <span className="text-[9px] text-fbblue font-mono font-bold tracking-widest block uppercase">
-                                        {hasAircraft
-                                          ? asset.class
-                                          : "DEPLOYABLE INVENTORY"}
-                                      </span>
-                                      <h5
-                                        className="text-sm font-black tracking-wider font-sync text-white uppercase mt-0.5 max-w-[250px] truncate"
-                                        title={asset.name}
-                                      >
-                                        {hasAircraft
-                                          ? asset.name
-                                          : "CHOOSE A PLANE"}
-                                      </h5>
-                                      <div className="flex gap-2 mt-1 text-[9px] text-gray-300 font-mono">
-                                        <span>
-                                          Capacity: {asset.specs.pax} Pax
-                                        </span>
-                                        <span>•</span>
-                                        <span>Range: {asset.specs.range}</span>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div
-                                    className={`absolute inset-0 flex items-center justify-center bg-black/30 transition-all duration-300 ${hasAircraft ? "opacity-0 group-hover:opacity-100 bg-black/60" : "opacity-100"}`}
-                                  >
-                                    <button
-                                      disabled={isConfigLocked}
-                                      onClick={() =>
-                                        !isConfigLocked &&
-                                        setShowAircraftIframe(true)
-                                      }
-                                      className="font-lexend text-[9px] bg-white text-black px-6 py-3 rounded-full hover:bg-fbblue hover:text-white transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.2)] font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                      {isConfigLocked
-                                        ? `LINKED: ${asset.name.toUpperCase()}`
-                                        : hasAircraft
-                                          ? "CHANGE CONFIGURATION"
-                                          : "SELECT AIRCRAFT CONFIGURATION"}
-                                    </button>
-                                  </div>
-                                </>
-                              );
-                            })()}
-                          </div>
-
-                          {(() => {
-                            const activeAircraftRecord = Array.isArray(
-                              mission?.mission_aircraft,
-                            )
-                              ? mission.mission_aircraft[0]
-                              : mission?.mission_aircraft;
-
-                            if (
-                              activeAircraftRecord ||
-                              mission.operator_aircraft ||
-                              mission.aircraft_class
-                            ) {
-                              return (
-                                <div
-                                  id="selected-aircraft-spec"
-                                  className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-3 mb-4"
-                                >
-                                  <div className="flex justify-between items-center">
-                                    <div>
-                                      <span className="text-[9px] text-gray-500 uppercase font-sync block">
-                                        Active Plane Details
-                                      </span>
-                                      <span className="text-sm font-bold text-white tracking-widest uppercase font-sync mt-1 block">
-                                        {activeAircraftRecord?.aircraft_name ||
-                                          activeAircraftRecord?.model ||
-                                          mission.operator_aircraft ||
-                                          mission.aircraft_class}
-                                      </span>
-                                    </div>
-                                    <span className="text-[8px] bg-fbblue/20 text-fbblue border border-fbblue/30 px-3 py-1 rounded-md font-sync uppercase font-bold tracking-wider">
-                                      {mission.operator_aircraft
-                                        ? "Partner Allocated"
-                                        : "Client Selected"}
-                                    </span>
-                                  </div>
-                                  {activeAircraftRecord?.tail_number && (
-                                    <div className="pt-2 border-t border-white/5 flex justify-between items-center text-[10px] font-mono">
-                                      <span className="text-gray-500 uppercase">
-                                        SPECIFIC REGISTRATION / TAIL
-                                      </span>
-                                      <span className="text-fbblue font-bold tracking-widest uppercase text-xs">
-                                        {activeAircraftRecord.tail_number}
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            }
-                            return null;
-                          })()}
-
-                          {isWithin72Hours || isConfigLocked ? (
-                            <div className="mt-4 p-5 rounded-2xl bg-black/40 border border-fbblue/20 space-y-2">
-                              <div className="flex justify-between items-center">
-                                <span className="font-sync text-[8px] text-fbblue font-bold uppercase tracking-widest">
-                                  ITINERARY PROTOCOL ACTIVE
-                                </span>
-                              </div>
-                              <p className="text-gray-400 text-[10px] font-light leading-relaxed">
-                                Flight parameters are locked to ensure absolute
-                                operational and logistical certainty.
-                                Adjustments must be confirmed via ICC Strategic
-                                Authority.
-                              </p>
-                            </div>
-                          ) : (
-                            <div className="flex justify-between items-center mt-4 border-b border-white/5 pb-6">
-                              <button
-                                onClick={() => setShowRescheduleIframe(true)}
-                                className="text-xs text-white/60 hover:text-white transition-colors flex items-center gap-2"
-                              >
-                                <Calendar className="w-3 h-3" /> Adjust
-                                Itinerary
-                              </button>
-                            </div>
-                          )}
-
-                          <div className="mt-6 pt-6 border-t border-white/5">
-                            <span className="font-sync text-fbblue text-[8px] mb-2 block uppercase tracking-widest">
-                              Customization & In-Flight Amenities
-                            </span>
-                            <p className="text-xs text-gray-400 font-light mb-4">
-                              Select fine vintage wines, Michelin-star
-                              gastronomy, secure tarmac transfer escorts,
-                              Starlink broadband connection, or logistical
-                              security. Scribe suggestions with our custom AI
-                              Scribe.
-                            </p>
-                            <button
-                              disabled={isConfigLocked}
-                              onClick={() =>
-                                !isConfigLocked &&
-                                setShowCustomizationModal(true)
-                              }
-                              className="w-full bg-black border border-white/10 text-white py-4 rounded-xl text-xs font-bold font-sync uppercase tracking-widest hover:border-fbblue/50 hover:bg-white/5 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {isConfigLocked
-                                ? "FLIGHT LOCKED & READY"
-                                : "Customize Your Flight"}
-                            </button>
-                          </div>
-                        </div>
-                        <div className="border-t border-white/5 pt-6">
-                          <span className="font-sync text-fbblue text-[8px] mb-2 block uppercase tracking-widest">
-                            Experiential Upgrade
-                          </span>
-                          <p className="text-xs text-gray-400 font-light mb-4 text-balance">
-                            bespoke productions like BlueHour™ or Sky Party™ are
-                            integrated into your mission. Upgrades automatically
-                            synchronize with your final billing.
-                          </p>
-                          <button
-                            disabled={isConfigLocked}
-                            onClick={() =>
-                              !isConfigLocked && setShowExperienceIframe(true)
-                            }
-                            className="w-full bg-white text-black py-4 rounded-xl text-xs font-bold font-sync uppercase tracking-widest hover:bg-gray-200 transition-all shadow-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {isConfigLocked
-                              ? "EXPERIENTIAL UPGRADES SECURED"
-                              : "ENTER EXPERIENCES PORTAL"}
-                          </button>
-                          <button
-                            disabled={isConfigLocked}
-                            onClick={async () => {
-                              if (!manifestUploaded) {
-                                showToast(
-                                  "The passenger manifest has not been completed. Fill Step 2 before locking state.",
-                                  "warning",
-                                );
-                                setActiveTab("manifest");
-                                return;
-                              }
-                              if (!mission?.aircraft_class) {
-                                showToast(
-                                  "Flight cannot lock in: You must select a plane first.",
-                                  "warning",
-                                );
-                                return;
-                              }
-                              try {
-                                await supabase
-                                  .from("missions")
-                                  .update({ is_config_locked: true })
-                                  .eq("id", mission.id);
-                              } catch (err) {}
-                              setIsConfigLocked(true);
-                              setActiveTab("manifest");
-                            }}
-                            className="w-full bg-white/[0.05] text-white border border-white/10 py-4 rounded-xl text-xs font-light hover:bg-white/10 transition-all mt-4 font-sync uppercase tracking-widest"
-                          >
-                            {isConfigLocked
-                              ? "CONFIGURATION LOCKED"
-                              : "LOCK CONFIGURATION"}
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {activeTab === "manifest" && (
-                      <motion.div
-                        key="manifest"
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="p-0 rounded-[2rem] overflow-hidden glass-vip border border-white/10 min-h-[700px] relative shadow-2xl"
+                        <Lock className="w-3.5 h-3.5" />
+                        <span>VIP.15DWINGS.COM.NG</span>
+                      </a>
+                      <button
+                        onClick={() => setShowCustomizationModal(true)}
+                        className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300 font-lexend transition-all cursor-pointer"
                       >
-                        {manifestUploaded ? (
-                          <div className="p-12 flex flex-col items-center justify-center h-full text-center space-y-4">
-                            <CheckCircle2 className="w-16 h-16 text-emerald-500 mb-2" />
-                            <h4 className="monument text-lg tracking-widest text-white/90">
-                              Manifest Validated
-                            </h4>
-                            <p className="text-sm text-gray-400 max-w-sm font-light">
-                              Your executive travel identities have been
-                              recorded and encrypted. All parameters are secured
-                              for departure.
-                            </p>
-                            <div className="pt-8 w-full max-w-xs border-t border-white/5">
-                              <button
-                                onClick={async () => {
-                                  try {
-                                    await supabase
-                                      .from("missions")
-                                      .update({ is_config_locked: true })
-                                      .eq("id", mission.id);
-                                  } catch (e) {}
-                                  setIsConfigLocked(true);
-                                  await refetch();
-                                  setActiveTab("status");
-                                  showToast(
-                                    "Flight details confirmed. Your flight is now locked.",
-                                    "success",
-                                  );
-                                }}
-                                className="w-full bg-white/[0.05] text-white border border-white/10 py-4 rounded-xl text-[10px] font-sync tracking-widest uppercase hover:bg-white/10 transition-all"
-                              >
-                                Proceed to Activation
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <PassengerManifestForm
-                            missionId={missionId!}
-                            onSuccess={() => {
-                              setManifestUploaded(true);
-                              refetch();
-                              if (isConfigLocked) {
-                                setActiveTab("status");
-                              } else {
-                                showToast(
-                                  "Passenger manifest submitted successfully. Lock configuration in Step 1 to activate.",
-                                  "success",
-                                );
-                                setActiveTab("customization");
-                              }
-                            }}
-                          />
-                        )}
-                      </motion.div>
-                    )}
-
-                    {activeTab === "status" && (
-                      <motion.div
-                        key="status"
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="space-y-6"
-                      >
-                        <div
-                          className="relative overflow-hidden rounded-[2rem] p-8 md:p-10 border border-white/10 shadow-2xl"
-                          style={{
-                            background:
-                              "linear-gradient(135deg, #030507 0%, #1a1e23 100%)",
-                          }}
-                        >
-                          <div className="absolute top-0 right-0 w-64 h-64 bg-fbblue/10 blur-[60px] rounded-full pointer-events-none" />
-                          <div className="flex justify-between items-start mb-10 relative z-10">
-                            <span className="font-sync uppercase tracking-widest text-white/80 text-xs font-bold">
-                              15D WINGS
-                            </span>
-                            <span className="font-lexend text-[8px] text-white/40 tracking-[0.5em]">
-                              FLIGHT ACTIVATION
-                            </span>
-                          </div>
-
-                           {mission.payment_status === "REJECTED" || mission.payment_status === "FAILED" ? (
-                            <div className="relative z-10 space-y-6">
-                              <div className="flex items-center gap-3">
-                                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-                                <h4 className="text-red-500 font-sync uppercase tracking-widest text-sm">
-                                  PAYMENT VERIFICATION REJECTED
-                                </h4>
-                              </div>
-                              <div className="p-6 bg-red-500/10 border border-red-500/30 rounded-2xl space-y-3">
-                                <h5 className="text-[10px] text-red-400 font-sync tracking-widest uppercase">
-                                  STRATEGIC AUTHORITY REFUSAL RECORD:
-                                </h5>
-                                <p className="text-white text-xs font-mono bg-black/40 p-4 rounded-xl border border-red-500/10 leading-relaxed">
-                                  {(() => {
-                                    try {
-                                      const payload = typeof mission.raw_payload === 'string' 
-                                        ? JSON.parse(mission.raw_payload) 
-                                        : mission.raw_payload;
-                                      return payload?.payment_error || "TRANSACTION REFERENCE UNRESOLVABLE: Ledger reference mismatch detected. The uploaded evidence does not match any settled wire entry on the Federal Clearing Network within the specified window.";
-                                    } catch (e) {
-                                      return "TRANSACTION REFERENCE UNRESOLVABLE: Ledger reference mismatch detected. The uploaded evidence does not match any settled wire entry on the Federal Clearing Network within the specified window.";
-                                    }
-                                  })()}
-                                </p>
-                              </div>
-                              <p className="text-gray-400 text-xs font-light leading-relaxed">
-                                Please re-submit your wire transfer notification or upload a clear, legible payment receipt containing the exact bank transaction stamp, sequence ID, and routing details.
-                              </p>
-                              <div className="pt-4 border-t border-white/5">
-                                <button
-                                  onClick={handlePaymentAlert}
-                                  className="px-6 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold font-sync uppercase tracking-widest transition-all cursor-pointer shadow-[0_0_15px_rgba(239,68,68,0.3)]"
-                                >
-                                  RE-UPLOAD RECEIPT PROOF
-                                </button>
-                              </div>
-                            </div>
-                          ) : mission.payment_status === "AWAITING_VERIFICATION" ? (
-                            <div className="relative z-10 space-y-6">
-                              <div className="flex items-center gap-3">
-                                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
-                                <h4 className="text-amber-500 font-sync tracking-widest text-sm uppercase">
-                                  Ledger Verification Active
-                                </h4>
-                              </div>
-                              <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl space-y-4">
-                                <h5 className="text-[10px] text-amber-400 font-sync tracking-widest uppercase">
-                                  APV LOCK STATE: ACTIVE
-                                </h5>
-                                <p className="text-gray-300 text-xs font-light leading-relaxed">
-                                  Your transaction receipt is undergoing rigorous settlement verification by our ICC Compliance division. 
-                                  <br /><br />
-                                  To ensure transactional integrity, your portal navigation has been locked to this screen. We will notify you instantly upon completion of settlement verification.
-                                </p>
-                              </div>
-                              <div className="p-4 bg-white/[0.02] border border-white/5 rounded-xl flex justify-between text-[10px] text-gray-500 font-mono">
-                                <span>VERIFICATION CODE:</span>
-                                <span className="text-white font-bold">{mission.id}-APV</span>
-                              </div>
-                            </div>
-                          ) : mission.payment_status === "CONFIRMING" ? (
-                            <div className="relative z-10 space-y-4">
-                              <h4 className="text-fbblue font-sync uppercase tracking-widest text-sm">
-                                PAYMENT IN REVIEW
-                              </h4>
-                              <p className="text-gray-400 text-xs font-light leading-relaxed">
-                                Your payment confirmation has been received. Our
-                                Strategic Authority is verifying the transfer.
-                              </p>
-                            </div>
-                          ) : mission.payment_status === "CONFIRMED" ? (
-                            <div className="relative z-10 space-y-6">
-                              <div className="space-y-2">
-                                <h4 className="text-emerald-500 font-sync uppercase tracking-widest text-sm">
-                                  ACTIVATION SECURED
-                                </h4>
-                                <p className="text-white font-lexend font-light text-2xl">
-                                  {dynamicDeposit
-                                    ? formatCurrency(dynamicDeposit)
-                                    : "—"}
-                                </p>
-                              </div>
-                              {(() => {
-                                const parsedLegs = typeof mission.legs === "string" ? JSON.parse(mission.legs) : mission.legs;
-                                const legsArr = Array.isArray(parsedLegs) ? parsedLegs : [];
-                                
-                                if (!mission.raw_payload?.icc_approved_quote) {
-                                  return (
-                                    <div className="border-t border-white/10 pt-4 space-y-3">
-                                      <p className="text-amber-500 text-xs font-semibold leading-relaxed font-mono">
-                                        ⚠ A tail number for your route will be matched within 12 to 24 hours due to high demand for flights at this time.
-                                      </p>
-                                      <p className="text-gray-400 text-xs font-light leading-relaxed">
-                                        The 15D Wings Broker Engine (Durable Object & Cloudflare Worker) has matched optimal partner operators based on your flight details:
-                                      </p>
-                                      
-                                      <div className="grid grid-cols-2 gap-3 bg-white/[0.02] p-3 rounded-xl border border-white/5 text-[11px] font-mono text-gray-300">
-                                        <div>
-                                          <span className="text-gray-500 text-[9px] block">AIRCRAFT TYPE</span>
-                                          {mission.aircraft_class || "VVIP Class"}
-                                        </div>
-                                        <div>
-                                          <span className="text-gray-500 text-[9px] block">FLIGHT PARAMETERS</span>
-                                          {legsArr.length || 1} Legs • {mission.pax || 1} Pax
-                                        </div>
-                                      </div>
-
-                                      {legsArr.length > 0 && (
-                                        <div className="bg-white/[0.02] p-3 rounded-xl border border-white/5 text-[11px] space-y-2">
-                                          <span className="text-gray-500 font-mono text-[9px] block">ROUTING SUMMARY</span>
-                                          {legsArr.map((leg: any, idx: number) => (
-                                            <div key={idx} className="flex justify-between text-white border-l-2 border-fbblue/30 pl-2">
-                                              <span>Leg {idx + 1}: {leg.origin || leg.departure || leg.from}</span>
-                                              <span className="text-gray-500">→ {leg.destination || leg.to}</span>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                } else {
-                                  return (
-                                    <div className="border-t border-white/10 pt-4 space-y-4">
-                                      <div className="space-y-2">
-                                        <span className="text-gray-500 font-mono text-[9px] block">MATCHED SPECIFICATION</span>
-                                        <p className="text-white text-sm font-semibold font-sync uppercase tracking-wide flex items-center gap-2">
-                                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                                          {mission.raw_payload?.tail_number || "5N-BGE / Gulfstream G550"}
-                                        </p>
-                                      </div>
-
-                                      <div className="space-y-2">
-                                        <span className="text-gray-500 font-mono text-[9px] block">DISPATCH STATUS</span>
-                                        <p className="text-emerald-400 text-xs font-mono font-medium">
-                                          {mission.raw_payload?.readiness_status || "Ready for flight. Pre-flight check cleared. Crew dispatched."}
-                                        </p>
-                                      </div>
-
-                                      {/* Virtual Tour Section */}
-                                      <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5 space-y-3">
-                                        <span className="text-fbblue font-sync text-[9px] tracking-widest font-semibold uppercase block">
-                                          INTERACTIVE VIRTUAL TOUR & GALLERY
-                                        </span>
-                                        <p className="text-[10px] text-slate-400 font-light leading-normal">
-                                          Step inside your assigned private jet cabin. View 360° virtual tours and inspect configuration spaces before departure.
-                                        </p>
-                                        
-                                        {/* Plane image slider / previews */}
-                                        <div className="grid grid-cols-2 gap-2 mt-2">
-                                          {Array.isArray(mission.raw_payload?.plane_images) && mission.raw_payload?.plane_images.map((imgUrl: string, idx: number) => (
-                                            <img 
-                                              key={idx}
-                                              src={imgUrl} 
-                                              alt={`Cabin Preview ${idx + 1}`}
-                                              referrerPolicy="no-referrer"
-                                              className="w-full h-20 object-cover rounded-xl border border-white/5 hover:border-fbblue/30 transition-all"
-                                            />
-                                          ))}
-                                        </div>
-
-                                        {/* Video Player */}
-                                        {mission.raw_payload?.plane_video_url && (
-                                          <div className="mt-2 rounded-xl overflow-hidden border border-white/10">
-                                            <video 
-                                              src={mission.raw_payload?.plane_video_url} 
-                                              controls 
-                                              className="w-full h-36 object-cover"
-                                            />
-                                          </div>
-                                        )}
-
-                                        {mission.raw_payload?.virtual_tour_url && (
-                                          <a 
-                                            href={mission.raw_payload?.virtual_tour_url} 
-                                            target="_blank" 
-                                            rel="noreferrer"
-                                            className="flex items-center justify-center gap-2 w-full py-2.5 bg-fbblue hover:bg-blue-600 text-white font-bold rounded-xl text-[10px] font-sync uppercase tracking-widest transition-colors mt-2 text-center"
-                                          >
-                                            LAUNCH 3D VIRTUAL CABIN TOUR
-                                          </a>
-                                        )}
-                                      </div>
-                                    </div>
-                                  );
-                                }
-                              })()}
-                            </div>
-                          ) : (
-                            <>
-                              <div className="mb-6 relative z-10 space-y-4">
-                                <div>
-                                  <p className="font-lexend text-fbblue text-[8px] mb-2 tracking-[0.3em]">
-                                    PLATFORM ACTIVATION DEPOSIT
-                                  </p>
-                                  <p className="text-white font-lexend font-light text-4xl">
-                                    {dynamicDeposit
-                                      ? formatCurrency(dynamicDeposit)
-                                      : "—"}
-                                  </p>
-                                </div>
-                                {mission.estimated_lower && (
-                                  <div className="pt-2 border-t border-white/10">
-                                    <p className="font-lexend text-gray-400 text-[8px] mb-1 tracking-[0.3em]">
-                                      FULL ESTIMATED PRICE RANGE
-                                    </p>
-                                    <p className="text-white font-lexend text-sm">
-                                      {formatCurrency(mission.estimated_lower)}{" "}
-                                      -{" "}
-                                      {formatCurrency(mission.estimated_upper)}{" "}
-                                      <span className="text-gray-500 text-[10px]">
-                                        (± dynamic operator quote)
-                                      </span>
-                                    </p>
-                                  </div>
-                                )}
-
-                                <p className="text-[10px] text-gray-400 font-light leading-relaxed">
-                                  This activation deposit secures your aircraft
-                                  allocation and platform logistics tracking.
-                                  <br />
-                                  <br />
-                                  <span className="text-amber-500 font-medium">
-                                    SETTLEMENT REMINDER: Please prepare to pay
-                                    your final outstanding balance. Our ICC
-                                    division will verify the exact final figure
-                                    (which may be lower than the initial upper
-                                    estimate based on operator consensus). To
-                                    ensure immediate dispatch, the final
-                                    verified balance must be fully settled no
-                                    later than 48 hours prior to your scheduled
-                                    flight departure. Failure to clear the funds
-                                    by this deadline may abort the flight
-                                    mission.
-                                  </span>
-                                  <br />
-                                  <br />
-                                  <span className="text-gray-500">
-                                    Storing or uploading evidence of payment is
-                                    a required notification step, but it is not
-                                    the final proof of payment until funds have
-                                    settled completely in our account and are
-                                    verified by the administrative team.
-                                  </span>
-                                </p>
-
-                                <div className="bg-black/50 p-4 rounded-xl border border-white/5 space-y-3 mt-4">
-                                  <span className="font-lexend text-[8px] text-gray-400 tracking-widest block border-b border-white/5 pb-2">
-                                    WIRE INSTRUCTIONS (USD INTERNATIONAL)
-                                  </span>
-                                  <div className="flex justify-between text-xs font-light">
-                                    <span className="text-gray-500">Bank:</span>
-                                    <span className="text-white">
-                                      Fidelity Bank
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between text-xs font-light">
-                                    <span className="text-gray-500">
-                                      Account Name:
-                                    </span>
-                                    <span className="text-white">
-                                      SKY PARTY LTD
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between text-xs font-light">
-                                    <span className="text-gray-500">
-                                      Account No:
-                                    </span>
-                                    <span className="text-white">
-                                      5240087555
-                                    </span>
-                                  </div>
-                                  <div className="flex justify-between text-xs font-light">
-                                    <span className="text-gray-500">
-                                      SWIFT:
-                                    </span>
-                                    <span className="text-white">FIDTNGLA</span>
-                                  </div>
-                                  <div className="mt-2 pt-2 border-t border-white/5 space-y-2">
-                                    <span className="font-lexend text-[8px] text-gray-500 tracking-widest block">
-                                      INTERMEDIARY BANK
-                                    </span>
-                                    <div className="flex justify-between text-[10px] font-light">
-                                      <span className="text-gray-500">
-                                        Bank:
-                                      </span>
-                                      <span className="text-white">
-                                        Citibank N.A. NY
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between text-[10px] font-light">
-                                      <span className="text-gray-500">
-                                        SWIFT / Routing (ABA):
-                                      </span>
-                                      <span className="text-white">
-                                        CITIUS33 / 021000089
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between text-[10px] font-light">
-                                      <span className="text-gray-500">
-                                        Fidelity A/C with Citibank:
-                                      </span>
-                                      <span className="text-white">
-                                        36115264
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="flex justify-between text-xs font-light mt-2 pt-2 border-t border-white/5">
-                                    <span className="text-gray-500">
-                                      Reference:
-                                    </span>
-                                    <span className="text-fbblue">
-                                      {mission.id}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-
-                              <div className="relative z-10 mt-6 space-y-4">
-                                <label className="flex items-start gap-3 cursor-pointer group">
-                                  <div className="relative flex items-center justify-center mt-0.5">
-                                    <input
-                                      type="checkbox"
-                                      id="legal-agreement"
-                                      className="peer sr-only"
-                                      checked={isAgreed}
-                                      onChange={(e) =>
-                                        setIsAgreed(e.target.checked)
-                                      }
-                                    />
-                                    <div className="w-4 h-4 border border-white/20 rounded bg-white/[0.02] peer-checked:bg-fbblue peer-checked:border-fbblue transition-colors flex items-center justify-center">
-                                      <svg
-                                        className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        strokeWidth="3"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          d="M5 13l4 4L19 7"
-                                        />
-                                      </svg>
-                                    </div>
-                                  </div>
-                                  <span className="text-[9px] text-gray-400 font-light leading-relaxed group-hover:text-gray-300 transition-colors">
-                                    I acknowledge and agree to the 15D Wings
-                                    Charter Agreement, irrevocably binding this
-                                    charter into operation. I accept the
-                                    activation deposit terms and the application
-                                    of tiered commissions including a 5% cost of
-                                    certainty on the final balance.
-                                  </span>
-                                </label>
-
-                                <div className="flex justify-between items-end pt-2">
-                                  <div className="text-[8px] text-white/60 font-sync tracking-widest uppercase">
-                                    {mission.client_name || "EXECUTIVE"}
-                                  </div>
-                                  <button
-                                    id="payment-btn"
-                                    disabled={!isAgreed}
-                                    onClick={handlePaymentAlert}
-                                    className="px-6 py-4 bg-fbblue text-white rounded-xl text-xs font-medium hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[0_0_15px_rgba(24,119,242,0.3)] disabled:shadow-none font-sync uppercase tracking-widest font-bold"
-                                  >
-                                    I HAVE MADE PAYMENT
-                                  </button>
-                                </div>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                        Edit Flight Customizations
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
 
