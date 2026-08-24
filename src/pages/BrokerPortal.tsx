@@ -20,6 +20,12 @@ import {
   LogOut,
   ExternalLink,
   Lock,
+  FileText,
+  CreditCard,
+  Radar,
+  Database,
+  Info,
+  Link
 } from "lucide-react";
 import { formatCurrency, calculateFlightTime, formatToLocalDate } from "../lib/utils";
 const Spline = lazy(() => import("@splinetool/react-spline"));
@@ -470,7 +476,7 @@ function FlightCountdown({
 
   if (timeLeft.isOver) {
     return (
-      <span className="text-red-500 font-sync tracking-widest text-[10px] uppercase font-bold">
+      <span className="text-red-500 font-space lowercase tracking-widest text-[10px] lowercase font-bold">
         EXPIRED
       </span>
     );
@@ -479,21 +485,21 @@ function FlightCountdown({
   const pad = (num: number) => String(num).padStart(2, "0");
 
   return (
-    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-fbblue/10 border border-fbblue/20 rounded-lg text-xs font-mono text-white mt-2 select-none shadow-[0_0_10px_rgba(24,119,242,0.1)]">
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-100 border border-purple-500/20 rounded-lg text-xs font-mono text-gray-900 mt-2 select-none shadow-[0_0_10px_rgba(24,119,242,0.1)]">
       <div className="flex gap-1 items-center font-bold tracking-wider text-xs">
-        <span className="text-white font-mono">{pad(timeLeft.days)}</span>
+        <span className="text-gray-900 font-mono">{pad(timeLeft.days)}</span>
         <span className="text-gray-500 text-[9px] lowercase font-sans">d</span>
-        <span className="text-white/20">:</span>
-        <span className="text-white font-mono">{pad(timeLeft.hours)}</span>
+        <span className="text-gray-900/20">:</span>
+        <span className="text-gray-900 font-mono">{pad(timeLeft.hours)}</span>
         <span className="text-gray-500 text-[9px] lowercase font-sans">h</span>
-        <span className="text-white/20">:</span>
-        <span className="text-white font-mono">{pad(timeLeft.minutes)}</span>
+        <span className="text-gray-900/20">:</span>
+        <span className="text-gray-900 font-mono">{pad(timeLeft.minutes)}</span>
         <span className="text-gray-500 text-[9px] lowercase font-sans">m</span>
-        <span className="text-white/20">:</span>
-        <span className="text-fbblue font-mono animate-pulse">
+        <span className="text-gray-900/20">:</span>
+        <span className="text-purple-600 font-mono animate-pulse">
           {pad(timeLeft.seconds)}
         </span>
-        <span className="text-fbblue/50 text-[9px] lowercase font-sans">s</span>
+        <span className="text-purple-600/50 text-[9px] lowercase font-sans">s</span>
       </div>
     </div>
   );
@@ -609,7 +615,11 @@ export default function BrokerPortal() {
 
   /* First-Time Broker Onboarding State */
   const [isBrokerOnboarded, setIsBrokerOnboarded] = useState<boolean>(() => {
-    return localStorage.getItem("15d_broker_onboarded") === "true";
+    try {
+      return typeof localStorage !== 'undefined' && localStorage.getItem("15d_broker_onboarded") === "true";
+    } catch {
+      return false;
+    }
   });
   const [onboardingPhase, setOnboardingPhase] = useState<1 | 2>(1);
   const [brokerFirstName, setBrokerFirstName] = useState("");
@@ -1049,7 +1059,9 @@ export default function BrokerPortal() {
   }, [missionId, sessionVerified]);
 
   const handleCloseOnboarding = () => {
-    localStorage.setItem("15d_onboarding_seen", "true");
+    try {
+      localStorage.setItem("15d_onboarding_seen", "true");
+    } catch {}
     setShowAIOnboarding(false);
   };
 
@@ -1057,7 +1069,9 @@ export default function BrokerPortal() {
     setAuthError("");
     setIsAuthenticating(true);
     setTimeout(() => {
-        sessionStorage.setItem("broker_verified", "true");
+        try {
+          sessionStorage.setItem("broker_verified", "true");
+        } catch {}
         setSessionVerified(true);
         setIsAuthenticating(false);
     }, 800);
@@ -1097,8 +1111,10 @@ export default function BrokerPortal() {
         }
       }
 
-      sessionStorage.setItem(`15d_email_${targetId}`, targetEmail);
-      sessionStorage.setItem("broker_verified", "true");
+      try {
+        sessionStorage.setItem(`15d_email_${targetId}`, targetEmail);
+        sessionStorage.setItem("broker_verified", "true");
+      } catch {}
       setSessionVerified(true);
       setSearchParams({ missionId: targetId, verified: "true" });
     } catch (err: any) {
@@ -1113,8 +1129,10 @@ export default function BrokerPortal() {
       showToast("Please complete all required broker verification fields.", "warning");
       return;
     }
-    localStorage.setItem("15d_broker_onboarded", "true");
-    localStorage.setItem("15d_broker_company", brokerCompany);
+    try {
+      localStorage.setItem("15d_broker_onboarded", "true");
+      localStorage.setItem("15d_broker_company", brokerCompany);
+    } catch {}
     setIsBrokerOnboarded(true);
     showToast("Broker identity & carrier proof verified successfully!", "success");
   };
@@ -1131,9 +1149,13 @@ export default function BrokerPortal() {
 
   useEffect(() => {
     if (sessionVerified && activeTab) {
-      const hasSeenOnboarding = localStorage.getItem("15d_onboarding_seen");
-      if (!hasSeenOnboarding && mission?.status !== "COMPLETED") {
-        setShowAIOnboarding(true);
+      try {
+        const hasSeenOnboarding = localStorage.getItem("15d_onboarding_seen");
+        if (!hasSeenOnboarding && mission?.status !== "COMPLETED") {
+          setShowAIOnboarding(true);
+        }
+      } catch {
+        // fallback
       }
     }
   }, [sessionVerified, mission?.status, activeTab]);
@@ -1227,22 +1249,22 @@ export default function BrokerPortal() {
   
   if (!sessionVerified) {
     return (
-      <div className="relative min-h-screen bg-[#07090e] text-white flex items-center justify-center p-4 md:p-6 font-lexend overflow-hidden">
+      <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100 text-gray-900 flex items-center justify-center p-4 md:p-6 font-space overflow-hidden">
         <div className="z-10 w-full max-w-md flex flex-col items-center pt-8 md:pt-14 pb-12">
           {/* Header branding above card */}
           <div className="text-center space-y-3 mb-8 md:mb-12">
-            <span className="font-sync text-[10px] text-gray-400 tracking-[0.38em] font-bold block uppercase">
+            <span className="font-sync uppercase text-[10px] text-gray-600 tracking-[0.3em] font-bold block">
               15D WINGS
             </span>
-            <h2 className="font-sync font-light text-xl md:text-2xl tracking-[0.25em] text-white uppercase pt-1">
+            <h2 className="font-sync uppercase font-bold text-xl md:text-2xl tracking-[0.2em] text-gray-900 pt-1">
               {authStep === 'LOGIN' ? 'FLIGHT BROKER' : authStep === 'SIGNUP' ? 'CREATE BROKER ACCOUNT' : 'SMS VERIFICATION'}
             </h2>
-            <p className="font-sync text-fbblue tracking-[0.3em] text-[9px] uppercase font-semibold pt-1">
+            <p className="font-sync uppercase text-purple-600 tracking-[0.3em] text-[9px] font-bold pt-1">
               {authStep === 'LOGIN' ? 'BROKER PORTAL LOGIN' : authStep === 'SIGNUP' ? 'PHASE 1 REGISTRATION' : 'MOBILE OTP VERIFICATION'}
             </p>
           </div>
 
-          <div className="p-8 md:p-10 rounded-[2.5rem] w-full space-y-6 border border-white/10 glass-vip shadow-[0_0_60px_rgba(0,0,0,0.85)] backdrop-blur-[10px] relative overflow-hidden mt-2">
+          <div className="p-8 md:p-10 rounded-[2.5rem] w-full space-y-6 border border-purple-200 glass-vip shadow-[0_0_60px_rgba(0,0,0,0.85)] backdrop-blur-[10px] relative overflow-hidden mt-2">
             <AnimatePresence mode="wait">
               {authStep === 'LOGIN' ? (
                 <motion.div
@@ -1255,7 +1277,7 @@ export default function BrokerPortal() {
                   {/* Google Sign In Button */}
                   <button
                     onClick={handleDirectSignIn}
-                    className="w-full py-3.5 px-4 bg-white/10 hover:bg-white/15 border border-white/15 rounded-2xl flex items-center justify-center gap-3 text-xs md:text-sm font-medium text-white transition-all shadow-md group"
+                    className="w-full py-3.5 px-4 bg-purple-100 hover:bg-white/15 border border-white/15 rounded-2xl flex items-center justify-center gap-3 text-xs md:text-sm font-medium text-gray-900 transition-all shadow-md group"
                   >
                     <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -1269,9 +1291,9 @@ export default function BrokerPortal() {
                   {/* Divider */}
                   <div className="relative flex items-center justify-center my-3">
                     <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-white/10" />
+                      <div className="w-full border-t border-purple-200" />
                     </div>
-                    <span className="relative bg-[#080d16] px-3 text-[9px] text-gray-500 font-mono tracking-widest uppercase">
+                    <span className="relative bg-[#080d16] px-3 text-[9px] text-gray-500 font-mono tracking-widest lowercase">
                       ─── OR SIGN IN WITH EMAIL ───
                     </span>
                   </div>
@@ -1279,20 +1301,20 @@ export default function BrokerPortal() {
                   {/* Email & Password Fields */}
                   <div className="space-y-4 text-left">
                     <div className="space-y-1.5">
-                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
                         EMAIL ADDRESS
                       </label>
                       <input
                         type="email"
                         value={inputEmail}
                         onChange={(e) => setInputEmail(e.target.value)}
-                        className="w-full border border-white/10 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-black/60 text-white focus:border-fbblue focus:bg-white/[0.05] placeholder:text-gray-600"
+                        className="w-full border border-purple-200 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-white/80 backdrop-blur-md text-gray-900 focus:border-purple-500 focus:bg-white/90 placeholder:text-gray-600"
                         placeholder="broker@charterdesk.com"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
                         PASSWORD
                       </label>
                       <input
@@ -1302,7 +1324,7 @@ export default function BrokerPortal() {
                         onKeyDown={(e) => {
                           if (e.key === "Enter") handleDirectSignIn();
                         }}
-                        className="w-full border border-white/10 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-black/60 text-white focus:border-fbblue focus:bg-white/[0.05] placeholder:text-gray-600"
+                        className="w-full border border-purple-200 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-white/80 backdrop-blur-md text-gray-900 focus:border-purple-500 focus:bg-white/90 placeholder:text-gray-600"
                         placeholder="••••••••••••••••"
                       />
                     </div>
@@ -1321,7 +1343,7 @@ export default function BrokerPortal() {
                   <button
                     onClick={handleDirectSignIn}
                     disabled={isAuthenticating}
-                    className="w-full py-4 rounded-2xl text-xs font-sync tracking-[0.2em] font-bold bg-fbblue text-white hover:bg-fbblue/90 transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] uppercase active:scale-[0.98]"
+                    className="w-full py-4 rounded-2xl text-xs font-space lowercase tracking-[0.2em] font-bold bg-purple-600 text-white hover:bg-purple-600/90 transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] lowercase active:scale-[0.98]"
                   >
                     {isAuthenticating ? "AUTHENTICATING..." : "SIGN IN"}
                   </button>
@@ -1332,9 +1354,9 @@ export default function BrokerPortal() {
                         setAuthError("");
                         setAuthStep("SIGNUP");
                       }}
-                      className="text-[11px] text-gray-400 hover:text-white transition-colors tracking-wide"
+                      className="text-[11px] text-gray-600 hover:text-gray-900 transition-colors tracking-wide"
                     >
-                      Don't have a broker account? <span className="text-fbblue font-semibold">Sign Up</span>
+                      Don't have a broker account? <span className="text-purple-600 font-semibold">Sign Up</span>
                     </button>
                   </div>
                 </motion.div>
@@ -1348,33 +1370,33 @@ export default function BrokerPortal() {
                 >
                   <div className="space-y-4">
                     <div className="space-y-1.5">
-                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
                         WORK EMAIL ADDRESS
                       </label>
                       <input
                         type="email"
                         value={inputEmail}
                         onChange={(e) => setInputEmail(e.target.value)}
-                        className="w-full border border-white/10 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-black/60 text-white focus:border-fbblue focus:bg-white/[0.05] placeholder:text-gray-600"
+                        className="w-full border border-purple-200 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-white/80 backdrop-blur-md text-gray-900 focus:border-purple-500 focus:bg-white/90 placeholder:text-gray-600"
                         placeholder="broker@charterdesk.com"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
                         PASSWORD
                       </label>
                       <input
                         type="password"
                         value={inputPassword}
                         onChange={(e) => setInputPassword(e.target.value)}
-                        className="w-full border border-white/10 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-black/60 text-white focus:border-fbblue focus:bg-white/[0.05] placeholder:text-gray-600"
+                        className="w-full border border-purple-200 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-white/80 backdrop-blur-md text-gray-900 focus:border-purple-500 focus:bg-white/90 placeholder:text-gray-600"
                         placeholder="••••••••••••••••"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
                         MOBILE PHONE NUMBER (FOR SMS OTP)
                       </label>
                       <div className="flex gap-2">
@@ -1382,7 +1404,7 @@ export default function BrokerPortal() {
                           <button
                             type="button"
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            className="flex items-center gap-2 px-4 py-3.5 bg-black/60 border border-white/10 hover:border-fbblue rounded-2xl text-xs font-mono text-white outline-none transition-all cursor-pointer"
+                            className="flex items-center gap-2 px-4 py-3.5 bg-white/80 backdrop-blur-md border border-purple-200 hover:border-purple-500 rounded-2xl text-xs font-mono text-gray-900 outline-none transition-all cursor-pointer"
                           >
                             <span>{countriesList.find(c => c.code === countryCode)?.flag || "🇳🇬"}</span>
                             <span>{countryCode}</span>
@@ -1396,13 +1418,13 @@ export default function BrokerPortal() {
                                 exit={{ opacity: 0, y: 10 }}
                                 className="absolute bottom-full left-0 mb-2 w-72 bg-slate-950 border border-white/15 rounded-2xl shadow-2xl z-[100] overflow-hidden backdrop-blur-xl"
                               >
-                                <div className="p-3 border-b border-white/5 flex items-center gap-2 bg-black/40">
+                                <div className="p-3 border-b border-purple-100 flex items-center gap-2 bg-white/80 backdrop-blur-md">
                                   <input
                                     type="text"
                                     placeholder="Search country..."
                                     value={countrySearch}
                                     onChange={(e) => setCountrySearch(e.target.value)}
-                                    className="w-full bg-transparent text-xs outline-none text-white placeholder:text-gray-600 font-lexend"
+                                    className="w-full bg-transparent text-xs outline-none text-gray-900 placeholder:text-gray-600 font-lexend"
                                   />
                                 </div>
                                 <div className="max-h-56 overflow-y-auto py-1.5">
@@ -1416,7 +1438,7 @@ export default function BrokerPortal() {
                                           setCountryCode(c.code);
                                           setIsDropdownOpen(false);
                                         }}
-                                        className="w-full flex items-center justify-between px-4 py-3 text-xs text-left text-gray-300 hover:bg-fbblue hover:text-white transition-colors"
+                                        className="w-full flex items-center justify-between px-4 py-3 text-xs text-left text-gray-700 hover:bg-purple-600 hover:text-gray-900 transition-colors"
                                       >
                                         <span className="font-lexend font-medium">{c.flag} {c.name}</span>
                                         <span className="font-mono text-gray-500">{c.code}</span>
@@ -1432,7 +1454,7 @@ export default function BrokerPortal() {
                           value={inputPhone}
                           onChange={(e) => setInputPhone(e.target.value)}
                           placeholder="801 234 5678"
-                          className="flex-1 bg-black/70 border border-white/10 rounded-2xl px-4 py-3.5 text-sm font-mono text-white outline-none focus:border-fbblue transition-all placeholder:text-gray-600"
+                          className="flex-1 bg-white/80 backdrop-blur-md border border-purple-200 rounded-2xl px-4 py-3.5 text-sm font-mono text-gray-900 outline-none focus:border-purple-500 transition-all placeholder:text-gray-600"
                         />
                       </div>
                     </div>
@@ -1451,14 +1473,14 @@ export default function BrokerPortal() {
                   <div className="space-y-2 pt-2">
                     <button
                       onClick={handleProceedToOtp}
-                      className="w-full py-4 rounded-2xl text-xs font-sync tracking-[0.2em] font-bold bg-fbblue text-white hover:bg-fbblue/90 transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] uppercase active:scale-[0.98]"
+                      className="w-full py-4 rounded-2xl text-xs font-space lowercase tracking-[0.2em] font-bold bg-purple-600 text-white hover:bg-purple-600/90 transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] lowercase active:scale-[0.98]"
                     >
                       SEND SMS VERIFICATION CODE
                     </button>
 
                     <button
                       onClick={() => setAuthStep("LOGIN")}
-                      className="w-full py-2 text-[10px] font-sync tracking-widest text-gray-400 hover:text-white transition-colors uppercase text-center"
+                      className="w-full py-2 text-[10px] font-space lowercase tracking-widest text-gray-600 hover:text-gray-900 transition-colors lowercase text-center"
                     >
                       ← BACK TO SIGN IN
                     </button>
@@ -1473,17 +1495,17 @@ export default function BrokerPortal() {
                   className="space-y-5 text-left"
                 >
                   <div className="space-y-1.5">
-                    <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                    <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
                       PHONE NUMBER ({countryCode} {inputPhone || "801 234 5678"})
                     </label>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="font-sync text-[8px] text-gray-400 block ml-1 tracking-widest uppercase">
+                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
                         SMS VERIFICATION CODE
                       </label>
-                      <span className="text-[9px] text-fbblue font-mono">DEMO PIN: 159382</span>
+                      <span className="text-[9px] text-purple-600 font-mono">DEMO PIN: 159382</span>
                     </div>
 
                     <div className="grid grid-cols-6 gap-2 my-2">
@@ -1501,7 +1523,7 @@ export default function BrokerPortal() {
                               if (prevInput) prevInput.focus();
                             }
                           }}
-                          className="w-full h-12 text-center bg-black/80 border border-white/20 rounded-xl text-base font-mono font-bold text-fbblue focus:border-fbblue focus:bg-fbblue/10 outline-none transition-all"
+                          className="w-full h-12 text-center bg-white/80 backdrop-blur-md border border-purple-300 rounded-xl text-base font-mono font-bold text-purple-600 focus:border-purple-500 focus:bg-purple-100 outline-none transition-all"
                         />
                       ))}
                     </div>
@@ -1521,14 +1543,14 @@ export default function BrokerPortal() {
                     <button
                       onClick={handleSmsVerify}
                       disabled={isAuthenticating}
-                      className="w-full py-4 rounded-2xl text-xs font-sync tracking-[0.2em] font-bold bg-fbblue text-white hover:bg-fbblue/90 transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] uppercase active:scale-[0.98]"
+                      className="w-full py-4 rounded-2xl text-xs font-space lowercase tracking-[0.2em] font-bold bg-purple-600 text-white hover:bg-purple-600/90 transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] lowercase active:scale-[0.98]"
                     >
                       {isAuthenticating ? "VERIFYING..." : "VERIFY & SIGN UP"}
                     </button>
 
                     <button
                       onClick={() => setAuthStep("SIGNUP")}
-                      className="w-full py-2 text-[10px] font-sync tracking-widest text-gray-500 hover:text-white transition-colors uppercase text-center"
+                      className="w-full py-2 text-[10px] font-space lowercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors lowercase text-center"
                     >
                       ← EDIT REGISTRATION INFO
                     </button>
@@ -1590,19 +1612,19 @@ export default function BrokerPortal() {
 
   if (mission.status === "COMPLETED") {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white font-lexend flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-16 h-16 bg-fbblue/20 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle2 className="w-8 h-8 text-fbblue" />
+      <div className="min-h-screen bg-[#0a0a0a] text-gray-900 font-lexend flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center mb-6">
+          <CheckCircle2 className="w-8 h-8 text-purple-600" />
         </div>
-        <h1 className="text-3xl md:text-4xl font-light mb-4 text-white/90">
+        <h1 className="text-3xl md:text-4xl font-light mb-4 text-gray-900/90">
           Flight Completed
         </h1>
-        <p className="text-gray-400 font-light mb-12 max-w-md mx-auto leading-relaxed text-sm">
+        <p className="text-gray-600 font-light mb-12 max-w-md mx-auto leading-relaxed text-sm">
           Your flight was a success! Create an account to save your history and
           preferences for future bookings.
         </p>
 
-        <div className="w-full max-w-sm space-y-4 bg-white/[0.02] p-8 rounded-[2rem] border border-white/5">
+        <div className="w-full max-w-sm space-y-4 bg-white/[0.02] p-8 rounded-[2rem] border border-purple-100">
           <button
             onClick={() =>
               showToast(
@@ -1622,7 +1644,7 @@ export default function BrokerPortal() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10"></div>
+              <div className="w-full border-t border-purple-200"></div>
             </div>
             <div className="relative flex justify-center text-[10px] font-lexend tracking-widest">
               <span className="bg-[#111] px-2 text-gray-500">OR</span>
@@ -1636,7 +1658,7 @@ export default function BrokerPortal() {
                 "info",
               )
             }
-            className="w-full bg-white/[0.05] text-white border border-white/10 py-4 rounded-xl text-xs font-light hover:bg-white/10 transition-all"
+            className="w-full bg-white/90 text-gray-900 border border-purple-200 py-4 rounded-xl text-xs font-light hover:bg-purple-100 transition-all"
           >
             Create Password
           </button>
@@ -1646,7 +1668,13 @@ export default function BrokerPortal() {
   }
 
   return (
-    <div className="relative min-h-screen bg-black text-white font-lexend pt-24 pb-20 px-4 md:px-8">
+    <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100 text-gray-900 font-space pt-24 pb-20 px-4 md:px-8">
+      {/* Background jet interior overlay (subtle) */}
+      <div 
+        className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none bg-cover bg-center mix-blend-multiply"
+        style={{ backgroundImage: "url('/src/assets/images/private_jet_interior_light_1787553612955.jpg')" }}
+      />
+      <div className="relative z-10">
       {/* Premium Toast Overlays */}
       <div className="fixed top-6 right-6 z-[300] flex flex-col gap-3 max-w-md w-full pointer-events-none">
         <AnimatePresence>
@@ -1680,11 +1708,11 @@ export default function BrokerPortal() {
                 <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
               )}
               {t.type === "info" && (
-                <Clock className="w-5 h-5 text-fbblue shrink-0 mt-0.5" />
+                <Clock className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
               )}
 
               <div className="flex-1">
-                <p className="text-xs text-white/90 font-light leading-relaxed">
+                <p className="text-xs text-gray-900/90 font-light leading-relaxed">
                   {t.message}
                 </p>
               </div>
@@ -1692,7 +1720,7 @@ export default function BrokerPortal() {
                 onClick={() =>
                   setToasts((prev) => prev.filter((item) => item.id !== t.id))
                 }
-                className="text-white/40 hover:text-white/80 transition-colors p-1"
+                className="text-gray-900/40 hover:text-gray-900/80 transition-colors p-1"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1708,24 +1736,24 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 px-4 backdrop-blur-[10px]"
+              className="fixed inset-0 z-[110] flex items-center justify-center bg-white/80 backdrop-blur-md px-4 backdrop-blur-[10px]"
             >
               <motion.div
                 initial={{ y: 20, scale: 0.95 }}
                 animate={{ y: 0, scale: 1 }}
-                className="bg-[#111] border border-white/10 p-8 rounded-[2rem] max-w-sm w-full relative shadow-2xl overflow-hidden"
+                className="bg-[#111] border border-purple-200 p-8 rounded-[2rem] max-w-sm w-full relative shadow-2xl overflow-hidden"
               >
-                <div className="absolute -top-20 -right-20 w-40 h-40 bg-fbblue/20 blur-3xl rounded-full pointer-events-none" />
+                <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-600/20 blur-3xl rounded-full pointer-events-none" />
                 <h3 className="text-xl font-light mb-4">
                   Welcome to your Portal
                 </h3>
-                <p className="text-sm text-gray-400 font-light leading-relaxed mb-6">
+                <p className="text-sm text-gray-600 font-light leading-relaxed mb-6">
                   Your portal is ready. Tap the{" "}
-                  <strong className="text-fbblue">AI Voice Support</strong>{" "}
+                  <strong className="text-purple-600">AI Voice Support</strong>{" "}
                   button in the bottom right corner at any time to speak with
                   your assistant.
                 </p>
-                <p className="text-sm text-gray-400 font-light leading-relaxed mb-8 border-t border-white/10 pt-6">
+                <p className="text-sm text-gray-600 font-light leading-relaxed mb-8 border-t border-purple-200 pt-6">
                   You can also add extra experiences to your flight in the CABIN
                   EXPERIENCE tab.
                 </p>
@@ -1744,31 +1772,31 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col"
+              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col"
             >
-              <div className="flex justify-between items-center p-4 md:px-8 border-b border-white/10 bg-black">
+              <div className="flex justify-between items-center p-4 md:px-8 border-b border-purple-200 bg-white">
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setShowExperienceIframe(false)}
-                    className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl flex items-center gap-2 text-xs font-sync uppercase tracking-wider transition-all border border-white/15 cursor-pointer active:scale-95 shadow-md"
+                    className="p-2.5 bg-purple-100 hover:bg-white/20 text-gray-900 rounded-xl flex items-center gap-2 text-xs font-space lowercase lowercase tracking-wider transition-all border border-white/15 cursor-pointer active:scale-95 shadow-md"
                     title="Back to Broker Portal"
                   >
-                    <ArrowLeft className="w-4 h-4 text-white" />
+                    <ArrowLeft className="w-4 h-4 text-gray-900" />
                     <span className="hidden sm:inline">BACK</span>
                   </button>
-                  <h3 className="text-white font-sync tracking-widest text-sm uppercase">
+                  <h3 className="text-gray-900 font-space lowercase tracking-widest text-sm lowercase">
                     15D EXPERIENCES PORTAL
                   </h3>
                 </div>
                 <button
                   onClick={() => setShowExperienceIframe(false)}
-                  className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                  className="p-3 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors cursor-pointer"
                   title="Close"
                 >
-                  <X className="w-5 h-5 text-white" />
+                  <X className="w-5 h-5 text-gray-900" />
                 </button>
               </div>
-              <div className="flex-1 w-full bg-black">
+              <div className="flex-1 w-full bg-white">
                 <iframe
                   src="https://experience.15dwings.com.ng"
                   className="w-full h-full border-none"
@@ -1802,21 +1830,21 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
+              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
             >
-              <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-black rounded-3xl border border-white/10 shadow-2xl flex flex-col my-auto scrollbar-hide">
-                <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black sticky top-0 z-10">
-                  <h3 className="text-white font-sync font-bold tracking-widest text-sm uppercase">
+              <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-white rounded-3xl border border-purple-200 shadow-2xl flex flex-col my-auto scrollbar-hide">
+                <div className="flex justify-between items-center p-6 border-b border-purple-200 bg-white sticky top-0 z-10">
+                  <h3 className="text-gray-900 font-space lowercase font-bold tracking-widest text-sm lowercase">
                     Reschedule Flight
                   </h3>
                   <button
                     onClick={() => setShowRescheduleIframe(false)}
-                    className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+                    className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
                   >
-                    <X className="w-4 h-4 text-white" />
+                    <X className="w-4 h-4 text-gray-900" />
                   </button>
                 </div>
-                <div className="flex-1 w-full bg-[#090d16] relative">
+                <div className="flex-1 w-full bg-white relative">
                   <RescheduleFlightForm
                     mission={mission}
                     onSuccess={() => {
@@ -1837,21 +1865,21 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
+              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
             >
-              <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-black rounded-3xl border border-white/10 shadow-2xl flex flex-col my-auto scrollbar-hide">
-                <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black sticky top-0 z-10">
-                  <h3 className="text-white font-sync font-bold tracking-widest text-sm uppercase">
+              <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-white rounded-3xl border border-purple-200 shadow-2xl flex flex-col my-auto scrollbar-hide">
+                <div className="flex justify-between items-center p-6 border-b border-purple-200 bg-white sticky top-0 z-10">
+                  <h3 className="text-gray-900 font-space lowercase font-bold tracking-widest text-sm lowercase">
                     Select Aircraft
                   </h3>
                   <button
                     onClick={() => setShowAircraftIframe(false)}
-                    className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+                    className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
                   >
-                    <X className="w-4 h-4 text-white" />
+                    <X className="w-4 h-4 text-gray-900" />
                   </button>
                 </div>
-                <div className="flex-1 w-full bg-[#090d16] relative">
+                <div className="flex-1 w-full bg-white relative">
                   <AircraftSelectionForm
                     mission={mission}
                     onSuccess={() => {
@@ -1871,21 +1899,21 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
+              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
             >
-              <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-black rounded-3xl border border-white/10 shadow-2xl flex flex-col my-auto scrollbar-hide">
-                <div className="flex justify-between items-center p-6 border-b border-white/10 bg-black sticky top-0 z-10">
-                  <h3 className="text-white font-sync font-bold tracking-widest text-sm uppercase">
+              <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-white rounded-3xl border border-purple-200 shadow-2xl flex flex-col my-auto scrollbar-hide">
+                <div className="flex justify-between items-center p-6 border-b border-purple-200 bg-white sticky top-0 z-10">
+                  <h3 className="text-gray-900 font-space lowercase font-bold tracking-widest text-sm lowercase">
                     Passenger Manifest
                   </h3>
                   <button
                     onClick={() => setShowManifestIframe(false)}
-                    className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+                    className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
                   >
-                    <X className="w-4 h-4 text-white" />
+                    <X className="w-4 h-4 text-gray-900" />
                   </button>
                 </div>
-                <div className="flex-1 w-full bg-[#090d16] relative">
+                <div className="flex-1 w-full bg-white relative">
                   <PassengerManifestForm
                     missionId={missionId!}
                     onSuccess={() => {
@@ -1908,15 +1936,15 @@ export default function BrokerPortal() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-[10px] flex flex-col items-center justify-center p-4"
+              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4"
             >
-              <div className="w-full max-w-lg glass-vip rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+              <div className="w-full max-w-lg glass-vip rounded-3xl overflow-hidden border border-purple-200 shadow-2xl">
                 <div className="flex justify-end p-4">
                   <button
                     onClick={() => setShowReceiptUpload(false)}
-                    className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors"
+                    className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
                   >
-                    <X className="w-4 h-4 text-white" />
+                    <X className="w-4 h-4 text-gray-900" />
                   </button>
                 </div>
                 <PaymentReceiptForm
@@ -1985,15 +2013,15 @@ export default function BrokerPortal() {
         <div className="max-w-4xl mx-auto space-y-12">
           <header className="flex flex-row items-start justify-between gap-4 pt-4 w-full">
             <div className="space-y-2 text-left">
-              <h1 className="font-sync text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white uppercase">
-                FLIGHT CONCIERGE DESK
+              <h1 className="font-space text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 lowercase flex items-center gap-4">
+                flight concierge desk ✨
               </h1>
             </div>
             <div className="flex items-center gap-3">
               {/* Book Flight iFrame Trigger */}
               <button
                 onClick={() => setShowBookFlightIframe(true)}
-                className="px-4 py-2.5 rounded-2xl bg-fbblue hover:bg-fbblue/90 text-white text-xs font-sync tracking-wider font-bold transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 uppercase cursor-pointer active:scale-95"
+                className="px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 text-xs font-space lowercase tracking-wider font-bold transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 lowercase cursor-pointer active:scale-95"
               >
                 <Plane className="w-3.5 h-3.5" />
                 <span>BOOK FLIGHT</span>
@@ -2003,17 +2031,38 @@ export default function BrokerPortal() {
               <div className="relative">
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-3.5 rounded-full bg-white/[0.03] border border-white/10 text-gray-400 hover:text-white hover:border-fbblue/50 hover:bg-white/[0.08] transition-all flex items-center justify-center cursor-pointer shadow-lg"
+                  className="relative p-3.5 rounded-full bg-white/90 border border-purple-200 text-gray-600 hover:text-gray-900 hover:border-purple-500/50 hover:bg-white/90 transition-all flex items-center justify-center cursor-pointer shadow-lg"
                 >
                   <Bell className="w-4 h-4" />
                   {notifications.some(n => !n.read) && (
-                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-fbblue rounded-full border border-black shadow-[0_0_10px_rgba(56,189,248,0.5)] animate-pulse" />
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-purple-600 rounded-full border border-black shadow-[0_0_10px_rgba(56,189,248,0.5)] animate-pulse" />
                   )}
                 </button>
               </div>
               <UserMenu />
             </div>
           </header>
+
+          {/* Welcome Graphic Card */}
+          <div className="w-full rounded-[2rem] bg-white shadow-xl border border-purple-100 overflow-hidden flex flex-col md:flex-row relative mt-8">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-100/50 to-white/10 pointer-events-none" />
+            <div className="p-8 md:p-12 flex-1 flex flex-col justify-center z-10">
+              <h2 className="font-space text-3xl font-bold text-gray-900 tracking-tight lowercase mb-4">
+                welcome back to your luxury command center.
+              </h2>
+              <p className="font-space text-gray-600 text-lg leading-relaxed max-w-lg lowercase">
+                everything you need to orchestrate seamless, world-class aviation experiences for your clients in one vibrant place.
+              </p>
+            </div>
+            <div className="w-full md:w-1/3 aspect-square md:aspect-auto relative min-h-[250px]">
+              <img 
+                src="/src/assets/images/jet_illustration_friendly_1787553630770.jpg" 
+                alt="Luxury Jet Graphic" 
+                className="absolute inset-0 w-full h-full object-cover object-center mix-blend-multiply" 
+              />
+            </div>
+          </div>
+
 
           {/* UNIFIED NOTIFICATION CENTER DRAWER */}
           <AnimatePresence>
@@ -2025,7 +2074,7 @@ export default function BrokerPortal() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onClick={() => setShowNotifications(false)}
-                  className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-[10px]"
+                  className="fixed inset-0 z-[150] bg-white/80 backdrop-blur-md backdrop-blur-[10px]"
                 />
 
                 {/* Sidebar Panel */}
@@ -2034,17 +2083,17 @@ export default function BrokerPortal() {
                   animate={{ x: 0 }}
                   exit={{ x: "100%" }}
                   transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                  className="fixed right-0 top-0 bottom-0 w-full max-w-md z-[160] bg-[#03060c] border-l border-white/10 shadow-2xl p-6 flex flex-col justify-between"
+                  className="fixed right-0 top-0 bottom-0 w-full max-w-md z-[160] bg-white border-l border-purple-200 shadow-2xl p-6 flex flex-col justify-between"
                 >
                   <div className="flex flex-col h-full">
                     {/* Header */}
-                    <div className="flex items-center justify-between pb-6 border-b border-white/5">
+                    <div className="flex items-center justify-between pb-6 border-b border-purple-100">
                       <div className="space-y-1">
-                        <h3 className="text-lg font-light tracking-tight text-white flex items-center gap-2">
-                          <Bell className="w-4 h-4 text-fbblue" />
+                        <h3 className="text-lg font-light tracking-tight text-gray-900 flex items-center gap-2">
+                          <Bell className="w-4 h-4 text-purple-600" />
                           Unified Alerts
                         </h3>
-                        <p className="font-sync text-[8px] text-gray-500 tracking-[0.2em] uppercase">
+                        <p className="font-space lowercase text-[8px] text-gray-500 tracking-[0.2em] lowercase">
                           System Alerts • Directives • Chat
                         </p>
                       </div>
@@ -2055,15 +2104,15 @@ export default function BrokerPortal() {
                             setNotifications(updated);
                             localStorage.setItem(`notifications_${mission.id}`, JSON.stringify(updated));
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[9px] font-sync tracking-wider uppercase text-gray-400 hover:text-white transition-all cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-[9px] font-space lowercase tracking-wider lowercase text-gray-600 hover:text-gray-900 transition-all cursor-pointer"
                         >
                           Mark all read
                         </button>
                         <button
                           onClick={() => setShowNotifications(false)}
-                          className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                          className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors cursor-pointer"
                         >
-                          <X className="w-4 h-4 text-white" />
+                          <X className="w-4 h-4 text-gray-900" />
                         </button>
                       </div>
                     </div>
@@ -2080,28 +2129,28 @@ export default function BrokerPortal() {
                             key={notif.id}
                             className={`p-4 rounded-2xl border transition-all relative overflow-hidden ${
                               notif.read 
-                                ? "bg-white/[0.01] border-white/5 opacity-70" 
-                                : "bg-gradient-to-br from-fbblue/5 to-white/[0.02] border-white/10 shadow-md"
+                                ? "bg-white/[0.01] border-purple-100 opacity-70" 
+                                : "bg-gradient-to-br from-fbblue/5 to-white/[0.02] border-purple-200 shadow-md"
                             }`}
                           >
                             {!notif.read && (
-                              <div className="absolute top-3 right-3 w-1.5 h-1.5 bg-fbblue rounded-full" />
+                              <div className="absolute top-3 right-3 w-1.5 h-1.5 bg-purple-600 rounded-full" />
                             )}
                             
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
                                 {notif.type === "system" && (
-                                  <span className="px-2 py-0.5 rounded text-[7px] font-sync tracking-wider bg-fbblue/20 text-fbblue border border-fbblue/30 uppercase">
+                                  <span className="px-2 py-0.5 rounded text-[7px] font-space lowercase tracking-wider bg-purple-600/20 text-purple-600 border border-purple-500/30 lowercase">
                                     System
                                   </span>
                                 )}
                                 {notif.type === "icc" && (
-                                  <span className="px-2 py-0.5 rounded text-[7px] font-sync tracking-wider bg-gold/20 text-gold border border-gold/30 uppercase">
+                                  <span className="px-2 py-0.5 rounded text-[7px] font-space lowercase tracking-wider bg-gold/20 text-gold border border-gold/30 lowercase">
                                     ICC Directive
                                   </span>
                                 )}
                                 {notif.type === "chat" && (
-                                  <span className="px-2 py-0.5 rounded text-[7px] font-sync tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase">
+                                  <span className="px-2 py-0.5 rounded text-[7px] font-space lowercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 lowercase">
                                     Chat Feed
                                   </span>
                                 )}
@@ -2109,10 +2158,10 @@ export default function BrokerPortal() {
                                   {new Date(notif.timestamp).toUTCString().replace("GMT", "UTC")}
                                 </span>
                               </div>
-                              <h4 className="text-xs font-semibold text-white pt-1">
+                              <h4 className="text-xs font-semibold text-gray-900 pt-1">
                                 {notif.title}
                               </h4>
-                              <p className="text-xs text-gray-400 leading-relaxed font-light">
+                              <p className="text-xs text-gray-600 leading-relaxed font-light">
                                 {notif.message}
                               </p>
                             </div>
@@ -2135,7 +2184,7 @@ export default function BrokerPortal() {
               <h4 className="text-amber-500 text-sm mb-2">
                 Operational refinement in progress.
               </h4>
-              <p className="text-gray-400 text-xs font-light leading-relaxed">
+              <p className="text-gray-600 text-xs font-light leading-relaxed">
                 Execution pathway being adjusted to preserve integrity. Buffers
                 exist to protect execution against airspace and crew volatility.
                 No action required on your part.
@@ -2146,76 +2195,76 @@ export default function BrokerPortal() {
           <MissionClockWidget mission={mission} />
 
           {/* BROKER DESK NAVIGATION TABS */}
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide border-b border-white/10">
+          <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide border-b border-purple-200 mb-8 items-center justify-start">
             <button
               onClick={() => setActiveTab('crm_workspace')}
-              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'crm_workspace'
-                  ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
-                  : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
+                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
               }`}
             >
-              0. Broker CRM
+              <Users className="w-4 h-4" /> crm workspace
             </button>
             <button
               onClick={() => setActiveTab('proposal_builder')}
-              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'proposal_builder'
-                  ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
-                  : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
+                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
               }`}
             >
-              2. White-Label Proposal
+              <FileText className="w-4 h-4" /> proposal builder
             </button>
             <button
               onClick={() => setActiveTab('booking_code')}
-              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'booking_code'
-                  ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
-                  : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
+                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
               }`}
             >
-              3. Client Booking Code
+              <Link className="w-4 h-4" /> client booking link
             </button>
             <button
               onClick={() => setActiveTab('checkout_engine')}
-              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'checkout_engine'
-                  ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
-                  : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
+                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
               }`}
             >
-              4. Payment & Escrow
+              <CreditCard className="w-4 h-4" /> payment & escrow
             </button>
             <button
               onClick={() => setActiveTab('operational_radar')}
-              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'operational_radar'
-                  ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
-                  : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
+                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
               }`}
             >
-              5. Fleet Tracking
+              <Radar className="w-4 h-4" /> fleet tracking
             </button>
             <button
               onClick={() => setActiveTab('telemetry_vault')}
-              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'telemetry_vault'
-                  ? 'bg-fbblue text-white border-fbblue shadow-[0_0_15px_rgba(24,119,242,0.4)]'
-                  : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
+                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
               }`}
             >
-              6. Flight Logs
+              <Database className="w-4 h-4" /> flight logs
             </button>
             <button
               onClick={() => setActiveTab('status')}
-              className={`px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'status'
-                  ? 'bg-white text-black border-white'
-                  : 'bg-white/5 text-gray-400 border-white/10 hover:text-white hover:bg-white/10'
+                  ? 'bg-purple-100 text-purple-900 border-purple-200 shadow-sm'
+                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
               }`}
             >
-              7. Flight Details
+              <Info className="w-4 h-4" /> flight details
             </button>
             <button
               onClick={() => {
@@ -2223,16 +2272,16 @@ export default function BrokerPortal() {
                 setSessionVerified(false);
                 showToast("Signed out successfully. Returning to login portal.", "info");
               }}
-              className="px-4 py-3 rounded-2xl text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border bg-red-500/10 hover:bg-red-500/20 text-red-400 border-red-500/30 flex items-center gap-1.5 ml-auto cursor-pointer"
+              className="flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border bg-white text-red-500 border-gray-200 hover:text-gray-900 hover:bg-red-500 hover:border-red-500 shadow-sm ml-auto"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
+              <LogOut className="w-4 h-4" /> exit
             </button>
           </div>
 
           {/* ACTIVE BROKER MODULE RENDERER */}
+          <AnimatePresence mode="wait">
           {activeTab === 'crm_workspace' && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
               <BrokerCRMWorkspace
                 missionId={mission.id}
                 brokerCompanyName={brokerCompany || "15D Executive Aviation Brokerage"}
@@ -2248,7 +2297,7 @@ export default function BrokerPortal() {
           )}
 
           {activeTab === 'proposal_builder' && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
               <WhiteLabelProposalBuilder
                 missionId={mission.id}
                 originCode={dep.substring(0, 3)}
@@ -2260,7 +2309,7 @@ export default function BrokerPortal() {
           )}
 
           {activeTab === 'booking_code' && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
               <BookingCodeGenerator
                 currentMissionId={mission.id}
                 onCodeGenerated={(code, op) => {
@@ -2271,7 +2320,7 @@ export default function BrokerPortal() {
           )}
 
           {activeTab === 'checkout_engine' && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
               <SystemizedCheckoutEngine
                 amountUsd={totalVerifiedCost || 18687}
                 hoursToDeparture={isWithin72Hours ? 36 : 120}
@@ -2280,26 +2329,27 @@ export default function BrokerPortal() {
           )}
 
           {activeTab === 'operational_radar' && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
               <OperationalIntegrityIndex missionId={mission.id} />
             </motion.div>
           )}
 
           {activeTab === 'telemetry_vault' && (
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
               <EyeOfGodTelemetry />
             </motion.div>
           )}
 
           {activeTab === 'status' && (
-            <div className="grid md:grid-cols-2 gap-4">
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
+              <div className="grid md:grid-cols-2 gap-4">
                 <div className="p-6 md:p-8 rounded-[2rem] border border-white/[0.05] glass-vip flex flex-col justify-between transition-all col-span-1 md:col-span-2">
-                  <div className="flex flex-col md:flex-row justify-between mb-8 pb-8 border-b border-white/5 gap-8">
+                  <div className="flex flex-col md:flex-row justify-between mb-8 pb-8 border-b border-purple-100 gap-8">
                     <div>
-                      <span className="text-[10px] text-gray-500 block mb-3 font-sync tracking-widest uppercase">
+                      <span className="text-[10px] text-gray-500 block mb-3 font-space lowercase tracking-widest lowercase">
                         Target Departure
                       </span>
-                      <div className="text-3xl font-light text-white tracking-tight">
+                      <div className="text-3xl font-light text-gray-900 tracking-tight">
                         {parseDate(mission)}
                       </div>
                       {mission.status !== "COMPLETED" &&
@@ -2315,7 +2365,7 @@ export default function BrokerPortal() {
                     </div>
 
                     <div className="flex flex-col justify-start md:items-end">
-                      <span className="text-[10px] text-gray-500 block mb-3 font-sync tracking-widest uppercase text-left md:text-right">
+                      <span className="text-[10px] text-gray-500 block mb-3 font-space lowercase tracking-widest lowercase text-left md:text-right">
                         Choose A Plane
                       </span>
                       {(() => {
@@ -2382,23 +2432,23 @@ export default function BrokerPortal() {
                         }
                         return (
                           <div
-                            className={`flex items-center gap-4 bg-white/[0.02] border border-white/5 p-3 rounded-2xl cursor-pointer hover:bg-white/[0.05] hover:border-white/10 transition-all max-w-sm ${mission.status !== "ACCEPTED" && mission.status !== "INTAKE_SUBMITTED" ? "pointer-events-none" : ""}`}
+                            className={`flex items-center gap-4 bg-white/[0.02] border border-purple-100 p-3 rounded-2xl cursor-pointer hover:bg-white/90 hover:border-purple-200 transition-all max-w-sm ${mission.status !== "ACCEPTED" && mission.status !== "INTAKE_SUBMITTED" ? "pointer-events-none" : ""}`}
                             onClick={() => setShowAircraftIframe(true)}
                           >
                             <img
                               src={asset.image}
                               alt={asset.name}
                               referrerPolicy="no-referrer"
-                              className="w-20 h-14 object-cover rounded-xl border border-white/10 shrink-0"
+                              className="w-20 h-14 object-cover rounded-xl border border-purple-200 shrink-0"
                             />
                             <div className="flex flex-col text-left">
                               <p
-                                className="text-sm font-bold text-white uppercase tracking-wider font-sync truncate max-w-[200px]"
+                                className="text-sm font-bold text-gray-900 lowercase tracking-wider font-space lowercase truncate max-w-[200px]"
                                 title={asset.name}
                               >
                                 {asset.name}
                               </p>
-                              <span className="text-[9px] text-fbblue font-sync uppercase tracking-widest mt-0.5">
+                              <span className="text-[9px] text-purple-600 font-space lowercase lowercase tracking-widest mt-0.5">
                                 {asset.class}
                               </span>
                               <div className="flex gap-2 mt-1 text-[8px] text-gray-500 font-mono">
@@ -2414,7 +2464,7 @@ export default function BrokerPortal() {
                   </div>
 
                   <div>
-                    <span className="text-[10px] text-gray-500 block mb-6 font-sync uppercase tracking-widest">
+                    <span className="text-[10px] text-gray-500 block mb-6 font-space lowercase lowercase tracking-widest">
                       ITINERARY & LOGISTICS
                     </span>
 
@@ -2430,18 +2480,18 @@ export default function BrokerPortal() {
                                 key={`dep-${i}`}
                                 className="relative pl-8 pb-8"
                               >
-                                <div className="absolute left-[11px] top-3 bottom-0 w-px bg-fbblue/30" />
-                                <div className="absolute left-1.5 top-1.5 w-2 h-2 rounded-full bg-fbblue ring-4 ring-[#0a0a0a]" />
+                                <div className="absolute left-[11px] top-3 bottom-0 w-px bg-purple-600/30" />
+                                <div className="absolute left-1.5 top-1.5 w-2 h-2 rounded-full bg-purple-600 ring-4 ring-[#0a0a0a]" />
                                 <div>
-                                  <p className="text-[9px] text-fbblue mb-1 tracking-widest uppercase font-sync font-bold">
+                                  <p className="text-[9px] text-purple-600 mb-1 tracking-widest lowercase font-space lowercase font-bold">
                                     {i === 0
                                       ? "ORIGIN"
                                       : `LEG ${i + 1} DEPARTURE`}{" "}
                                     • {leg.date}{" "}
                                     {leg.time ? ` ${leg.time}` : ""}
                                   </p>
-                                  <p className="text-sm font-light text-white/90">
-                                    <span className="text-white">
+                                  <p className="text-sm font-light text-gray-900/90">
+                                    <span className="text-gray-900">
                                       {getFullAirportName(
                                         leg.departure || leg.from,
                                       )}
@@ -2462,14 +2512,14 @@ export default function BrokerPortal() {
                                   key={`arr-${i}`}
                                   className="relative pl-8 pb-8"
                                 >
-                                  <div className="absolute left-[11px] top-3 bottom-0 w-px bg-fbblue/30 border-l-2 border-dashed border-[#0a0a0a]" />
+                                  <div className="absolute left-[11px] top-3 bottom-0 w-px bg-purple-600/30 border-l-2 border-dashed border-[#0a0a0a]" />
                                   <div className="absolute left-[9px] top-1.5 w-1.5 h-1.5 rounded-full bg-gray-500 ring-4 ring-[#0a0a0a]" />
                                   <div>
-                                    <p className="text-[9px] text-gray-400 mb-1 tracking-widest uppercase font-sync font-bold">
+                                    <p className="text-[9px] text-gray-600 mb-1 tracking-widest lowercase font-space lowercase font-bold">
                                       LEG {i + 1} ARRIVAL (Est. Flight: {ft})
                                     </p>
-                                    <p className="text-sm font-light text-white/90">
-                                      <span className="text-white">
+                                    <p className="text-sm font-light text-gray-900/90">
+                                      <span className="text-gray-900">
                                         {getFullAirportName(
                                           leg.arrival || leg.to,
                                         )}
@@ -2478,7 +2528,7 @@ export default function BrokerPortal() {
                                   </div>
                                   <div className="mt-4 inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg z-10 relative">
                                     <Clock className="w-3 h-3 text-amber-500" />
-                                    <span className="text-[9px] text-amber-500 font-sync uppercase tracking-widest">
+                                    <span className="text-[9px] text-amber-500 font-space lowercase lowercase tracking-widest">
                                       Calculated Layover
                                     </span>
                                   </div>
@@ -2492,11 +2542,11 @@ export default function BrokerPortal() {
                                 >
                                   <div className="absolute left-[9px] top-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 ring-4 ring-[#0a0a0a]" />
                                   <div>
-                                    <p className="text-[9px] text-emerald-500 mb-1 tracking-widest uppercase font-sync font-bold">
+                                    <p className="text-[9px] text-emerald-500 mb-1 tracking-widest lowercase font-space lowercase font-bold">
                                       FINAL DESTINATION (Est. Flight: {ft})
                                     </p>
-                                    <p className="text-sm font-light text-white/90">
-                                      <span className="text-white">
+                                    <p className="text-sm font-light text-gray-900/90">
+                                      <span className="text-gray-900">
                                         {getFullAirportName(
                                           leg.arrival || leg.to,
                                         )}
@@ -2513,24 +2563,24 @@ export default function BrokerPortal() {
                     ) : (
                       <div className="space-y-6">
                         <div className="flex gap-4 items-start">
-                          <MapPin className="w-4 h-4 text-fbblue/50 mt-1 shrink-0" />
+                          <MapPin className="w-4 h-4 text-purple-600/50 mt-1 shrink-0" />
                           <div>
-                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-widest font-sync">
+                            <p className="text-xs text-gray-500 mb-1 lowercase tracking-widest font-space lowercase">
                               DEPARTURE
                             </p>
-                            <p className="text-sm font-light text-white/90">
+                            <p className="text-sm font-light text-gray-900/90">
                               {dep}
                             </p>
                           </div>
                         </div>
-                        <div className="w-px h-6 ml-2 bg-white/10" />
+                        <div className="w-px h-6 ml-2 bg-purple-100" />
                         <div className="flex gap-4 items-start">
-                          <MapPin className="w-4 h-4 text-fbblue/50 mt-1 shrink-0" />
+                          <MapPin className="w-4 h-4 text-purple-600/50 mt-1 shrink-0" />
                           <div>
-                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-widest font-sync">
+                            <p className="text-xs text-gray-500 mb-1 lowercase tracking-widest font-space lowercase">
                               ARRIVAL
                             </p>
-                            <p className="text-sm font-light text-white/90">
+                            <p className="text-sm font-light text-gray-900/90">
                               {dest}
                             </p>
                           </div>
@@ -2543,13 +2593,13 @@ export default function BrokerPortal() {
                       mission?.raw_payload?.destination,
                     ) &&
                       (!mission.legs || mission.legs.length <= 1) && (
-                        <div className="flex gap-3 items-center mt-6 pt-6 border-t border-white/5">
-                          <Clock className="w-4 h-4 text-fbblue/50" />
+                        <div className="flex gap-3 items-center mt-6 pt-6 border-t border-purple-100">
+                          <Clock className="w-4 h-4 text-purple-600/50" />
                           <div>
                             <p className="text-[10px] text-gray-500 font-lexend tracking-widest">
                               EST. DIRECT DURATION
                             </p>
-                            <p className="text-xs mt-0.5 text-white">
+                            <p className="text-xs mt-0.5 text-gray-900">
                               {estimateFlightTime(
                                 mission?.raw_payload?.departure,
                                 mission?.raw_payload?.destination,
@@ -2562,10 +2612,10 @@ export default function BrokerPortal() {
 
                     {}
                     {Array.isArray(mission.legs) && mission.legs.length > 1 && (
-                      <div className="flex flex-col gap-4 mt-6 pt-6 border-t border-white/5">
+                      <div className="flex flex-col gap-4 mt-6 pt-6 border-t border-purple-100">
                         <div className="flex items-center gap-3">
-                          <Clock className="w-4 h-4 text-fbblue/50" />
-                          <span className="text-[10px] text-gray-500 font-sync tracking-widest uppercase">
+                          <Clock className="w-4 h-4 text-purple-600/50" />
+                          <span className="text-[10px] text-gray-500 font-space lowercase tracking-widest lowercase">
                             Multi-Leg Duration Overview
                           </span>
                         </div>
@@ -2578,12 +2628,12 @@ export default function BrokerPortal() {
                             return (
                               <div
                                 key={idx}
-                                className="bg-white/[0.02] border border-white/5 rounded-xl p-3"
+                                className="bg-white/[0.02] border border-purple-100 rounded-xl p-3"
                               >
-                                <p className="text-[9px] text-gray-500 font-sync tracking-widest uppercase mb-1">
+                                <p className="text-[9px] text-gray-500 font-space lowercase tracking-widest lowercase mb-1">
                                   Leg {idx + 1} Time
                                 </p>
-                                <p className="text-xs text-white">
+                                <p className="text-xs text-gray-900">
                                   {ft || "TBD"}
                                 </p>
                               </div>
@@ -2595,9 +2645,6 @@ export default function BrokerPortal() {
                   </div>
                 </div>
               </div>
-            )}
-
-          {}
           <div className="pt-8">
             {mission.payment_status === "CONFIRMING" ||
             mission.status === "AWAITING_CONFIRMATION" ? (
@@ -2610,32 +2657,32 @@ export default function BrokerPortal() {
                     "linear-gradient(135deg, #050a12 0%, #111a2e 100%)",
                 }}
               >
-                <div className="absolute top-0 right-0 w-80 h-80 bg-fbblue/20 blur-[100px] rounded-full pointer-events-none animate-pulse" />
+                <div className="absolute top-0 right-0 w-80 h-80 bg-purple-600/20 blur-[100px] rounded-full pointer-events-none animate-pulse" />
                 <div className="absolute top-0 left-0 w-64 h-64 bg-amber-500/10 blur-[80px] rounded-full pointer-events-none" />
 
-                <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6 pb-8 border-b border-white/10 mb-8">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6 pb-8 border-b border-purple-200 mb-8">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                      <span className="text-[10px] text-amber-500 font-sync tracking-[0.3em] uppercase">
+                      <span className="text-[10px] text-amber-500 font-space lowercase tracking-[0.3em] lowercase">
                         VERIFYING EVIDENCE
                       </span>
                     </div>
-                    <h2 className="text-2xl font-light text-white tracking-tight">
+                    <h2 className="text-2xl font-light text-gray-900 tracking-tight">
                       TRANSITIONAL ACTIVATION SECURED
                     </h2>
                   </div>
-                  <div className="px-5 py-3 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-sync uppercase tracking-widest font-bold text-center">
+                  <div className="px-5 py-3 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-space lowercase lowercase tracking-widest font-bold text-center">
                     AWAITING ADMINISTRATIVE VERIFICATION
                   </div>
                 </div>
 
                 <div className="relative z-10 space-y-8">
                   <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
-                    <h4 className="text-amber-500 text-xs font-sync tracking-wider uppercase mb-2">
+                    <h4 className="text-amber-500 text-xs font-space lowercase tracking-wider lowercase mb-2">
                       CRITICAL AUDIT NOTICE
                     </h4>
-                    <p className="text-gray-300 text-xs font-light leading-relaxed">
+                    <p className="text-gray-700 text-xs font-light leading-relaxed">
                       Evidence of payment has been uploaded for our Strategic
                       Authority review. **Please note that storing or uploading
                       evidence is not the final proof of payment until the
@@ -2646,39 +2693,39 @@ export default function BrokerPortal() {
 
                   <div className="grid md:grid-cols-2 gap-8 pt-4">
                     <div className="space-y-6">
-                      <h3 className="font-sync text-[10px] text-gray-500 tracking-widest">
+                      <h3 className="font-space lowercase text-[10px] text-gray-500 tracking-widest">
                         FLIGHT SPECIFICATIONS
                       </h3>
                       <div className="space-y-4">
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
+                          <span className="text-[9px] text-gray-600 block font-space lowercase lowercase">
                             ROUTE
                           </span>
-                          <span className="text-sm font-light text-white/90">
+                          <span className="text-sm font-light text-gray-900/90">
                             {dep} ➔ {dest}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
+                          <span className="text-[9px] text-gray-600 block font-space lowercase lowercase">
                             SCHEDULED DEPARTURE
                           </span>
-                          <span className="text-sm font-light text-white/90">
+                          <span className="text-sm font-light text-gray-900/90">
                             {parseDate(mission)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
+                          <span className="text-[9px] text-gray-600 block font-space lowercase lowercase">
                             AIRCRAFT RESOURCE
                           </span>
-                          <span className="text-sm font-light text-white/90 uppercase tracking-wider font-sync">
+                          <span className="text-sm font-light text-gray-900/90 lowercase tracking-wider font-space lowercase">
                             {specificAircraftName}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-6 p-6 rounded-3xl bg-black/50 border border-white/5">
-                      <h3 className="font-sync text-[10px] text-fbblue tracking-widest">
+                    <div className="space-y-6 p-6 rounded-3xl bg-white/80 backdrop-blur-md border border-purple-100">
+                      <h3 className="font-space lowercase text-[10px] text-purple-600 tracking-widest">
                         FINANCIAL SETTLEMENT (V-2 HYBRID)
                       </h3>
                       <div className="space-y-3">
@@ -2686,7 +2733,7 @@ export default function BrokerPortal() {
                           <span className="text-gray-500">
                             Midpoint Valuation (EM):
                           </span>
-                          <span className="text-white">
+                          <span className="text-gray-900">
                             {mission.midpoint_estimate
                               ? formatCurrency(mission.midpoint_estimate)
                               : "—"}
@@ -2696,7 +2743,7 @@ export default function BrokerPortal() {
                           <span className="text-gray-500">
                             Escrow Deposit (50% Collateral):
                           </span>
-                          <span className="text-white">
+                          <span className="text-gray-900">
                             {mission.escrow_deposit
                               ? formatCurrency(mission.escrow_deposit)
                               : "—"}
@@ -2706,13 +2753,13 @@ export default function BrokerPortal() {
                           <span className="text-gray-500">
                             Platform Activation Fee (10%):
                           </span>
-                          <span className="text-white">
+                          <span className="text-gray-900">
                             {mission.platform_fee
                               ? formatCurrency(mission.platform_fee)
                               : "—"}
                           </span>
                         </div>
-                        <div className="flex justify-between text-xs font-bold pt-2 border-t border-white/5">
+                        <div className="flex justify-between text-xs font-bold pt-2 border-t border-purple-100">
                           <span className="text-amber-500">
                             Total Upfront Paid (TU):
                           </span>
@@ -2723,17 +2770,17 @@ export default function BrokerPortal() {
 
                         <div className="flex justify-between items-start text-base font-medium pt-3 border-t border-white/15">
                           <div>
-                            <span className="text-white block">
+                            <span className="text-gray-900 block">
                               Flight Cost (Gross Quote):
                             </span>
-                            <span className="text-[9px] text-gray-500 font-sync mt-1 block tracking-wider uppercase">
+                            <span className="text-[9px] text-gray-500 font-space lowercase mt-1 block tracking-wider lowercase">
                               {mission.gross_operator_quote
                                 ? "Verified ICC Route Valuation"
                                 : "Pending Final ICC Verification"}
                             </span>
                           </div>
                           <div className="text-right">
-                            <span className="text-white font-sync uppercase block text-lg">
+                            <span className="text-gray-900 font-space lowercase lowercase block text-lg">
                               {mission.gross_operator_quote
                                 ? formatCurrency(mission.gross_operator_quote)
                                 : "TBD"}
@@ -2746,19 +2793,19 @@ export default function BrokerPortal() {
                             <span className="text-emerald-500 block">
                               Outstanding Balance:
                             </span>
-                            <span className="text-[9px] text-emerald-500/70 font-sync mt-1 block tracking-wider uppercase">
+                            <span className="text-[9px] text-emerald-500/70 font-space lowercase mt-1 block tracking-wider lowercase">
                               DUE AT T-48 BOUNDARY
                             </span>
                           </div>
                           <div className="text-right">
-                            <span className="text-emerald-500 font-sync uppercase block text-lg">
+                            <span className="text-emerald-500 font-space lowercase lowercase block text-lg">
                               {mission.gross_operator_quote
                                 ? formatCurrency(mission.outstanding_balance)
                                 : "TBD"}
                             </span>
                             {!mission.gross_operator_quote &&
                               mission.midpoint_estimate && (
-                                <span className="text-[9px] text-emerald-500/70 font-sync mt-1 block tracking-wider uppercase">
+                                <span className="text-[9px] text-emerald-500/70 font-space lowercase mt-1 block tracking-wider lowercase">
                                   (Est:{" "}
                                   {formatCurrency(
                                     Math.max(
@@ -2778,7 +2825,7 @@ export default function BrokerPortal() {
                             <span className="text-gray-500">
                               Premium Additions Added:
                             </span>
-                            <span className="text-fbblue">
+                            <span className="text-purple-600">
                               +
                               {formatCurrency(
                                 mission?.raw_payload?.customization_cost || 0,
@@ -2788,9 +2835,9 @@ export default function BrokerPortal() {
                         )}
                       </div>
 
-                      <div className="mt-6 pt-4 border-t border-white/5">
+                      <div className="mt-6 pt-4 border-t border-purple-100">
                         <p className="text-[10px] text-red-400/90 font-light leading-relaxed">
-                          <strong className="text-red-400 uppercase">
+                          <strong className="text-red-400 lowercase">
                             Settlement Period Restriction:
                           </strong>{" "}
                           Payment of the outstanding balance must be fully paid
@@ -2806,7 +2853,7 @@ export default function BrokerPortal() {
                     </div>
                   </div>
 
-                  <div className="pt-8 text-center text-[10px] text-gray-500 border-t border-white/5 italic">
+                  <div className="pt-8 text-center text-[10px] text-gray-500 border-t border-purple-100 italic">
                     All action parameters have been locked during transit
                     verification. Access to customization, configuration, and
                     upgrades are temporarily paused.
@@ -2834,26 +2881,26 @@ export default function BrokerPortal() {
                 <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/20 blur-[100px] rounded-full pointer-events-none animate-pulse" />
                 <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-400/10 blur-[80px] rounded-full pointer-events-none" />
 
-                <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6 pb-8 border-b border-white/10 mb-8">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6 pb-8 border-b border-purple-200 mb-8">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                      <span className="text-[10px] text-emerald-500 font-sync tracking-[0.3em] uppercase">
+                      <span className="text-[10px] text-emerald-500 font-space lowercase tracking-[0.3em] lowercase">
                         FLIGHT PRE-ACTIVATION INITIATED
                       </span>
                     </div>
-                    <h2 className="text-2xl font-light text-white tracking-tight">
+                    <h2 className="text-2xl font-light text-gray-900 tracking-tight">
                       FLIGHT FULLY ACTIVATED
                     </h2>
                   </div>
-                  <div className="px-5 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-sync uppercase tracking-widest font-bold text-center">
+                  <div className="px-5 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-space lowercase lowercase tracking-widest font-bold text-center">
                     ACTIVATION SECURED & VERIFIED
                   </div>
                 </div>
 
                 <div className="relative z-10 space-y-10">
                   <div className="text-center space-y-4">
-                    <span className="font-sync text-[10px] text-gray-400 tracking-widest uppercase block mb-1">
+                    <span className="font-space lowercase text-[10px] text-gray-600 tracking-widest lowercase block mb-1">
                       COUNTDOWN TO FLIGHT DEPARTURE
                     </span>
                     <FlightCountdown dateStr={depDateStr} mission={mission} />
@@ -2864,39 +2911,39 @@ export default function BrokerPortal() {
 
                   <div className="grid md:grid-cols-2 gap-8 pt-4">
                     <div className="space-y-6">
-                      <h3 className="font-sync text-[10px] text-gray-400 tracking-widest">
+                      <h3 className="font-space lowercase text-[10px] text-gray-600 tracking-widest">
                         ACTIVATED DETAILS
                       </h3>
                       <div className="space-y-4">
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
+                          <span className="text-[9px] text-gray-600 block font-space lowercase lowercase">
                             ROUTE
                           </span>
-                          <span className="text-sm font-light text-white/90">
+                          <span className="text-sm font-light text-gray-900/90">
                             {dep} ➔ {dest}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
+                          <span className="text-[9px] text-gray-600 block font-space lowercase lowercase">
                             SCHEDULED DEPARTURE
                           </span>
-                          <span className="text-sm font-light text-white/90">
+                          <span className="text-sm font-light text-gray-900/90">
                             {parseDate(mission)}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[9px] text-gray-400 block font-sync uppercase">
+                          <span className="text-[9px] text-gray-600 block font-space lowercase lowercase">
                             AIRCRAFT SPECIFICATION
                           </span>
-                          <span className="text-sm font-light text-white/90 uppercase tracking-wider font-sync">
+                          <span className="text-sm font-light text-gray-900/90 lowercase tracking-wider font-space lowercase">
                             {specificAircraftName}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-6 p-6 rounded-3xl bg-black/40 border border-white/5">
-                      <h3 className="font-sync text-[10px] text-emerald-500 tracking-widest">
+                    <div className="space-y-6 p-6 rounded-3xl bg-white/80 backdrop-blur-md border border-purple-100">
+                      <h3 className="font-space lowercase text-[10px] text-emerald-500 tracking-widest">
                         FINANCIAL RESOLUTION
                       </h3>
                       <div className="space-y-3">
@@ -2904,7 +2951,7 @@ export default function BrokerPortal() {
                           <span className="text-gray-500">
                             Verified ICC Value:
                           </span>
-                          <span className="text-white">
+                          <span className="text-gray-900">
                             {formatCurrency(remainingBalance + dynamicDeposit)}
                           </span>
                         </div>
@@ -2924,9 +2971,9 @@ export default function BrokerPortal() {
                             VERIFIED ({formatCurrency(remainingBalance)})
                           </span>
                         </div>
-                        <div className="flex justify-between text-sm font-medium pt-3 border-t border-white/10">
-                          <span className="text-white">Active Balance:</span>
-                          <span className="text-emerald-400 font-sync uppercase">
+                        <div className="flex justify-between text-sm font-medium pt-3 border-t border-purple-200">
+                          <span className="text-gray-900">Active Balance:</span>
+                          <span className="text-emerald-400 font-space lowercase lowercase">
                             FULLY CONFIRMED ($0.00 DUE)
                           </span>
                         </div>
@@ -2934,7 +2981,7 @@ export default function BrokerPortal() {
                     </div>
                   </div>
 
-                  <div className="pt-6 text-center text-[10px] text-gray-500 border-t border-white/5">
+                  <div className="pt-6 text-center text-[10px] text-gray-500 border-t border-purple-100">
                     Pre-flight dispatch check completed. Logistical routing
                     successfully secured. Contact administrative desk for sudden
                     modifications.
@@ -2945,36 +2992,36 @@ export default function BrokerPortal() {
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-8 md:p-10 rounded-[2.5rem] border border-white/10 glass-vip bg-gradient-to-br from-black/80 via-[#0a1220]/90 to-black/90 shadow-2xl space-y-8 relative overflow-hidden"
+                className="p-8 md:p-10 rounded-[2.5rem] border border-purple-200 glass-vip bg-gradient-to-br from-black/80 via-[#0a1220]/90 to-black/90 shadow-2xl space-y-8 relative overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-96 h-96 bg-fbblue/5 blur-3xl pointer-events-none rounded-full" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/5 blur-3xl pointer-events-none rounded-full" />
 
                 {/* Top Status Banner */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/10">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-purple-200">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <span className="w-2.5 h-2.5 rounded-full bg-fbblue animate-pulse" />
-                      <span className="font-sync text-[10px] text-fbblue font-bold tracking-[0.25em] uppercase">
+                      <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse" />
+                      <span className="font-space lowercase text-[10px] text-purple-600 font-bold tracking-[0.25em] lowercase">
                         MISSION FLIGHT ID: {mission.id}
                       </span>
                     </div>
-                    <h2 className="font-sync text-xl md:text-2xl font-bold tracking-wider text-white uppercase">
+                    <h2 className="font-space lowercase text-xl md:text-2xl font-bold tracking-wider text-gray-900 lowercase">
                       {dep} ➔ {dest}
                     </h2>
-                    <p className="text-xs text-gray-400 font-light">
-                      Scheduled Departure: <span className="text-white font-mono">{parseDate(mission)}</span>
+                    <p className="text-xs text-gray-600 font-light">
+                      Scheduled Departure: <span className="text-gray-900 font-mono">{parseDate(mission)}</span>
                     </p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <span className="px-4 py-2 rounded-full bg-fbblue/10 border border-fbblue/20 text-fbblue text-xs font-mono tracking-wider uppercase font-semibold">
+                    <span className="px-4 py-2 rounded-full bg-purple-100 border border-purple-500/20 text-purple-600 text-xs font-mono tracking-wider lowercase font-semibold">
                       STATUS: {mission.status.replace(/_/g, " ")}
                     </span>
                     <a
                       href={`https://vip.15dwings.com.ng/verify/${mission.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-2.5 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 cursor-pointer"
+                      className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-space lowercase text-xs font-bold lowercase tracking-wider transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 cursor-pointer"
                     >
                       <span>PAY & ACTIVATE ON VIP PORTAL</span>
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -2985,56 +3032,56 @@ export default function BrokerPortal() {
                 {/* Grid of Key Mission Details */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Aircraft Profile */}
-                  <div className="p-6 rounded-2xl bg-black/60 border border-white/10 space-y-3">
-                    <span className="font-sync text-[9px] text-gray-400 uppercase tracking-widest block">
+                  <div className="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 space-y-3">
+                    <span className="font-space lowercase text-[9px] text-gray-600 lowercase tracking-widest block">
                       AIRCRAFT ALLOCATION
                     </span>
                     <div className="space-y-1">
-                      <h4 className="font-sync text-sm font-bold text-white uppercase">{specificAircraftName}</h4>
-                      <p className="text-xs text-fbblue font-mono font-semibold">{mission.aircraft_class || "HEAVY JET"}</p>
+                      <h4 className="font-space lowercase text-sm font-bold text-gray-900 lowercase">{specificAircraftName}</h4>
+                      <p className="text-xs text-purple-600 font-mono font-semibold">{mission.aircraft_class || "HEAVY JET"}</p>
                     </div>
-                    <div className="pt-2 border-t border-white/5 text-[11px] text-gray-400 space-y-1">
+                    <div className="pt-2 border-t border-purple-100 text-[11px] text-gray-600 space-y-1">
                       <div className="flex justify-between">
                         <span>Passenger Capacity:</span>
-                        <span className="font-mono text-white font-bold">{mission.passengers || mission.pax || mission.raw_payload?.passengers || 8} Pax</span>
+                        <span className="font-mono text-gray-900 font-bold">{mission.passengers || mission.pax || mission.raw_payload?.passengers || 8} Pax</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Luggage Protocol:</span>
-                        <span className="font-mono text-white font-bold">Standard Jet Hold</span>
+                        <span className="font-mono text-gray-900 font-bold">Standard Jet Hold</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Financial Overview */}
-                  <div className="p-6 rounded-2xl bg-black/60 border border-white/10 space-y-3">
-                    <span className="font-sync text-[9px] text-gray-400 uppercase tracking-widest block">
+                  <div className="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 space-y-3">
+                    <span className="font-space lowercase text-[9px] text-gray-600 lowercase tracking-widest block">
                       FINANCIAL ESTIMATION
                     </span>
                     <div className="space-y-1">
-                      <h4 className="font-sync text-xl font-bold text-white">
+                      <h4 className="font-space lowercase text-xl font-bold text-gray-900">
                         {dynamicDeposit ? formatCurrency(dynamicDeposit) : "—"}
                       </h4>
-                      <p className="text-[10px] text-gray-400 font-mono uppercase">Estimated Upfront Activation Deposit</p>
+                      <p className="text-[10px] text-gray-600 font-mono lowercase">Estimated Upfront Activation Deposit</p>
                     </div>
-                    <div className="pt-2 border-t border-white/5 text-[11px] text-gray-400 space-y-1">
+                    <div className="pt-2 border-t border-purple-100 text-[11px] text-gray-600 space-y-1">
                       <div className="flex justify-between">
                         <span>Total Flight Estimate:</span>
-                        <span className="font-mono text-white font-bold">{formatCurrency(dynamicDeposit + remainingBalance)}</span>
+                        <span className="font-mono text-gray-900 font-bold">{formatCurrency(dynamicDeposit + remainingBalance)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Escrow Status:</span>
-                        <span className="font-mono text-fbblue font-bold">AWAITING ESCROW FUNDING</span>
+                        <span className="font-mono text-purple-600 font-bold">AWAITING ESCROW FUNDING</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Quick Actions & Handoff */}
-                  <div className="p-6 rounded-2xl bg-black/60 border border-white/10 flex flex-col justify-between space-y-4">
+                  <div className="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 flex flex-col justify-between space-y-4">
                     <div>
-                      <span className="font-sync text-[9px] text-gray-400 uppercase tracking-widest block mb-2">
+                      <span className="font-space lowercase text-[9px] text-gray-600 lowercase tracking-widest block mb-2">
                         EXECUTIVE ACTIONS
                       </span>
-                      <p className="text-xs text-gray-300 leading-relaxed font-light">
+                      <p className="text-xs text-gray-700 leading-relaxed font-light">
                         To lock charter operation and release tail allocations, proceed to the VIP portal to settle the principal and flight activation deposit.
                       </p>
                     </div>
@@ -3044,14 +3091,14 @@ export default function BrokerPortal() {
                         href={`https://vip.15dwings.com.ng/verify/${mission.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full py-3 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(24,119,242,0.3)] cursor-pointer"
+                        className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-space lowercase text-xs font-bold lowercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(24,119,242,0.3)] cursor-pointer"
                       >
                         <Lock className="w-3.5 h-3.5" />
                         <span>VIP.15DWINGS.COM.NG</span>
                       </a>
                       <button
                         onClick={() => setShowCustomizationModal(true)}
-                        className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-gray-300 font-lexend transition-all cursor-pointer"
+                        className="w-full py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs text-gray-700 font-lexend transition-all cursor-pointer"
                       >
                         Edit Flight Customizations
                       </button>
@@ -3063,7 +3110,7 @@ export default function BrokerPortal() {
           </div>
 
           <div className="pt-8 pb-12">
-            <div className="p-6 rounded-[2rem] border border-white/5 bg-white/[0.01]">
+            <div className="p-6 rounded-[2rem] border border-purple-100 bg-white/[0.01]">
               <div className="flex justify-between items-center mb-6">
                 <span className="font-lexend text-gray-500 text-[8px]">
                   ARCHITECTURE LOGS
@@ -3071,9 +3118,9 @@ export default function BrokerPortal() {
                 <span className="text-[10px] text-gray-600">LIVE FEED</span>
               </div>
               <div className="space-y-4">
-                <div className="flex gap-4 text-xs font-light pb-3 border-b border-white/5">
-                  <span className="text-fbblue">SYSTEM</span>
-                  <span className="text-gray-300">
+                <div className="flex gap-4 text-xs font-light pb-3 border-b border-purple-100">
+                  <span className="text-purple-600">SYSTEM</span>
+                  <span className="text-gray-700">
                     Flight {mission.id} ready. Parameters awaiting lock.
                   </span>
                 </div>
@@ -3081,6 +3128,9 @@ export default function BrokerPortal() {
             </div>
           </div>
 
+            </motion.div>
+          )}
+          </AnimatePresence>
           {[
             "ACTIVATED",
             "EXECUTING",
@@ -3091,7 +3141,7 @@ export default function BrokerPortal() {
             <MissionChat missionId={missionId || ""} role="CLIENT" senderId={mission.client_name || "Client"} />
           )}
 
-          <div className="pt-20 border-t border-white/5 flex justify-center">
+          <div className="pt-20 border-t border-purple-100 flex justify-center">
             <VoiceAssistant />
           </div>
         </div>
@@ -3104,7 +3154,7 @@ export default function BrokerPortal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/80 backdrop-blur-[10px] p-4"
+            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white/80 backdrop-blur-md backdrop-blur-[10px] p-4"
           >
             <motion.div
               initial={{ scale: 0.95 }}
@@ -3134,34 +3184,34 @@ export default function BrokerPortal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-[10px] p-4"
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-white/80 backdrop-blur-md backdrop-blur-[10px] p-4"
           >
             <motion.div
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border border-white/10 glass-vip bg-gradient-to-br from-[#0a1220]/95 via-black/95 to-[#050810]/95 shadow-[0_0_60px_rgba(0,0,0,0.85)] space-y-6 text-left relative"
+              className="w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border border-purple-200 glass-vip bg-gradient-to-br from-[#0a1220]/95 via-black/95 to-[#050810]/95 shadow-[0_0_60px_rgba(0,0,0,0.85)] space-y-6 text-left relative"
             >
               <button
                 onClick={() => setShowAOCModal(false)}
-                className="absolute top-6 right-6 text-gray-400 hover:text-white transition-all cursor-pointer"
+                className="absolute top-6 right-6 text-gray-600 hover:text-gray-900 transition-all cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
 
               <div className="flex items-center gap-3">
-                <ShieldCheck className="w-8 h-8 text-fbblue" />
+                <ShieldCheck className="w-8 h-8 text-purple-600" />
                 <div>
-                  <h2 className="font-sync font-bold text-lg md:text-xl tracking-wider uppercase text-white">
+                  <h2 className="font-space lowercase font-bold text-lg md:text-xl tracking-wider lowercase text-gray-900">
                     OPERATOR VERIFICATION REQUIRED
                   </h2>
-                  <p className="font-lexend text-xs text-fbblue">
+                  <p className="font-lexend text-xs text-purple-600">
                     Verification Gateway & AOC Onboarding
                   </p>
                 </div>
               </div>
 
-              <p className="font-lexend text-xs text-gray-300 leading-relaxed">
+              <p className="font-lexend text-xs text-gray-700 leading-relaxed">
                 Your broker account must be verified by a licensed operator before using flight booking and proposal features. Please onboard a licensed operator below to activate your full workspace.
               </p>
 
@@ -3175,7 +3225,7 @@ export default function BrokerPortal() {
                 className="space-y-4 pt-2"
               >
                 <div className="space-y-1.5">
-                  <label className="font-sync text-[10px] uppercase text-gray-400 font-bold tracking-wider">
+                  <label className="font-space lowercase text-[10px] lowercase text-gray-600 font-bold tracking-wider">
                     OPERATOR / AIRLINE NAME
                   </label>
                   <input
@@ -3184,12 +3234,12 @@ export default function BrokerPortal() {
                     value={operatorName}
                     onChange={(e) => setOperatorName(e.target.value)}
                     placeholder="e.g. ExecuJet Executive Aviation"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 font-lexend focus:outline-none focus:border-fbblue"
+                    className="w-full px-4 py-3 rounded-xl bg-purple-50 border border-purple-200 text-sm text-gray-900 placeholder-gray-500 font-lexend focus:outline-none focus:border-purple-500"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-sync text-[10px] uppercase text-gray-400 font-bold tracking-wider">
+                  <label className="font-space lowercase text-[10px] lowercase text-gray-600 font-bold tracking-wider">
                     AIR OPERATOR CERTIFICATE (AOC) / LICENSE NUMBER
                   </label>
                   <input
@@ -3198,12 +3248,12 @@ export default function BrokerPortal() {
                     value={operatorAocNumber}
                     onChange={(e) => setOperatorAocNumber(e.target.value)}
                     placeholder="e.g. AOC-2026-9041"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 font-lexend focus:outline-none focus:border-fbblue"
+                    className="w-full px-4 py-3 rounded-xl bg-purple-50 border border-purple-200 text-sm text-gray-900 placeholder-gray-500 font-lexend focus:outline-none focus:border-purple-500"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-sync text-[10px] uppercase text-gray-400 font-bold tracking-wider">
+                  <label className="font-space lowercase text-[10px] lowercase text-gray-600 font-bold tracking-wider">
                     AIRCRAFT TAIL NUMBER
                   </label>
                   <input
@@ -3212,7 +3262,7 @@ export default function BrokerPortal() {
                     value={operatorEmail}
                     onChange={(e) => setOperatorEmail(e.target.value)}
                     placeholder="e.g. 5N-B15D"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder-gray-500 font-lexend focus:outline-none focus:border-fbblue"
+                    className="w-full px-4 py-3 rounded-xl bg-purple-50 border border-purple-200 text-sm text-gray-900 placeholder-gray-500 font-lexend focus:outline-none focus:border-purple-500"
                   />
                 </div>
 
@@ -3220,13 +3270,13 @@ export default function BrokerPortal() {
                   <button
                     type="button"
                     onClick={() => setShowAOCModal(false)}
-                    className="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-lexend text-xs transition-all cursor-pointer"
+                    className="px-5 py-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-gray-700 font-lexend text-xs transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-3 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold uppercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] cursor-pointer"
+                    className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-space lowercase text-xs font-bold lowercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] cursor-pointer"
                   >
                     ONBOARD A LICENSED OPERATOR
                   </button>
@@ -3236,6 +3286,7 @@ export default function BrokerPortal() {
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 }

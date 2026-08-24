@@ -43,6 +43,38 @@ export function calculateFlightTime(lat1: number, lon1: number, lat2: number, lo
   return `${hours}h ${minutes}m`;
 }
 
+export async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (err) {
+    console.warn('navigator.clipboard.writeText unavailable or permission denied, using fallback', err);
+  }
+
+  // Fallback for sandboxed iframes or environments with clipboard restrictions
+  try {
+    if (typeof document !== 'undefined') {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      textArea.setAttribute('readonly', '');
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return successful;
+    }
+  } catch (fallbackErr) {
+    console.error('Fallback clipboard copy failed:', fallbackErr);
+  }
+  return false;
+}
+
 export function formatToLocalDate(isoString: string, includeTime: boolean = false) {
   if (!isoString) return '';
   const date = new Date(isoString);
@@ -58,5 +90,6 @@ export function formatToLocalDate(isoString: string, includeTime: boolean = fals
     options.minute = '2-digit';
   }
   
-  return new Intl.DateTimeFormat(navigator.language, options).format(date);
+  const lang = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US';
+  return new Intl.DateTimeFormat(lang, options).format(date);
 }

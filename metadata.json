@@ -1,6 +1,6 @@
 {
   "name": "15D Wings Flight Broker",
   "description": "15D Wings Flight Broker",
-  "requestFramePermissions": ["geolocation", "microphone"],
+  "requestFramePermissions": ["camera", "microphone", "geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldCheck, Lock, CreditCard, ArrowRight, CheckCircle2, Copy, AlertTriangle, Zap, Building, Wallet } from 'lucide-react';
-import { formatCurrency } from '../../lib/utils';
+import { formatCurrency, copyToClipboard } from '../../lib/utils';
 
 export type PaymentRailType = 'PROVIDUS_VIRTUAL_NUBAN' | 'FIREBLOCKS_USDC_ESCROW' | 'BRIDGE_FIAT_AUTO_OFFRAMP';
 
@@ -50,35 +50,35 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
     return determinePaymentRail(hoursToDeparture, selectedCurrency, payerLocation);
   }, [hoursToDeparture, selectedCurrency, payerLocation]);
 
-  const handleCopyAccount = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const handleCopyAccount = async (text: string) => {
+    await copyToClipboard(text);
     setCopiedAccount(true);
     setTimeout(() => setCopiedAccount(false), 3000);
   };
 
   return (
-    <div className="p-6 md:p-8 rounded-[2rem] border border-white/10 glass-vip shadow-2xl relative overflow-hidden bg-gradient-to-br from-black/80 via-[#07131e]/90 to-black/90">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-fbblue/5 blur-3xl pointer-events-none rounded-full" />
+    <div className="p-6 md:p-8 rounded-[2rem] border border-purple-200 glass-vip shadow-2xl relative overflow-hidden bg-gradient-to-br from-black/80 via-[#07131e]/90 to-black/90">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/5 blur-3xl pointer-events-none rounded-full" />
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-purple-200">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-fbblue animate-pulse" />
-            <span className="font-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
+            <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
+            <span className="font-space lowercase text-[9px] text-purple-600 tracking-[0.25em] font-bold lowercase">
               MODULE 5 — CHECKOUT & PAYMENT ROUTING
             </span>
           </div>
-          <h3 className="font-sync text-lg md:text-xl font-bold tracking-wider text-white uppercase">
+          <h3 className="font-space lowercase text-lg md:text-xl font-bold tracking-wider text-gray-900 lowercase">
             Payment Locked & Safe
           </h3>
-          <p className="text-xs text-gray-400 font-light">
+          <p className="text-xs text-gray-600 font-light">
             Automated zero-latency financial settlement via Providus Bank & Fireblocks Solana Escrow.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-mono tracking-wider uppercase font-bold flex items-center gap-1.5">
+          <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-mono tracking-wider lowercase font-bold flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-400" /> Double-Entry Ledger Active
           </span>
         </div>
@@ -88,7 +88,7 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
         {/* Left Side: Currency & Urgency Rules */}
         <div className="space-y-5">
           <div className="space-y-2">
-            <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+            <label className="font-space lowercase text-[9px] text-gray-600 tracking-widest lowercase block">
               PAYMENT CURRENCY SELECTION
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -96,8 +96,8 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
                 onClick={() => setSelectedCurrency('USD')}
                 className={`py-3 rounded-xl text-xs font-mono font-bold transition-all border ${
                   selectedCurrency === 'USD'
-                    ? 'bg-fbblue border-fbblue text-white shadow-md'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                    ? 'bg-purple-600 border-purple-500 text-gray-900 shadow-md'
+                    : 'bg-purple-50 border-purple-200 text-gray-600 hover:text-gray-900'
                 }`}
               >
                 USD ($)
@@ -106,8 +106,8 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
                 onClick={() => setSelectedCurrency('NGN')}
                 className={`py-3 rounded-xl text-xs font-mono font-bold transition-all border ${
                   selectedCurrency === 'NGN'
-                    ? 'bg-fbblue border-fbblue text-white shadow-md'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                    ? 'bg-purple-600 border-purple-500 text-gray-900 shadow-md'
+                    : 'bg-purple-50 border-purple-200 text-gray-600 hover:text-gray-900'
                 }`}
               >
                 NGN (₦)
@@ -116,8 +116,8 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
                 onClick={() => setSelectedCurrency('USDC')}
                 className={`py-3 rounded-xl text-xs font-mono font-bold transition-all border ${
                   selectedCurrency === 'USDC'
-                    ? 'bg-fbblue border-fbblue text-white shadow-md'
-                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                    ? 'bg-purple-600 border-purple-500 text-gray-900 shadow-md'
+                    : 'bg-purple-50 border-purple-200 text-gray-600 hover:text-gray-900'
                 }`}
               >
                 USDC (Solana)
@@ -125,22 +125,22 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-black/60 border border-white/10 space-y-2 text-xs">
-            <div className="flex justify-between items-center text-gray-400 text-[10px] font-lexend">
+          <div className="p-4 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 space-y-2 text-xs">
+            <div className="flex justify-between items-center text-gray-600 text-[10px] font-lexend">
               <span>TIME TO DEPARTURE</span>
-              <span className="font-mono text-fbblue font-bold">{hoursToDeparture} HOURS ({hoursToDeparture < 48 ? 'URGENT <48h' : 'STANDARD'})</span>
+              <span className="font-mono text-purple-600 font-bold">{hoursToDeparture} HOURS ({hoursToDeparture < 48 ? 'URGENT <48h' : 'STANDARD'})</span>
             </div>
-            <div className="flex justify-between items-center text-gray-400 text-[10px] font-lexend">
+            <div className="flex justify-between items-center text-gray-600 text-[10px] font-lexend">
               <span>AUTOMATED RAIL SELECTED</span>
               <span className="font-mono text-emerald-400 font-bold">{activeRail.replace(/_/g, ' ')}</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-fbblue/10 border border-fbblue/30 space-y-1">
-            <span className="text-[10px] text-fbblue font-mono font-bold block">
+          <div className="p-4 rounded-xl bg-purple-100 border border-purple-500/30 space-y-1">
+            <span className="text-[10px] text-purple-600 font-mono font-bold block">
               AUTOMATED ROUTING EVALUATOR RULE:
             </span>
-            <p className="text-xs text-gray-300 font-light leading-relaxed">
+            <p className="text-xs text-gray-700 font-light leading-relaxed">
               {hoursToDeparture < 48
                 ? "Urgent flight (<48 hrs) enforced zero-latency bank transfer or Solana USDC escrow. Sub-3-second webhook settlement."
                 : "Standard international settlement routed via Bridge Enterprise Fiat-to-USDC auto off-ramp."}
@@ -149,37 +149,37 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
         </div>
 
         {/* Right Side: Rail Payment Details */}
-        <div className="p-6 rounded-2xl bg-black/80 border border-white/15 flex flex-col justify-between space-y-4">
+        <div className="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-white/15 flex flex-col justify-between space-y-4">
           {activeRail === 'PROVIDUS_VIRTUAL_NUBAN' ? (
             <div className="space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="font-lexend text-[9px] text-fbblue tracking-widest block font-bold">
+                  <span className="font-lexend text-[9px] text-purple-600 tracking-widest block font-bold">
                     ENGINE A: LOCAL NGN RAILS
                   </span>
-                  <h4 className="text-base font-bold text-white flex items-center gap-2 mt-1">
-                    <Building className="w-4 h-4 text-fbblue" /> Providus Bank Virtual Account
+                  <h4 className="text-base font-bold text-gray-900 flex items-center gap-2 mt-1">
+                    <Building className="w-4 h-4 text-purple-600" /> Providus Bank Virtual Account
                   </h4>
                 </div>
-                <span className="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-mono font-bold uppercase">
+                <span className="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 text-[9px] font-mono font-bold lowercase">
                   Code 033
                 </span>
               </div>
 
-              <div className="space-y-2 p-4 rounded-xl bg-white/[0.03] border border-white/10 font-mono text-xs">
-                <div className="flex justify-between text-gray-400">
+              <div className="space-y-2 p-4 rounded-xl bg-white/90 border border-purple-200 font-mono text-xs">
+                <div className="flex justify-between text-gray-600">
                   <span>Bank Name:</span>
-                  <span className="text-white font-bold">Providus Bank</span>
+                  <span className="text-gray-900 font-bold">Providus Bank</span>
                 </div>
-                <div className="flex justify-between text-gray-400">
+                <div className="flex justify-between text-gray-600">
                   <span>Account Number:</span>
-                  <span className="text-fbblue font-bold text-sm tracking-wider">9928104829</span>
+                  <span className="text-purple-600 font-bold text-sm tracking-wider">9928104829</span>
                 </div>
-                <div className="flex justify-between text-gray-400">
+                <div className="flex justify-between text-gray-600">
                   <span>Account Title:</span>
-                  <span className="text-white">15D Wings / Flight Escrow</span>
+                  <span className="text-gray-900">15D Wings / Flight Escrow</span>
                 </div>
-                <div className="flex justify-between text-gray-400 pt-2 border-t border-white/10">
+                <div className="flex justify-between text-gray-600 pt-2 border-t border-purple-200">
                   <span>Amount Due (NGN):</span>
                   <span className="text-emerald-400 font-bold text-sm">₦{amountNgn.toLocaleString()}</span>
                 </div>
@@ -187,7 +187,7 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
 
               <button
                 onClick={() => handleCopyAccount('9928104829')}
-                className="w-full py-3 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(24,119,242,0.4)]"
+                className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-space lowercase text-xs font-bold tracking-wider lowercase transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(24,119,242,0.4)]"
               >
                 <Copy className="w-4 h-4" />
                 <span>{copiedAccount ? 'Account Copied!' : 'Copy Providus NUBAN Account'}</span>
@@ -197,28 +197,28 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
             <div className="space-y-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <span className="font-lexend text-[9px] text-fbblue tracking-widest block font-bold">
+                  <span className="font-lexend text-[9px] text-purple-600 tracking-widest block font-bold">
                     ENGINE B: STABLECOIN ESCROW RAILS
                   </span>
-                  <h4 className="text-base font-bold text-white flex items-center gap-2 mt-1">
-                    <Wallet className="w-4 h-4 text-fbblue" /> Solana USDC Anchor Escrow
+                  <h4 className="text-base font-bold text-gray-900 flex items-center gap-2 mt-1">
+                    <Wallet className="w-4 h-4 text-purple-600" /> Solana USDC Anchor Escrow
                   </h4>
                 </div>
-                <span className="px-2.5 py-1 rounded bg-fbblue/20 text-fbblue text-[9px] font-mono font-bold uppercase">
+                <span className="px-2.5 py-1 rounded bg-purple-600/20 text-purple-600 text-[9px] font-mono font-bold lowercase">
                   Fireblocks MPC
                 </span>
               </div>
 
-              <div className="space-y-2 p-4 rounded-xl bg-white/[0.03] border border-white/10 font-mono text-xs">
-                <div className="flex justify-between text-gray-400">
+              <div className="space-y-2 p-4 rounded-xl bg-white/90 border border-purple-200 font-mono text-xs">
+                <div className="flex justify-between text-gray-600">
                   <span>Vault Contract:</span>
-                  <span className="text-fbblue font-bold truncate max-w-[180px]">Aviat11111...Escrow</span>
+                  <span className="text-purple-600 font-bold truncate max-w-[180px]">Aviat11111...Escrow</span>
                 </div>
-                <div className="flex justify-between text-gray-400">
+                <div className="flex justify-between text-gray-600">
                   <span>Network:</span>
-                  <span className="text-white">Solana Mainnet-Beta / Base L2</span>
+                  <span className="text-gray-900">Solana Mainnet-Beta / Base L2</span>
                 </div>
-                <div className="flex justify-between text-gray-400 pt-2 border-t border-white/10">
+                <div className="flex justify-between text-gray-600 pt-2 border-t border-purple-200">
                   <span>Amount Locked (USDC):</span>
                   <span className="text-emerald-400 font-bold text-sm">${amountUsd.toLocaleString()} USDC</span>
                 </div>
@@ -226,7 +226,7 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
 
               <button
                 onClick={() => handleCopyAccount('AviationEscrow11111111111111111111111111111111')}
-                className="w-full py-3 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold tracking-wider uppercase transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(24,119,242,0.4)]"
+                className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-space lowercase text-xs font-bold tracking-wider lowercase transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(24,119,242,0.4)]"
               >
                 <Copy className="w-4 h-4" />
                 <span>{copiedAccount ? 'Vault Copied!' : 'Copy Solana USDC Vault Address'}</span>
@@ -234,7 +234,7 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
             </div>
           )}
 
-          <p className="text-[10px] text-gray-400 font-mono text-center">
+          <p className="text-[10px] text-gray-600 font-mono text-center">
             Sub-3-second webhook auto-updates double-entry ledger upon payment receipt.
           </p>
         </div>

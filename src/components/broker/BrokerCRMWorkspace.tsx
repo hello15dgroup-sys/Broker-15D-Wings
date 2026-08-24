@@ -43,7 +43,7 @@ import {
   Award,
   LogOut
 } from 'lucide-react';
-import { formatCurrency, formatToLocalDate } from '../../lib/utils';
+import { formatCurrency, formatToLocalDate, copyToClipboard } from '../../lib/utils';
 import { WhiteLabelProposalBuilder } from './WhiteLabelProposalBuilder';
 
 /* Types for CRM Core */
@@ -553,8 +553,8 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   /* State for Copy Toast */
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
-  const handleCopyText = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
+  const handleCopyText = async (text: string, label: string) => {
+    await copyToClipboard(text);
     setCopiedLink(label);
     setTimeout(() => setCopiedLink(null), 3000);
   };
@@ -677,19 +677,19 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   return (
     <div className="w-full text-left font-sans space-y-6">
       {/* CRM Navigation Bar & Quick Actions */}
-      <div className="p-4 md:p-6 rounded-[2rem] border border-white/10 glass-vip bg-gradient-to-br from-black/90 via-[#0a1220]/90 to-black/95 shadow-2xl relative overflow-hidden">
-        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-white/10">
+      <div className="p-4 md:p-6 rounded-[2rem] border border-purple-200 glass-vip bg-gradient-to-br from-black/90 via-[#0a1220]/90 to-black/95 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-purple-200">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-fbblue animate-ping" />
-              <span className="font-sync text-[10px] text-fbblue tracking-[0.3em] font-bold uppercase">
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-ping" />
+              <span className="font-space lowercase text-[10px] text-purple-600 tracking-[0.3em] font-bold lowercase">
                 WHITE-LABEL FLIGHT BROKER CRM
               </span>
             </div>
-            <h2 className="font-sync text-xl md:text-2xl font-bold tracking-wider text-white uppercase flex flex-wrap items-center gap-3">
+            <h2 className="font-space lowercase text-xl md:text-2xl font-bold tracking-wider text-gray-900 lowercase flex flex-wrap items-center gap-3">
               <span>BROKER CONTROL CRM</span>
             </h2>
-            <p className="text-xs text-gray-400 font-light">
+            <p className="text-xs text-gray-600 font-light">
               Full client pipeline, HNWI preferences, white-label quotes, and one-click execution bridge.
             </p>
           </div>
@@ -703,7 +703,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                   window.open("/vip-booking.html", "_blank");
                 }
               }} 
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-fbblue hover:bg-fbblue/90 text-white rounded-xl text-[10px] font-bold font-sync uppercase transition-all shadow-[0_0_15px_rgba(24,119,242,0.3)] cursor-pointer"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-600/90 text-gray-900 rounded-xl text-[10px] font-bold font-space lowercase lowercase transition-all shadow-[0_0_15px_rgba(24,119,242,0.3)] cursor-pointer"
             >
               <Plane className="w-3.5 h-3.5" />
               <span>BOOK FLIGHT</span>
@@ -712,7 +712,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             {onSignOut && (
               <button
                 onClick={onSignOut}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 text-gray-300 hover:text-red-400 rounded-xl text-[10px] font-bold font-sync uppercase transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-50 hover:bg-red-500/20 border border-purple-200 hover:border-red-500/40 text-gray-700 hover:text-red-400 rounded-xl text-[10px] font-bold font-space lowercase lowercase transition-all cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>SIGN OUT</span>
@@ -720,7 +720,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             )}
             <button
               onClick={() => setShowAddDealModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-[10px] tracking-widest font-bold uppercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 cursor-pointer active:scale-95"
+              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-space lowercase text-[10px] tracking-widest font-bold lowercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <Plus className="w-4 h-4" />
               <span>NEW DEAL INQUIRY</span>
@@ -728,9 +728,9 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
             <button
               onClick={() => setShowAddClientModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 font-sync text-[10px] tracking-widest font-bold uppercase transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              className="px-4 py-2.5 rounded-xl bg-purple-100 hover:bg-white/20 text-gray-900 border border-purple-200 font-space lowercase text-[10px] tracking-widest font-bold lowercase transition-all flex items-center gap-2 cursor-pointer active:scale-95"
             >
-              <UserPlus className="w-4 h-4 text-fbblue" />
+              <UserPlus className="w-4 h-4 text-purple-600" />
               <span>ADD HNWI CLIENT</span>
             </button>
           </div>
@@ -740,10 +740,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
         <div className="flex items-center gap-1.5 overflow-x-auto pt-4 scrollbar-none">
           <button
             onClick={() => setActiveSubTab('pipeline')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync tracking-wider uppercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'pipeline'
-                ? 'bg-fbblue text-white font-bold shadow-md'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
             }`}
           >
             <Kanban className="w-3.5 h-3.5" />
@@ -755,10 +755,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('clients')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync tracking-wider uppercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'clients'
-                ? 'bg-fbblue text-white font-bold shadow-md'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
@@ -770,10 +770,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('proposals')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync tracking-wider uppercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'proposals'
-                ? 'bg-fbblue text-white font-bold shadow-md'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -782,10 +782,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('history')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync tracking-wider uppercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'history'
-                ? 'bg-fbblue text-white font-bold shadow-md'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
             }`}
           >
             <History className="w-3.5 h-3.5" />
@@ -794,10 +794,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('analytics')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync tracking-wider uppercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'analytics'
-                ? 'bg-fbblue text-white font-bold shadow-md'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5" />
@@ -806,10 +806,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('messaging')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync tracking-wider uppercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'messaging'
-                ? 'bg-fbblue text-white font-bold shadow-md'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -818,10 +818,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('tasks')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync tracking-wider uppercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'tasks'
-                ? 'bg-fbblue text-white font-bold shadow-md'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
             }`}
           >
             <CheckSquare className="w-3.5 h-3.5" />
@@ -833,10 +833,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('directory')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync tracking-wider uppercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'directory'
-                ? 'bg-fbblue text-white font-bold shadow-md'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
             }`}
           >
             <Plane className="w-3.5 h-3.5" />
@@ -845,10 +845,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('team')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync tracking-wider uppercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'team'
-                ? 'bg-fbblue text-white font-bold shadow-md'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
             }`}
           >
             <Briefcase className="w-3.5 h-3.5" />
@@ -864,7 +864,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-emerald-500 text-black font-sync text-[11px] font-bold tracking-widest rounded-xl shadow-2xl flex items-center gap-2 uppercase"
+            className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-emerald-500 text-black font-space lowercase text-[11px] font-bold tracking-widest rounded-xl shadow-2xl flex items-center gap-2 lowercase"
           >
             <Check className="w-4 h-4" />
             <span>{copiedLink}</span>
@@ -891,18 +891,18 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               return (
                 <div
                   key={stage}
-                  className="p-4 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-[10px] space-y-3 flex flex-col justify-between"
+                  className="p-4 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md backdrop-blur-[10px] space-y-3 flex flex-col justify-between"
                 >
-                  <div className="space-y-1 pb-3 border-b border-white/10">
+                  <div className="space-y-1 pb-3 border-b border-purple-200">
                     <div className="flex justify-between items-center">
-                      <span className="font-sync text-[10px] text-fbblue tracking-widest font-bold uppercase">
+                      <span className="font-space lowercase text-[10px] text-purple-600 tracking-widest font-bold lowercase">
                         STAGE 0{stageIdx + 1}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-white/10 text-[9px] font-mono text-gray-300">
+                      <span className="px-2 py-0.5 rounded-full bg-purple-100 text-[9px] font-mono text-gray-700">
                         {stageDeals.length}
                       </span>
                     </div>
-                    <h3 className="font-sync text-xs font-bold text-white tracking-wider uppercase">
+                    <h3 className="font-space lowercase text-xs font-bold text-gray-900 tracking-wider lowercase">
                       {stage}
                     </h3>
                     <p className="text-[10px] text-emerald-400 font-mono font-semibold">
@@ -912,64 +912,64 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
                   <div className="space-y-3 min-h-[320px]">
                     {stageDeals.length === 0 ? (
-                      <div className="p-4 rounded-xl border border-dashed border-white/10 text-center text-gray-500 text-[10px] font-sync uppercase tracking-widest">
+                      <div className="p-4 rounded-xl border border-dashed border-purple-200 text-center text-gray-500 text-[10px] font-space lowercase lowercase tracking-widest">
                         NO DEALS IN THIS STAGE
                       </div>
                     ) : (
                       stageDeals.map(deal => (
                         <div
                           key={deal.id}
-                          className="p-3.5 rounded-xl border border-white/15 bg-white/5 hover:border-fbblue/50 transition-all space-y-2.5 shadow-md relative group text-left"
+                          className="p-3.5 rounded-xl border border-purple-200 bg-purple-50 hover:border-purple-500/50 transition-all space-y-2.5 shadow-md relative group text-left"
                         >
                           <div className="flex justify-between items-start">
-                            <span className="px-2 py-0.5 rounded bg-fbblue/20 text-fbblue text-[9px] font-mono font-bold tracking-wider">
+                            <span className="px-2 py-0.5 rounded bg-purple-600/20 text-purple-600 text-[9px] font-mono font-bold tracking-wider">
                               {deal.dealCode}
                             </span>
-                            <span className="text-[9px] text-gray-400 font-mono">
+                            <span className="text-[9px] text-gray-600 font-mono">
                               {deal.lastUpdated}
                             </span>
                           </div>
 
                           <div>
-                            <h4 className="font-sync uppercase text-xs font-bold text-white">
+                            <h4 className="font-space lowercase lowercase text-xs font-bold text-gray-900">
                               {deal.clientName}
                             </h4>
-                            <p className="text-[10px] text-gray-300 font-mono flex items-center gap-1.5 pt-0.5">
-                              <Plane className="w-3 h-3 text-fbblue" />
+                            <p className="text-[10px] text-gray-700 font-mono flex items-center gap-1.5 pt-0.5">
+                              <Plane className="w-3 h-3 text-purple-600" />
                               <span>{deal.origin} ➔ {deal.destination}</span>
                             </p>
                           </div>
 
-                          <div className="p-2 rounded-lg bg-black/50 border border-white/5 space-y-1">
+                          <div className="p-2 rounded-lg bg-white/80 backdrop-blur-md border border-purple-100 space-y-1">
                             <div className="flex justify-between text-[10px]">
-                              <span className="text-gray-400">Aircraft:</span>
-                              <span className="text-white font-medium">{deal.aircraftCategory.split(' ')[0]}</span>
+                              <span className="text-gray-600">Aircraft:</span>
+                              <span className="text-gray-900 font-medium">{deal.aircraftCategory.split(' ')[0]}</span>
                             </div>
                             <div className="flex justify-between text-[10px]">
-                              <span className="text-gray-400">Client Total:</span>
+                              <span className="text-gray-600">Client Total:</span>
                               <span className="text-emerald-400 font-bold font-mono">
                                 {formatCurrency(deal.totalValueUsd, 'USD')}
                               </span>
                             </div>
                             <div className="flex justify-between text-[10px]">
-                              <span className="text-gray-400">Broker Margin:</span>
-                              <span className="text-fbblue font-bold font-mono">
+                              <span className="text-gray-600">Broker Margin:</span>
+                              <span className="text-purple-600 font-bold font-mono">
                                 +{formatCurrency(deal.brokerCommissionUsd, 'USD')} ({deal.brokerMarkupPercent}%)
                               </span>
                             </div>
                           </div>
 
-                          <div className="pt-2 flex flex-col gap-1.5 border-t border-white/10">
+                          <div className="pt-2 flex flex-col gap-1.5 border-t border-purple-200">
 
                           {/* Broker-to-Principal Communication Timeline */}
-                          <div className="pt-3 border-t border-white/10 space-y-2">
-                            <h5 className="text-[10px] text-gray-400 font-sync uppercase font-bold tracking-wider mb-2">Communication Timeline</h5>
-                            <div className="space-y-1.5 border-l border-fbblue/30 pl-2 ml-1">
-                                <div className="text-[9px] text-gray-300 font-mono">
+                          <div className="pt-3 border-t border-purple-200 space-y-2">
+                            <h5 className="text-[10px] text-gray-600 font-space lowercase lowercase font-bold tracking-wider mb-2">Communication Timeline</h5>
+                            <div className="space-y-1.5 border-l border-purple-500/30 pl-2 ml-1">
+                                <div className="text-[9px] text-gray-700 font-mono">
                                     <span className="text-emerald-400">●</span> {deal.lastUpdated} - Proposal Sent to Principal
                                 </div>
-                                <div className="text-[9px] text-gray-300 font-mono">
-                                    <span className="text-fbblue">●</span> Inquiry Received & Structured
+                                <div className="text-[9px] text-gray-700 font-mono">
+                                    <span className="text-purple-600">●</span> Inquiry Received & Structured
                                 </div>
                             </div>
                           </div>
@@ -978,7 +978,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                             {stage === 'Inquiry' && (
                               <button
                                 onClick={() => handleAdvanceStage(deal.id, 'Quote Sent')}
-                                className="w-full py-1.5 rounded-lg bg-fbblue/20 hover:bg-fbblue/40 border border-fbblue/40 text-fbblue text-[9px] font-sync tracking-wider uppercase font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                                className="w-full py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500/40 text-purple-600 text-[9px] font-space lowercase tracking-wider lowercase font-bold flex items-center justify-center gap-1.5 cursor-pointer"
                               >
                                 <span>GENERATE PROPOSAL</span>
                                 <ChevronRight className="w-3 h-3" />
@@ -988,7 +988,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                             {stage === 'Quote Sent' && (
                               <button
                                 onClick={() => handleAdvanceStage(deal.id, 'Proposal Viewed')}
-                                className="w-full py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/40 border border-amber-500/40 text-amber-300 text-[9px] font-sync tracking-wider uppercase font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                                className="w-full py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/40 border border-amber-500/40 text-amber-300 text-[9px] font-space lowercase tracking-wider lowercase font-bold flex items-center justify-center gap-1.5 cursor-pointer"
                               >
                                 <span>MARK VIEWED BY CLIENT</span>
                                 <ChevronRight className="w-3 h-3" />
@@ -998,7 +998,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                             {stage === 'Proposal Viewed' && (
                               <button
                                 onClick={() => handleAdvanceStage(deal.id, 'Contract Signed')}
-                                className="w-full py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-500/40 text-emerald-300 text-[9px] font-sync tracking-wider uppercase font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                                className="w-full py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-500/40 text-emerald-300 text-[9px] font-space lowercase tracking-wider lowercase font-bold flex items-center justify-center gap-1.5 cursor-pointer"
                               >
                                 <span>CLIENT SIGNED CHARTER</span>
                                 <ChevronRight className="w-3 h-3" />
@@ -1013,7 +1013,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                                     onIssueLiveCodeRequest(deal.missionCode || '15D-001');
                                   }
                                 }}
-                                className="w-full py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-black text-[9px] font-sync tracking-wider uppercase font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-lg"
+                                className="w-full py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-black text-[9px] font-space lowercase tracking-wider lowercase font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-lg"
                               >
                                 <Zap className="w-3 h-3" />
                                 <span>ISSUE LIVE BOOKING CODE</span>
@@ -1030,9 +1030,9 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                                     window.open(`https://vip.15dwings.com.ng/verify/${deal.missionCode}`, '_blank');
                                   }
                                 }}
-                                className="w-full py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/15 text-[9px] font-sync tracking-wider uppercase font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+                                className="w-full py-1.5 rounded-lg bg-purple-100 hover:bg-white/20 text-gray-900 border border-purple-200 text-[9px] font-space lowercase tracking-wider lowercase font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
                               >
-                                <ExternalLink className="w-3 h-3 text-fbblue" />
+                                <ExternalLink className="w-3 h-3 text-purple-600" />
                                 <span>VIP CLIENT HANDOFF</span>
                               </button>
                             )}
@@ -1051,19 +1051,19 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       {/* SUB-TAB 2: HNWI & CORPORATE CLIENT PROFILES */}
       {activeSubTab === 'clients' && (
         <div className="space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-[10px]">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md backdrop-blur-[10px]">
             <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+              <Search className="w-4 h-4 text-gray-600 absolute left-3.5 top-3" />
               <input
                 type="text"
                 placeholder="Search HNWI client name, company or email..."
                 value={clientSearch}
                 onChange={e => setClientSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-fbblue transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-purple-50 border border-purple-200 rounded-xl text-xs text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-all"
               />
             </div>
-            <div className="text-xs text-gray-400 font-mono">
-              Showing <span className="text-white font-bold">{filteredClients.length}</span> verified profiles
+            <div className="text-xs text-gray-600 font-mono">
+              Showing <span className="text-gray-900 font-bold">{filteredClients.length}</span> verified profiles
             </div>
           </div>
 
@@ -1076,31 +1076,31 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                   onClick={() => setSelectedClient(client)}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-2 text-left ${
                     selectedClient?.id === client.id
-                      ? 'border-fbblue bg-fbblue/10 shadow-[0_0_20px_rgba(24,119,242,0.2)]'
-                      : 'border-white/10 bg-black/60 hover:border-white/20 hover:bg-white/5'
+                      ? 'border-purple-500 bg-purple-100 shadow-[0_0_20px_rgba(24,119,242,0.2)]'
+                      : 'border-purple-200 bg-white/80 backdrop-blur-md hover:border-purple-300 hover:bg-purple-50'
                   }`}
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-sync uppercase text-sm font-bold text-white">
+                      <h3 className="font-space lowercase lowercase text-sm font-bold text-gray-900">
                         {client.fullName}
                       </h3>
-                      <p className="text-[10px] text-gray-400 font-mono pt-0.5">
+                      <p className="text-[10px] text-gray-600 font-mono pt-0.5">
                         {client.company}
                       </p>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full bg-white/10 text-fbblue text-[9px] font-sync font-bold uppercase tracking-wider">
+                    <span className="px-2.5 py-1 rounded-full bg-purple-100 text-purple-600 text-[9px] font-space lowercase font-bold lowercase tracking-wider">
                       {client.type}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 pt-2 text-[10px] border-t border-white/10 font-mono">
+                  <div className="grid grid-cols-2 gap-2 pt-2 text-[10px] border-t border-purple-200 font-mono">
                     <div>
-                      <span className="text-gray-400 block">Total Charters:</span>
-                      <span className="text-white font-bold">{client.totalFlightsBooked} flights</span>
+                      <span className="text-gray-600 block">Total Charters:</span>
+                      <span className="text-gray-900 font-bold">{client.totalFlightsBooked} flights</span>
                     </div>
                     <div>
-                      <span className="text-gray-400 block">Lifetime Value:</span>
+                      <span className="text-gray-600 block">Lifetime Value:</span>
                       <span className="text-emerald-400 font-bold">{formatCurrency(client.totalLifetimeSpendUsd, 'USD')}</span>
                     </div>
                   </div>
@@ -1109,21 +1109,21 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             </div>
 
             {/* Client Profile Deep View */}
-            <div className="lg:col-span-2 p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-6 text-left">
+            <div className="lg:col-span-2 p-6 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md backdrop-blur-[10px] space-y-6 text-left">
               {selectedClient ? (
                 <div className="space-y-6">
                   {/* Header */}
-                  <div className="flex justify-between items-start pb-4 border-b border-white/10">
+                  <div className="flex justify-between items-start pb-4 border-b border-purple-200">
                     <div>
                       <div className="flex items-center gap-3">
-                        <h2 className="font-sync uppercase text-xl font-bold text-white">
+                        <h2 className="font-space lowercase lowercase text-xl font-bold text-gray-900">
                           {selectedClient.fullName}
                         </h2>
-                        <span className="px-3 py-1 rounded-full bg-fbblue/20 border border-fbblue/40 text-fbblue text-[10px] font-sync font-bold uppercase">
+                        <span className="px-3 py-1 rounded-full bg-purple-600/20 border border-purple-500/40 text-purple-600 text-[10px] font-space lowercase font-bold lowercase">
                           {selectedClient.type}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-400 font-mono pt-1">
+                      <p className="text-xs text-gray-600 font-mono pt-1">
                         {selectedClient.company} • Managed by {selectedClient.assignedBroker}
                       </p>
                     </div>
@@ -1135,7 +1135,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                           'Client contact copied!'
                         )
                       }
-                      className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs flex items-center gap-1.5 cursor-pointer"
+                      className="p-2 bg-purple-100 hover:bg-white/20 text-gray-900 rounded-xl text-xs flex items-center gap-1.5 cursor-pointer"
                     >
                       <Copy className="w-3.5 h-3.5" />
                       <span>COPY CONTACT</span>
@@ -1144,60 +1144,60 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
                   {/* Contact Info Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                      <span className="text-[10px] text-gray-400 uppercase font-sync block">EMAIL ADDRESS</span>
-                      <span className="text-xs text-white font-mono">{selectedClient.email}</span>
+                    <div className="p-3.5 rounded-xl bg-purple-50 border border-purple-200 space-y-1">
+                      <span className="text-[10px] text-gray-600 lowercase font-space lowercase block">EMAIL ADDRESS</span>
+                      <span className="text-xs text-gray-900 font-mono">{selectedClient.email}</span>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                      <span className="text-[10px] text-gray-400 uppercase font-sync block">PHONE NUMBER</span>
-                      <span className="text-xs text-white font-mono">{selectedClient.phone}</span>
+                    <div className="p-3.5 rounded-xl bg-purple-50 border border-purple-200 space-y-1">
+                      <span className="text-[10px] text-gray-600 lowercase font-space lowercase block">PHONE NUMBER</span>
+                      <span className="text-xs text-gray-900 font-mono">{selectedClient.phone}</span>
                     </div>
                   </div>
 
                   {/* Private Aviation Preferences */}
                   <div className="space-y-3">
-                    <h3 className="font-sync text-xs font-bold text-fbblue tracking-widest uppercase flex items-center gap-2">
+                    <h3 className="font-space lowercase text-xs font-bold text-purple-600 tracking-widest lowercase flex items-center gap-2">
                       <Plane className="w-4 h-4" />
                       <span>PRIVATE AVIATION PREFERENCES</span>
                     </h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                        <span className="text-gray-400 block text-[10px]">PREFERRED AIRCRAFT</span>
-                        <span className="text-white font-semibold">{selectedClient.preferredAircraftClass}</span>
+                      <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 space-y-1">
+                        <span className="text-gray-600 block text-[10px]">PREFERRED AIRCRAFT</span>
+                        <span className="text-gray-900 font-semibold">{selectedClient.preferredAircraftClass}</span>
                       </div>
 
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                        <span className="text-gray-400 block text-[10px]">TAIL AVOIDANCES</span>
+                      <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 space-y-1">
+                        <span className="text-gray-600 block text-[10px]">TAIL AVOIDANCES</span>
                         <span className="text-amber-300 font-semibold">
                           {selectedClient.tailAvoidances.join(', ') || 'None'}
                         </span>
                       </div>
 
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                        <span className="text-gray-400 block text-[10px]">CATERING & DIETARY</span>
+                      <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 space-y-1">
+                        <span className="text-gray-600 block text-[10px]">CATERING & DIETARY</span>
                         <span className="text-emerald-300 font-semibold">
                           {selectedClient.dietaryRestrictions.join(', ') || 'Standard Executive Catering'}
                         </span>
                       </div>
 
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                        <span className="text-gray-400 block text-[10px]">PET POLICY</span>
-                        <span className="text-white font-semibold">{selectedClient.petPolicy}</span>
+                      <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 space-y-1">
+                        <span className="text-gray-600 block text-[10px]">PET POLICY</span>
+                        <span className="text-gray-900 font-semibold">{selectedClient.petPolicy}</span>
                       </div>
 
-                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 col-span-2 space-y-1">
-                        <span className="text-gray-400 block text-[10px]">SECURITY & ESCORT DETAIL</span>
-                        <span className="text-white font-semibold">{selectedClient.securityDetails}</span>
+                      <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 col-span-2 space-y-1">
+                        <span className="text-gray-600 block text-[10px]">SECURITY & ESCORT DETAIL</span>
+                        <span className="text-gray-900 font-semibold">{selectedClient.securityDetails}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Passport & ID Vault */}
-                  <div className="space-y-3 pt-2 border-t border-white/10">
+                  <div className="space-y-3 pt-2 border-t border-purple-200">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-sync text-xs font-bold text-fbblue tracking-widest uppercase flex items-center gap-2">
+                      <h3 className="font-space lowercase text-xs font-bold text-purple-600 tracking-widest lowercase flex items-center gap-2">
                         <ShieldCheck className="w-4 h-4" />
                         <span>PASSPORT & PASSENGER VAULT</span>
                       </h3>
@@ -1208,7 +1208,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                             'Passport vault exported!'
                           )
                         }
-                        className="px-3 py-1 bg-fbblue/20 hover:bg-fbblue/40 text-fbblue rounded-lg text-[10px] font-sync font-bold uppercase cursor-pointer"
+                        className="px-3 py-1 bg-purple-600/20 hover:bg-purple-600/40 text-purple-600 rounded-lg text-[10px] font-space lowercase font-bold lowercase cursor-pointer"
                       >
                         EXPORT FOR MANIFEST
                       </button>
@@ -1218,17 +1218,17 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                       {selectedClient.passportVault.map(pass => (
                         <div
                           key={pass.id}
-                          className="p-3 rounded-xl bg-white/5 border border-white/10 flex justify-between items-center text-xs font-mono"
+                          className="p-3 rounded-xl bg-purple-50 border border-purple-200 flex justify-between items-center text-xs font-mono"
                         >
                           <div>
-                            <span className="text-white font-bold block">{pass.passengerName}</span>
-                            <span className="text-gray-400 text-[10px]">
+                            <span className="text-gray-900 font-bold block">{pass.passengerName}</span>
+                            <span className="text-gray-600 text-[10px]">
                               Passport #: {pass.passportNumber} • {pass.nationality}
                             </span>
                           </div>
                           <div className="text-right">
                             <span
-                              className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${
+                              className={`px-2.5 py-0.5 rounded-full text-[9px] font-bold lowercase ${
                                 pass.status === 'Valid'
                                   ? 'bg-emerald-500/20 text-emerald-300'
                                   : 'bg-amber-500/20 text-amber-300'
@@ -1236,7 +1236,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                             >
                               {pass.status}
                             </span>
-                            <span className="text-gray-400 text-[10px] block pt-1">
+                            <span className="text-gray-600 text-[10px] block pt-1">
                               Exp: {pass.expiryDate}
                             </span>
                           </div>
@@ -1248,7 +1248,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               ) : (
                 <div className="py-20 text-center space-y-3 text-gray-500">
                   <Users className="w-10 h-10 mx-auto text-gray-600" />
-                  <p className="font-sync text-xs tracking-widest uppercase">
+                  <p className="font-space lowercase text-xs tracking-widest lowercase">
                     SELECT A CLIENT FROM THE DIRECTORY TO VIEW DETAILED PROFILE & PASSPORT VAULT
                   </p>
                 </div>
@@ -1271,13 +1271,13 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 4: TRIP HISTORY & LOGS */}
       {activeSubTab === 'history' && (
-        <div className="space-y-4 p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px]">
-          <div className="flex justify-between items-center pb-4 border-b border-white/10">
+        <div className="space-y-4 p-6 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md backdrop-blur-[10px]">
+          <div className="flex justify-between items-center pb-4 border-b border-purple-200">
             <div>
-              <h3 className="font-sync text-base font-bold text-white uppercase tracking-wider">
+              <h3 className="font-space lowercase text-base font-bold text-gray-900 lowercase tracking-wider">
                 HISTORICAL TRIP LEDGER & CHARTER LOGS
               </h3>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 Complete flight activity, wholesale settlement costs, and broker margin historical record.
               </p>
             </div>
@@ -1286,7 +1286,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className="border-b border-white/10 text-gray-400 text-[10px] font-sync uppercase">
+                <tr className="border-b border-purple-200 text-gray-600 text-[10px] font-space lowercase lowercase">
                   <th className="py-3 px-2">BOOKING CODE</th>
                   <th className="py-3 px-2">CLIENT</th>
                   <th className="py-3 px-2">DATE</th>
@@ -1300,19 +1300,19 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               </thead>
               <tbody className="divide-y divide-white/10">
                 {INITIAL_FLIGHT_HISTORY.map(flight => (
-                  <tr key={flight.id} className="hover:bg-white/5 transition-colors">
-                    <td className="py-3 px-2 font-bold text-fbblue">{flight.missionCode}</td>
-                    <td className="py-3 px-2 text-white">{flight.clientName}</td>
-                    <td className="py-3 px-2 text-gray-400">{flight.flightDate}</td>
-                    <td className="py-3 px-2 text-white font-bold">{flight.route}</td>
-                    <td className="py-3 px-2 text-gray-300">{flight.aircraftModel}</td>
-                    <td className="py-3 px-2 text-gray-300">{formatCurrency(flight.wholesaleCostUsd, 'USD')}</td>
+                  <tr key={flight.id} className="hover:bg-purple-50 transition-colors">
+                    <td className="py-3 px-2 font-bold text-purple-600">{flight.missionCode}</td>
+                    <td className="py-3 px-2 text-gray-900">{flight.clientName}</td>
+                    <td className="py-3 px-2 text-gray-600">{flight.flightDate}</td>
+                    <td className="py-3 px-2 text-gray-900 font-bold">{flight.route}</td>
+                    <td className="py-3 px-2 text-gray-700">{flight.aircraftModel}</td>
+                    <td className="py-3 px-2 text-gray-700">{formatCurrency(flight.wholesaleCostUsd, 'USD')}</td>
                     <td className="py-3 px-2 text-emerald-400 font-bold">
                       +{formatCurrency(flight.brokerProfitUsd, 'USD')}
                     </td>
-                    <td className="py-3 px-2 text-fbblue text-[10px]">{flight.paymentRail}</td>
+                    <td className="py-3 px-2 text-purple-600 text-[10px]">{flight.paymentRail}</td>
                     <td className="py-3 px-2">
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-bold uppercase">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-bold lowercase">
                         {flight.status}
                       </span>
                     </td>
@@ -1328,41 +1328,41 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       {activeSubTab === 'analytics' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="p-5 rounded-2xl border border-white/10 bg-black/80 space-y-2">
-              <span className="text-[10px] text-gray-400 font-sync uppercase tracking-widest block">
+            <div className="p-5 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md space-y-2">
+              <span className="text-[10px] text-gray-600 font-space lowercase lowercase tracking-widest block">
                 TOTAL CLOSED CHARTER VOLUME
               </span>
-              <p className="text-2xl font-sync uppercase font-bold text-white font-mono">
+              <p className="text-2xl font-space lowercase lowercase font-bold text-gray-900 font-mono">
                 {formatCurrency(totalClosedVolume || 1850000, 'USD')}
               </p>
               <span className="text-[10px] text-emerald-400 font-mono">↑ +24% vs last quarter</span>
             </div>
 
-            <div className="p-5 rounded-2xl border border-white/10 bg-black/80 space-y-2">
-              <span className="text-[10px] text-gray-400 font-sync uppercase tracking-widest block">
+            <div className="p-5 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md space-y-2">
+              <span className="text-[10px] text-gray-600 font-space lowercase lowercase tracking-widest block">
                 NET BROKER COMFLIGHTS
               </span>
-              <p className="text-2xl font-sync uppercase font-bold text-fbblue font-mono">
+              <p className="text-2xl font-space lowercase lowercase font-bold text-purple-600 font-mono">
                 {formatCurrency(totalCommissions || 248500, 'USD')}
               </p>
-              <span className="text-[10px] text-fbblue font-mono">Average margin: 13.4%</span>
+              <span className="text-[10px] text-purple-600 font-mono">Average margin: 13.4%</span>
             </div>
 
-            <div className="p-5 rounded-2xl border border-white/10 bg-black/80 space-y-2">
-              <span className="text-[10px] text-gray-400 font-sync uppercase tracking-widest block">
+            <div className="p-5 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md space-y-2">
+              <span className="text-[10px] text-gray-600 font-space lowercase lowercase tracking-widest block">
                 PROVIDUS NGN CLEARING RAIL
               </span>
-              <p className="text-2xl font-sync uppercase font-bold text-emerald-400 font-mono">
+              <p className="text-2xl font-space lowercase lowercase font-bold text-emerald-400 font-mono">
                 ₦382,400,000
               </p>
-              <span className="text-[10px] text-gray-400 font-mono">Sub-second NUBAN settlement</span>
+              <span className="text-[10px] text-gray-600 font-mono">Sub-second NUBAN settlement</span>
             </div>
 
-            <div className="p-5 rounded-2xl border border-white/10 bg-black/80 space-y-2">
-              <span className="text-[10px] text-gray-400 font-sync uppercase tracking-widest block">
+            <div className="p-5 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md space-y-2">
+              <span className="text-[10px] text-gray-600 font-space lowercase lowercase tracking-widest block">
                 USDC ESCROW (SOLANA / BASE L2)
               </span>
-              <p className="text-2xl font-sync uppercase font-bold text-indigo-400 font-mono">
+              <p className="text-2xl font-space lowercase lowercase font-bold text-indigo-400 font-mono">
                 $189,750 USDC
               </p>
               <span className="text-[10px] text-indigo-300 font-mono">Fireblocks Vault Locked</span>
@@ -1373,13 +1373,13 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 6: MESSAGING */}
       {activeSubTab === 'messaging' && (
-        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-4 max-w-3xl mx-auto">
-          <div className="pb-3 border-b border-white/10 flex justify-between items-center">
+        <div className="p-6 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md backdrop-blur-[10px] space-y-4 max-w-3xl mx-auto">
+          <div className="pb-3 border-b border-purple-200 flex justify-between items-center">
             <div>
-              <h3 className="font-sync text-sm font-bold text-white uppercase">
+              <h3 className="font-space lowercase text-sm font-bold text-gray-900 lowercase">
                 CLIENT CONCIERGE CHAT HUB
               </h3>
-              <p className="text-[10px] text-gray-400 font-mono">
+              <p className="text-[10px] text-gray-600 font-mono">
                 Direct client interaction vault without exposing platform backend details.
               </p>
             </div>
@@ -1397,11 +1397,11 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 <div
                   className={`p-3 rounded-2xl max-w-md text-xs font-mono space-y-1 ${
                     msg.isClient
-                      ? 'bg-white/10 text-white rounded-tl-none'
-                      : 'bg-fbblue text-white rounded-tr-none'
+                      ? 'bg-purple-100 text-gray-900 rounded-tl-none'
+                      : 'bg-purple-600 text-gray-900 rounded-tr-none'
                   }`}
                 >
-                  <span className="text-[9px] opacity-75 block font-sync uppercase">{msg.sender}</span>
+                  <span className="text-[9px] opacity-75 block font-space lowercase lowercase">{msg.sender}</span>
                   <p>{msg.text}</p>
                   <span className="text-[8px] opacity-60 text-right block pt-1">{msg.time}</span>
                 </div>
@@ -1409,17 +1409,17 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             ))}
           </div>
 
-          <form onSubmit={handleSendMessage} className="flex gap-2 pt-2 border-t border-white/10">
+          <form onSubmit={handleSendMessage} className="flex gap-2 pt-2 border-t border-purple-200">
             <input
               type="text"
               placeholder="Type client concierge message..."
               value={newMessageInput}
               onChange={e => setNewMessageInput(e.target.value)}
-              className="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-fbblue"
+              className="flex-1 px-4 py-2.5 bg-purple-50 border border-purple-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-purple-500"
             />
             <button
               type="submit"
-              className="px-4 py-2.5 bg-fbblue hover:bg-fbblue/90 text-white rounded-xl text-xs font-sync font-bold uppercase cursor-pointer"
+              className="px-4 py-2.5 bg-purple-600 hover:bg-purple-600/90 text-gray-900 rounded-xl text-xs font-space lowercase font-bold lowercase cursor-pointer"
             >
               SEND
             </button>
@@ -1429,13 +1429,13 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 7: TASKS & ALERTS */}
       {activeSubTab === 'tasks' && (
-        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div className="p-6 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md backdrop-blur-[10px] space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-purple-200">
             <div>
-              <h3 className="font-sync text-base font-bold text-white uppercase tracking-wider">
+              <h3 className="font-space lowercase text-base font-bold text-gray-900 lowercase tracking-wider">
                 AUTOMATED REMINDERS & TASK ENGINE
               </h3>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 Auto-generated alerts for 48h quote follow-ups, passport expirations, and annual trip prep.
               </p>
             </div>
@@ -1446,11 +1446,11 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 placeholder="New broker task..."
                 value={newTaskTitle}
                 onChange={e => setNewTaskTitle(e.target.value)}
-                className="px-3.5 py-2 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-fbblue"
+                className="px-3.5 py-2 bg-purple-50 border border-purple-200 rounded-xl text-xs text-gray-900 placeholder-gray-500 focus:outline-none focus:border-purple-500"
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-fbblue hover:bg-fbblue/90 text-white rounded-xl text-xs font-sync font-bold uppercase cursor-pointer"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-600/90 text-gray-900 rounded-xl text-xs font-space lowercase font-bold lowercase cursor-pointer"
               >
                 ADD TASK
               </button>
@@ -1461,7 +1461,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             {tasks.map(task => (
               <div
                 key={task.id}
-                className="p-3.5 rounded-xl border border-white/10 bg-white/5 flex items-center justify-between text-xs font-mono"
+                className="p-3.5 rounded-xl border border-purple-200 bg-purple-50 flex items-center justify-between text-xs font-mono"
               >
                 <div className="flex items-center gap-3">
                   <input
@@ -1472,18 +1472,18 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                         prev.map(t => (t.id === task.id ? { ...t, completed: !t.completed } : t))
                       )
                     }
-                    className="w-4 h-4 rounded bg-black border-white/20 text-fbblue focus:ring-0 cursor-pointer"
+                    className="w-4 h-4 rounded bg-white border-purple-300 text-purple-600 focus:ring-0 cursor-pointer"
                   />
                   <div>
                     <span
-                      className={`font-semibold text-white ${
+                      className={`font-semibold text-gray-900 ${
                         task.completed ? 'line-through text-gray-500' : ''
                       }`}
                     >
                       {task.title}
                     </span>
                     {task.clientName && (
-                      <span className="text-[10px] text-gray-400 block pt-0.5">
+                      <span className="text-[10px] text-gray-600 block pt-0.5">
                         Client: {task.clientName}
                       </span>
                     )}
@@ -1492,15 +1492,15 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
                 <div className="flex items-center gap-2">
                   <span
-                    className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                    className={`px-2 py-0.5 rounded text-[9px] font-bold lowercase ${
                       task.priority === 'High'
                         ? 'bg-red-500/20 text-red-300'
-                        : 'bg-fbblue/20 text-fbblue'
+                        : 'bg-purple-600/20 text-purple-600'
                     }`}
                   >
                     {task.priority}
                   </span>
-                  <span className="text-[10px] text-gray-400">{task.dueDate}</span>
+                  <span className="text-[10px] text-gray-600">{task.dueDate}</span>
                 </div>
               </div>
             ))}
@@ -1510,12 +1510,12 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 8: FLEET DIRECTORY */}
       {activeSubTab === 'directory' && (
-        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-4">
-          <div className="pb-4 border-b border-white/10">
-            <h3 className="font-sync text-base font-bold text-white uppercase tracking-wider">
+        <div className="p-6 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md backdrop-blur-[10px] space-y-4">
+          <div className="pb-4 border-b border-purple-200">
+            <h3 className="font-space lowercase text-base font-bold text-gray-900 lowercase tracking-wider">
               VERIFIED FLEET DIRECTORY (READ-ONLY)
             </h3>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-600">
               Live aircraft availability and hourly wholesale rates for instant quote calculation.
             </p>
           </div>
@@ -1524,38 +1524,38 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             {INITIAL_AIRCRAFT_DIRECTORY.map(air => (
               <div
                 key={air.id}
-                className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3 text-left"
+                className="p-4 rounded-xl border border-purple-200 bg-purple-50 space-y-3 text-left"
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="px-2 py-0.5 rounded bg-fbblue/20 text-fbblue text-[9px] font-mono font-bold">
+                    <span className="px-2 py-0.5 rounded bg-purple-600/20 text-purple-600 text-[9px] font-mono font-bold">
                       {air.tailNumber}
                     </span>
-                    <h4 className="font-sync uppercase text-sm font-bold text-white pt-1">{air.model}</h4>
+                    <h4 className="font-space lowercase lowercase text-sm font-bold text-gray-900 pt-1">{air.model}</h4>
                   </div>
                   <span className="text-[9px] text-emerald-400 font-mono font-bold">
                     {air.argusRating}
                   </span>
                 </div>
 
-                <div className="space-y-1 text-xs font-mono text-gray-300">
+                <div className="space-y-1 text-xs font-mono text-gray-700">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Category:</span>
+                    <span className="text-gray-600">Category:</span>
                     <span>{air.category}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Base Airport:</span>
-                    <span className="text-white">{air.baseAirport.split(' ')[0]}</span>
+                    <span className="text-gray-600">Base Airport:</span>
+                    <span className="text-gray-900">{air.baseAirport.split(' ')[0]}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Rate:</span>
+                    <span className="text-gray-600">Rate:</span>
                     <span className="text-emerald-400 font-bold">
                       {formatCurrency(air.hourlyRateUsd, 'USD')}/hr
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Operator:</span>
-                    <span className="text-fbblue">{air.operatorName}</span>
+                    <span className="text-gray-600">Operator:</span>
+                    <span className="text-purple-600">{air.operatorName}</span>
                   </div>
                 </div>
               </div>
@@ -1566,17 +1566,17 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 9: TEAM ACCOUNTS */}
       {activeSubTab === 'team' && (
-        <div className="p-6 rounded-2xl border border-white/10 bg-black/80 backdrop-blur-[10px] space-y-4">
-          <div className="pb-4 border-b border-white/10 flex justify-between items-center">
+        <div className="p-6 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md backdrop-blur-[10px] space-y-4">
+          <div className="pb-4 border-b border-purple-200 flex justify-between items-center">
             <div>
-              <h3 className="font-sync text-base font-bold text-white uppercase tracking-wider">
+              <h3 className="font-space lowercase text-base font-bold text-gray-900 lowercase tracking-wider">
                 BROKERAGE TEAM SUB-ACCOUNTS
               </h3>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-600">
                 Manage junior brokers, lead assignments, and commission split ratios.
               </p>
             </div>
-            <button className="px-3.5 py-2 bg-fbblue hover:bg-fbblue/90 text-white rounded-xl text-xs font-sync font-bold uppercase cursor-pointer">
+            <button className="px-3.5 py-2 bg-purple-600 hover:bg-purple-600/90 text-gray-900 rounded-xl text-xs font-space lowercase font-bold lowercase cursor-pointer">
               INVITE BROKER
             </button>
           </div>
@@ -1585,29 +1585,29 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             {INITIAL_TEAM_MEMBERS.map(member => (
               <div
                 key={member.id}
-                className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3 text-left"
+                className="p-4 rounded-xl border border-purple-200 bg-purple-50 space-y-3 text-left"
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-sync uppercase text-sm font-bold text-white">{member.fullName}</h4>
-                    <span className="text-[10px] text-fbblue font-mono">{member.role}</span>
+                    <h4 className="font-space lowercase lowercase text-sm font-bold text-gray-900">{member.fullName}</h4>
+                    <span className="text-[10px] text-purple-600 font-mono">{member.role}</span>
                   </div>
                   <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-mono font-bold">
                     {member.commissionSplitPercent}% Split
                   </span>
                 </div>
 
-                <div className="space-y-1 text-xs font-mono text-gray-300 pt-2 border-t border-white/10">
+                <div className="space-y-1 text-xs font-mono text-gray-700 pt-2 border-t border-purple-200">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Email:</span>
+                    <span className="text-gray-600">Email:</span>
                     <span>{member.email}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Active Deals:</span>
-                    <span className="text-white font-bold">{member.assignedDealsCount}</span>
+                    <span className="text-gray-600">Active Deals:</span>
+                    <span className="text-gray-900 font-bold">{member.assignedDealsCount}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Closed Volume:</span>
+                    <span className="text-gray-600">Closed Volume:</span>
                     <span className="text-emerald-400 font-bold">
                       {formatCurrency(member.closedVolumeUsd, 'USD')}
                     </span>
@@ -1626,16 +1626,16 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-[10px] flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-white/80 backdrop-blur-md backdrop-blur-[10px] flex items-center justify-center p-4"
           >
-            <div className="w-full max-w-md p-6 rounded-2xl border border-white/20 bg-black space-y-4 text-left">
-              <div className="flex justify-between items-center pb-2 border-b border-white/10">
-                <h3 className="font-sync text-sm font-bold text-white uppercase">
+            <div className="w-full max-w-md p-6 rounded-2xl border border-purple-300 bg-white space-y-4 text-left">
+              <div className="flex justify-between items-center pb-2 border-b border-purple-200">
+                <h3 className="font-space lowercase text-sm font-bold text-gray-900 lowercase">
                   ADD NEW HNWI CLIENT PROFILE
                 </h3>
                 <button
                   onClick={() => setShowAddClientModal(false)}
-                  className="p-1 text-gray-400 hover:text-white"
+                  className="p-1 text-gray-600 hover:text-gray-900"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1643,7 +1643,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
               <form onSubmit={handleCreateClient} className="space-y-3 text-xs">
                 <div>
-                  <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                  <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                     FULL NAME
                   </label>
                   <input
@@ -1652,12 +1652,12 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                     placeholder="e.g. Chief Alani Adeleke"
                     value={newClientName}
                     onChange={e => setNewClientName(e.target.value)}
-                    className="w-full p-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue"
+                    className="w-full p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                  <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                     COMPANY / PRIVATE OFFICE
                   </label>
                   <input
@@ -1665,12 +1665,12 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                     placeholder="e.g. Adeleke Holdings"
                     value={newClientCompany}
                     onChange={e => setNewClientCompany(e.target.value)}
-                    className="w-full p-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue"
+                    className="w-full p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                  <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                     EMAIL ADDRESS
                   </label>
                   <input
@@ -1678,12 +1678,12 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                     placeholder="client@privateoffice.com"
                     value={newClientEmail}
                     onChange={e => setNewClientEmail(e.target.value)}
-                    className="w-full p-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue"
+                    className="w-full p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                  <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                     PHONE NUMBER
                   </label>
                   <input
@@ -1691,18 +1691,18 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                     placeholder="+234 803 000 0000"
                     value={newClientPhone}
                     onChange={e => setNewClientPhone(e.target.value)}
-                    className="w-full p-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue"
+                    className="w-full p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                  <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                     CLIENT TYPE
                   </label>
                   <select
                     value={newClientType}
                     onChange={e => setNewClientType(e.target.value as any)}
-                    className="w-full p-2.5 bg-black border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue"
+                    className="w-full p-2.5 bg-white border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500"
                   >
                     <option value="HNWI">HNWI Individual</option>
                     <option value="Corporate">Corporate Fleet</option>
@@ -1714,14 +1714,14 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 <div className="pt-2 flex gap-2">
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-fbblue hover:bg-fbblue/90 text-white rounded-xl font-sync text-xs font-bold uppercase cursor-pointer"
+                    className="flex-1 py-3 bg-purple-600 hover:bg-purple-600/90 text-gray-900 rounded-xl font-space lowercase text-xs font-bold lowercase cursor-pointer"
                   >
                     SAVE PROFILE
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowAddClientModal(false)}
-                    className="py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl font-sync text-xs font-bold uppercase cursor-pointer"
+                    className="py-3 px-4 bg-purple-100 hover:bg-white/20 text-gray-900 rounded-xl font-space lowercase text-xs font-bold lowercase cursor-pointer"
                   >
                     CANCEL
                   </button>
@@ -1739,16 +1739,16 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-[10px] flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-white/80 backdrop-blur-md backdrop-blur-[10px] flex items-center justify-center p-4"
           >
-            <div className="w-full max-w-md p-6 rounded-2xl border border-white/20 bg-black space-y-4 text-left">
-              <div className="flex justify-between items-center pb-2 border-b border-white/10">
-                <h3 className="font-sync text-sm font-bold text-white uppercase">
+            <div className="w-full max-w-md p-6 rounded-2xl border border-purple-300 bg-white space-y-4 text-left">
+              <div className="flex justify-between items-center pb-2 border-b border-purple-200">
+                <h3 className="font-space lowercase text-sm font-bold text-gray-900 lowercase">
                   NEW CHARTER DEAL INQUIRY
                 </h3>
                 <button
                   onClick={() => setShowAddDealModal(false)}
-                  className="p-1 text-gray-400 hover:text-white"
+                  className="p-1 text-gray-600 hover:text-gray-900"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1756,13 +1756,13 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
               <form onSubmit={handleCreateDeal} className="space-y-3 text-xs">
                 <div>
-                  <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                  <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                     SELECT CLIENT
                   </label>
                   <select
                     value={newDealClient}
                     onChange={e => setNewDealClient(e.target.value)}
-                    className="w-full p-2.5 bg-black border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue"
+                    className="w-full p-2.5 bg-white border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500"
                   >
                     {clients.map(c => (
                       <option key={c.id} value={c.id}>
@@ -1774,7 +1774,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                    <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                       ORIGIN (ICAO/IATA)
                     </label>
                     <input
@@ -1782,11 +1782,11 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                       required
                       value={newDealOrigin}
                       onChange={e => setNewDealOrigin(e.target.value.toUpperCase())}
-                      className="w-full p-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue font-mono"
+                      className="w-full p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500 font-mono"
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                    <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                       DESTINATION
                     </label>
                     <input
@@ -1794,19 +1794,19 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                       required
                       value={newDealDest}
                       onChange={e => setNewDealDest(e.target.value.toUpperCase())}
-                      className="w-full p-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue font-mono"
+                      className="w-full p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500 font-mono"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                  <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                     AIRCRAFT CATEGORY
                   </label>
                   <select
                     value={newDealAircraft}
                     onChange={e => setNewDealAircraft(e.target.value)}
-                    className="w-full p-2.5 bg-black border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue"
+                    className="w-full p-2.5 bg-white border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500"
                   >
                     <option value="Heavy Jet (Challenger 650)">Heavy Jet (Challenger 650)</option>
                     <option value="Ultra Long Range (G650ER)">Ultra Long Range (G650ER)</option>
@@ -1816,7 +1816,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-sync text-gray-400 uppercase block mb-1">
+                  <label className="text-[10px] font-space lowercase text-gray-600 lowercase block mb-1">
                     ESTIMATED WHOLESALE COST (USD)
                   </label>
                   <input
@@ -1824,21 +1824,21 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                     required
                     value={newDealCost}
                     onChange={e => setNewDealCost(Number(e.target.value))}
-                    className="w-full p-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-fbblue font-mono"
+                    className="w-full p-2.5 bg-purple-50 border border-purple-200 rounded-xl text-gray-900 focus:outline-none focus:border-purple-500 font-mono"
                   />
                 </div>
 
                 <div className="pt-2 flex gap-2">
                   <button
                     type="submit"
-                    className="flex-1 py-3 bg-fbblue hover:bg-fbblue/90 text-white rounded-xl font-sync text-xs font-bold uppercase cursor-pointer"
+                    className="flex-1 py-3 bg-purple-600 hover:bg-purple-600/90 text-gray-900 rounded-xl font-space lowercase text-xs font-bold lowercase cursor-pointer"
                   >
                     CREATE DEAL IN PIPELINE
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowAddDealModal(false)}
-                    className="py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl font-sync text-xs font-bold uppercase cursor-pointer"
+                    className="py-3 px-4 bg-purple-100 hover:bg-white/20 text-gray-900 rounded-xl font-space lowercase text-xs font-bold lowercase cursor-pointer"
                   >
                     CANCEL
                   </button>

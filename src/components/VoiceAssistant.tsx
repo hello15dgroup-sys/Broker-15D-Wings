@@ -22,6 +22,12 @@ export default function VoiceAssistant() {
     try {
         setIsListening(true);
         setStatus('Initializing Link...');
+
+        if (!navigator?.mediaDevices?.getUserMedia) {
+            setStatus('Microphone API unavailable');
+            setIsListening(false);
+            return;
+        }
         
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         ws.current = new WebSocket(`${protocol}//${window.location.host}/live`);
@@ -29,7 +35,18 @@ export default function VoiceAssistant() {
         audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
         nextStartTime.current = audioContext.current.currentTime;
 
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        let stream: MediaStream;
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch (mediaErr: any) {
+            console.warn('Microphone permission denied or unavailable:', mediaErr);
+            setStatus('Mic permission denied');
+            setIsListening(false);
+            if (ws.current) ws.current.close();
+            if (audioContext.current) audioContext.current.close();
+            return;
+        }
+
         const source = audioContext.current.createMediaStreamSource(stream);
         
         // Use standard AudioWorklet if possible, but for simplicity here we'll use a fast approach

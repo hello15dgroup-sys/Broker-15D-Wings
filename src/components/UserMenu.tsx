@@ -41,14 +41,39 @@ export default function UserMenu() {
     }, 100);
   };
 
+  const [pushStatus, setPushStatus] = useState<string | null>(null);
+
   const requestPushNotifications = async () => {
-    if (!('Notification' in window)) {
-      alert('This browser does not support desktop notification');
-      return;
-    }
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      alert('Push notifications enabled successfully.');
+    try {
+      if (typeof window === 'undefined' || !('Notification' in window)) {
+        setPushStatus('Not supported');
+        setTimeout(() => setPushStatus(null), 3000);
+        return;
+      }
+      
+      if (Notification.permission === 'granted') {
+        setPushStatus('Already Enabled');
+        setTimeout(() => setPushStatus(null), 3000);
+        return;
+      }
+
+      if (Notification.permission === 'denied') {
+        setPushStatus('Permission Denied');
+        setTimeout(() => setPushStatus(null), 3000);
+        return;
+      }
+
+      const permission = await Notification.requestPermission().catch(() => 'denied');
+      if (permission === 'granted') {
+        setPushStatus('Alerts Enabled');
+      } else {
+        setPushStatus('Alerts Blocked');
+      }
+      setTimeout(() => setPushStatus(null), 3000);
+    } catch (err) {
+      console.warn('Desktop notifications request blocked or unsupported in frame:', err);
+      setPushStatus('Unavailable in Frame');
+      setTimeout(() => setPushStatus(null), 3000);
     }
   };
 
@@ -88,7 +113,8 @@ export default function UserMenu() {
               <Settings className="w-4 h-4" /> Profile Settings
             </button>
             <button onClick={requestPushNotifications} className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-light text-gray-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer active:bg-white/10">
-              <BellRing className="w-4 h-4" /> Enable Push Alerts
+              <BellRing className="w-4 h-4 text-fbblue" />
+              <span>{pushStatus ? pushStatus : 'Enable Push Alerts'}</span>
             </button>
             <a href="https://15dwings.com.ng/faqs" target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-light text-gray-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer active:bg-white/10">
               <HelpCircle className="w-4 h-4" /> Help & FAQs

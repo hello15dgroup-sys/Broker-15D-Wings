@@ -125,40 +125,40 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
   };
 
   return (
-    <div className="p-6 md:p-8 rounded-[2rem] border border-white/10 glass-vip shadow-2xl relative overflow-hidden bg-gradient-to-br from-black/80 via-[#070c16]/90 to-black/90">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-fbblue/5 blur-3xl pointer-events-none rounded-full" />
+    <div className="p-6 md:p-8 rounded-[2rem] border border-purple-200 glass-vip shadow-2xl relative overflow-hidden bg-gradient-to-br from-black/80 via-[#070c16]/90 to-black/90">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/5 blur-3xl pointer-events-none rounded-full" />
       
       {/* Header with Law of Cheerful Giver tag */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-purple-200">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-fbblue animate-pulse" />
-            <span className="font-sync text-[9px] text-fbblue tracking-[0.25em] font-bold uppercase">
+            <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
+            <span className="font-sync text-[9px] text-purple-600 tracking-[0.25em] font-bold uppercase">
               MODULE 1 — NATIVE DECISION ENGINE
             </span>
           </div>
-          <h3 className="font-sync text-lg md:text-xl font-bold tracking-wider text-white uppercase">
+          <h3 className="font-sync text-lg md:text-xl font-bold tracking-wider text-gray-900 uppercase">
             Get Flight Estimate
           </h3>
-          <p className="text-xs text-gray-400 font-light">
+          <p className="text-xs text-gray-600 font-light">
             Zero-latency route distance, fuel burn, and wholesale cost calculation.
           </p>
         </div>
 
         <div className="flex items-center gap-2 self-start md:self-auto">
-          <span className="px-3 py-1.5 rounded-full bg-fbblue/10 border border-fbblue/20 text-fbblue text-[9px] font-mono tracking-wider uppercase font-semibold">
+          <span className="px-3 py-1.5 rounded-full bg-purple-100 border border-purple-500/20 text-purple-600 text-[9px] font-mono tracking-wider uppercase font-semibold">
             100% Free Route Math
           </span>
-          <div className="bg-white/5 p-1 rounded-xl border border-white/10 flex gap-1">
+          <div className="bg-white/5 p-1 rounded-xl border border-purple-200 flex gap-1">
             <button
               onClick={() => setCurrency('USD')}
-              className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all ${currency === 'USD' ? 'bg-fbblue text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
+              className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all ${currency === 'USD' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900'}`}
             >
               USD ($)
             </button>
             <button
               onClick={() => setCurrency('NGN')}
-              className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all ${currency === 'NGN' ? 'bg-fbblue text-white shadow-md' : 'text-gray-400 hover:text-white'}`}
+              className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all ${currency === 'NGN' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-600 hover:text-gray-900'}`}
             >
               NGN (₦)
             </button>
@@ -170,14 +170,14 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 py-6">
         {/* Departure */}
         <div className="space-y-2">
-          <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+          <label className="font-sync text-[9px] text-gray-600 tracking-widest uppercase block">
             DEPARTURE CITY (ORIGIN)
           </label>
           <div className="relative">
             <select
               value={originCode}
               onChange={(e) => setOriginCode(e.target.value)}
-              className="w-full bg-black/80 border border-white/15 rounded-2xl px-4 py-3.5 text-sm text-white font-mono focus:border-fbblue outline-none transition-all cursor-pointer appearance-none"
+              className="w-full bg-white/80 backdrop-blur-md border border-purple-200 rounded-2xl px-4 py-3.5 text-sm text-gray-900 font-mono focus:border-purple-500 outline-none transition-all cursor-pointer appearance-none"
             >
               {AIRPORT_DATABASE.map((apt) => (
                 <option key={apt.code} value={apt.code} disabled={apt.code === destCode}>
@@ -186,21 +186,21 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
               ))}
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-              <MapPin className="w-4 h-4 text-fbblue" />
+              <MapPin className="w-4 h-4 text-purple-600" />
             </div>
           </div>
         </div>
 
         {/* Destination */}
         <div className="space-y-2">
-          <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+          <label className="font-sync text-[9px] text-gray-600 tracking-widest uppercase block">
             DESTINATION CITY
           </label>
           <div className="relative">
             <select
               value={destCode}
               onChange={(e) => setDestCode(e.target.value)}
-              className="w-full bg-black/80 border border-white/15 rounded-2xl px-4 py-3.5 text-sm text-white font-mono focus:border-fbblue outline-none transition-all cursor-pointer appearance-none"
+              className="w-full bg-white/80 backdrop-blur-md border border-purple-200 rounded-2xl px-4 py-3.5 text-sm text-gray-900 font-mono focus:border-purple-500 outline-none transition-all cursor-pointer appearance-none"
             >
               {AIRPORT_DATABASE.map((apt) => (
                 <option key={apt.code} value={apt.code} disabled={apt.code === originCode}>
@@ -216,14 +216,14 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
 
         {/* Aircraft Selection */}
         <div className="space-y-2">
-          <label className="font-sync text-[9px] text-gray-400 tracking-widest uppercase block">
+          <label className="font-sync text-[9px] text-gray-600 tracking-widest uppercase block">
             AIRCRAFT CLASS
           </label>
           <div className="relative">
             <select
               value={selectedAircraftId}
               onChange={(e) => setSelectedAircraftId(e.target.value)}
-              className="w-full bg-black/80 border border-white/15 rounded-2xl px-4 py-3.5 text-xs text-white font-lexend focus:border-fbblue outline-none transition-all cursor-pointer appearance-none"
+              className="w-full bg-white/80 backdrop-blur-md border border-purple-200 rounded-2xl px-4 py-3.5 text-xs text-gray-900 font-lexend focus:border-purple-500 outline-none transition-all cursor-pointer appearance-none"
             >
               {AIRCRAFT_CLASSES.map((ac) => (
                 <option key={ac.id} value={ac.id}>
@@ -232,7 +232,7 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
               ))}
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-              <Plane className="w-4 h-4 text-fbblue" />
+              <Plane className="w-4 h-4 text-purple-600" />
             </div>
           </div>
         </div>
@@ -244,8 +244,8 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
           onClick={() => setTripType('ONE_WAY')}
           className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-mono font-semibold transition-all border ${
             tripType === 'ONE_WAY'
-              ? 'bg-fbblue/20 border-fbblue text-fbblue'
-              : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+              ? 'bg-purple-600/20 border-purple-500 text-purple-600'
+              : 'bg-white/5 border-purple-200 text-gray-600 hover:text-gray-900'
           }`}
         >
           ONE WAY FLIGHT
@@ -254,8 +254,8 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
           onClick={() => setTripType('ROUND_TRIP')}
           className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-mono font-semibold transition-all border ${
             tripType === 'ROUND_TRIP'
-              ? 'bg-fbblue/20 border-fbblue text-fbblue'
-              : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+              ? 'bg-purple-600/20 border-purple-500 text-purple-600'
+              : 'bg-white/5 border-purple-200 text-gray-600 hover:text-gray-900'
           }`}
         >
           ROUND TRIP (RETURN)
@@ -263,36 +263,36 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
       </div>
 
       {/* Decision Results Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-2xl bg-black/60 border border-white/10 my-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 my-2">
         <div className="space-y-1">
-          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
-            <Compass className="w-3 h-3 text-fbblue" /> AIR DISTANCE
+          <span className="text-[9px] text-gray-600 font-sync uppercase block flex items-center gap-1">
+            <Compass className="w-3 h-3 text-purple-600" /> AIR DISTANCE
           </span>
-          <span className="text-xl font-mono font-bold text-white">
-            {calculation.distanceNm} <span className="text-xs text-gray-400 font-normal">NM</span>
+          <span className="text-xl font-mono font-bold text-gray-900">
+            {calculation.distanceNm} <span className="text-xs text-gray-600 font-normal">NM</span>
           </span>
         </div>
 
         <div className="space-y-1">
-          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
-            <Clock className="w-3 h-3 text-fbblue" /> FLIGHT DURATION
+          <span className="text-[9px] text-gray-600 font-sync uppercase block flex items-center gap-1">
+            <Clock className="w-3 h-3 text-purple-600" /> FLIGHT DURATION
           </span>
-          <span className="text-xl font-mono font-bold text-fbblue">
-            {calculation.flightHours} <span className="text-xs text-gray-400 font-normal">HRS</span>
+          <span className="text-xl font-mono font-bold text-purple-600">
+            {calculation.flightHours} <span className="text-xs text-gray-600 font-normal">HRS</span>
           </span>
         </div>
 
         <div className="space-y-1">
-          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
+          <span className="text-[9px] text-gray-600 font-sync uppercase block flex items-center gap-1">
             <Fuel className="w-3 h-3 text-amber-400" /> EST. FUEL BURN
           </span>
           <span className="text-xl font-mono font-bold text-amber-300">
-            {calculation.fuelGallons.toLocaleString()} <span className="text-xs text-gray-400 font-normal">GAL</span>
+            {calculation.fuelGallons.toLocaleString()} <span className="text-xs text-gray-600 font-normal">GAL</span>
           </span>
         </div>
 
         <div className="space-y-1">
-          <span className="text-[9px] text-gray-400 font-sync uppercase block flex items-center gap-1">
+          <span className="text-[9px] text-gray-600 font-sync uppercase block flex items-center gap-1">
             <DollarSign className="w-3 h-3 text-emerald-400" /> BASELINE WHOLESALE
           </span>
           <span className="text-xl font-mono font-bold text-emerald-400">
@@ -305,16 +305,16 @@ export const DecisionEngineCard: React.FC<DecisionEngineCardProps> = ({ onQuoteC
 
       {/* Footer CTA */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 mt-2">
-        <div className="text-[10px] text-gray-400 font-mono">
+        <div className="text-[10px] text-gray-600 font-mono">
           <span>Haversine Matrix: </span>
-          <span className="text-fbblue font-semibold">{origin.code} ({origin.lat}, {origin.lon})</span>
+          <span className="text-purple-600 font-semibold">{origin.code} ({origin.lat}, {origin.lon})</span>
           <span> → </span>
           <span className="text-emerald-400 font-semibold">{destination.code} ({destination.lat}, {destination.lon})</span>
         </div>
 
         <button
           onClick={handleApplyEstimate}
-          className="w-full sm:w-auto px-6 py-3 rounded-xl bg-fbblue hover:bg-fbblue/90 text-white font-sync text-xs font-bold tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center justify-center gap-2 active:scale-95"
+          className="w-full sm:w-auto px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-sync text-xs font-bold tracking-wider uppercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center justify-center gap-2 active:scale-95"
         >
           <span>Use Estimate in Proposal</span>
           <ChevronRight className="w-4 h-4" />
