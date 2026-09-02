@@ -123,20 +123,20 @@ export function MissionClockWidget({ mission }: { mission: any }) {
   const isCritical = timeLeft.hours < 72 && timeLeft.hours >= 48;
 
   return (
-    <div className="bg-[#0b0c10] border border-white/10 rounded-2xl p-6 backdrop-blur-[10px] relative overflow-hidden mb-6">
+    <div className="bg-white/95 border border-purple-200/90 shadow-xl rounded-2xl p-6 backdrop-blur-xl relative overflow-hidden mb-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-fbblue" />
-          <span className="text-xs font-sync tracking-widest text-slate-400 uppercase">
+          <Clock className="w-4 h-4 text-purple-600" />
+          <span className="text-xs font-sync tracking-widest text-gray-900 uppercase font-bold">
             Time to Flight
           </span>
         </div>
         {mission.status === "CANCELLED" ? (
-          <span className="text-[10px] bg-red-900/40 text-red-400 px-2 flex items-center h-5 border border-red-500/20 rounded font-bold uppercase">
+          <span className="text-[10px] bg-red-100 text-red-700 px-2.5 py-0.5 flex items-center h-6 border border-red-200 rounded-md font-bold uppercase">
             Cancelled
           </span>
         ) : (
-          <span className="text-[10px] bg-fbblue/20 text-fbblue px-2 flex items-center h-5 border border-fbblue/30 rounded font-bold uppercase">
+          <span className="text-[10px] bg-purple-100 text-purple-800 px-2.5 py-0.5 flex items-center h-6 border border-purple-200 rounded-md font-bold uppercase">
             Active
           </span>
         )}
@@ -144,60 +144,60 @@ export function MissionClockWidget({ mission }: { mission: any }) {
 
       <div className="flex flex-col gap-2 mt-4">
         {timeLeft.expired ? (
-          <span className="text-3xl font-sync tracking-tighter text-red-500 font-bold uppercase">
+          <span className="text-3xl font-sync tracking-tighter text-red-600 font-bold uppercase">
             EXPIRED
           </span>
         ) : (
           <div className="flex items-center gap-3 md:gap-6">
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-gray-950 font-bold">
                 {timeLeft.weeks.toString().padStart(2, "0")}
               </span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
+              <span className="text-[10px] text-purple-700 uppercase tracking-widest font-sync font-bold">
                 w
               </span>
             </div>
-            <div className="text-gray-700 font-lexend text-2xl md:text-4xl">
+            <div className="text-purple-400 font-lexend text-2xl md:text-4xl font-bold">
               :
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-gray-950 font-bold">
                 {timeLeft.days.toString().padStart(2, "0")}
               </span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
+              <span className="text-[10px] text-purple-700 uppercase tracking-widest font-sync font-bold">
                 d
               </span>
             </div>
-            <div className="text-gray-700 font-lexend text-2xl md:text-4xl">
+            <div className="text-purple-400 font-lexend text-2xl md:text-4xl font-bold">
               :
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-gray-950 font-bold">
                 {timeLeft.hours.toString().padStart(2, "0")}
               </span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
+              <span className="text-[10px] text-purple-700 uppercase tracking-widest font-sync font-bold">
                 h
               </span>
             </div>
-            <div className="text-gray-700 font-lexend text-2xl md:text-4xl">
+            <div className="text-purple-400 font-lexend text-2xl md:text-4xl font-bold">
               :
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-gray-950 font-bold">
                 {timeLeft.minutes.toString().padStart(2, "0")}
               </span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
+              <span className="text-[10px] text-purple-700 uppercase tracking-widest font-sync font-bold">
                 m
               </span>
             </div>
-            <div className="text-gray-700 font-lexend text-2xl md:text-4xl">
+            <div className="text-purple-400 font-lexend text-2xl md:text-4xl font-bold">
               :
             </div>
             <div className="flex flex-col items-center">
-              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-white">
+              <span className="text-2xl md:text-4xl font-lexend tracking-tighter text-gray-950 font-bold">
                 {timeLeft.seconds.toString().padStart(2, "0")}
               </span>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-sync">
+              <span className="text-[10px] text-purple-700 uppercase tracking-widest font-sync font-bold">
                 s
               </span>
             </div>
@@ -205,15 +205,15 @@ export function MissionClockWidget({ mission }: { mission: any }) {
         )}
       </div>
 
-      <div className="mt-6 pt-6 border-t border-white/5 space-y-4">
+      <div className="mt-6 pt-6 border-t border-purple-100 space-y-4">
         {isUrgent && mission.payment_status !== "SETTLED" && (
-          <div className="bg-red-900/20 border border-red-500/20 p-3 rounded-lg flex items-start gap-3">
-            <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+          <div className="bg-red-50 border border-red-200 p-3.5 rounded-xl flex items-start gap-3">
+            <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
             <div>
-              <p className="text-xs font-medium text-red-400">
+              <p className="text-xs font-bold text-red-800">
                 Payment Required Soon
               </p>
-              <p className="text-[10px] text-red-400/70 mt-1">
+              <p className="text-[10px] text-red-700 mt-0.5">
                 Your flight is at risk of cancellation if payment is not
                 completed.
               </p>
@@ -222,13 +222,13 @@ export function MissionClockWidget({ mission }: { mission: any }) {
         )}
 
         {isCritical && mission.payment_status !== "SETTLED" && (
-          <div className="bg-amber-900/20 border border-amber-500/20 p-3 rounded-lg flex items-start gap-3">
-            <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+          <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl flex items-start gap-3">
+            <AlertTriangle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
             <div>
-              <p className="text-xs font-medium text-amber-400">
+              <p className="text-xs font-bold text-amber-900">
                 Payment Due Soon
               </p>
-              <p className="text-[10px] text-amber-400/70 mt-1">
+              <p className="text-[10px] text-amber-800 mt-0.5">
                 Please complete your payment to secure your plane.
               </p>
             </div>
@@ -236,13 +236,13 @@ export function MissionClockWidget({ mission }: { mission: any }) {
         )}
 
         {mission.payment_status === "SETTLED" && (
-          <div className="bg-emerald-900/20 border border-emerald-500/20 p-3 rounded-lg flex items-start gap-3">
-            <ShieldCheck className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+          <div className="bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl flex items-start gap-3">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
             <div>
-              <p className="text-xs font-medium text-emerald-400">
+              <p className="text-xs font-bold text-emerald-900">
                 Payment Verified
               </p>
-              <p className="text-[10px] text-emerald-400/70 mt-1">
+              <p className="text-[10px] text-emerald-800 mt-0.5">
                 Everything is confirmed. Your plane is secured for departure.
               </p>
             </div>

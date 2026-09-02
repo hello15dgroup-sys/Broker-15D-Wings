@@ -32,10 +32,10 @@ a[href*="spline.design"] {
 
   /* 17% Transparency & 5px (5%) Blur Glassmorphic Card Style */
   .glass-vip {
-    background-color: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    box-shadow: 0 10px 40px -10px rgba(100, 50, 200, 0.1);
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow: 0 15px 40px -10px rgba(100, 50, 200, 0.12);
   }
 
   .title-monument {
@@ -45,6 +45,42 @@ a[href*="spline.design"] {
   .ui-sync {
     @apply font-space lowercase font-bold tracking-tight text-[12px];
   }
+}
+
+/* Original Luxury VIP Swirl and Glow animations */
+.bg-swirl {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(100px);
+  will-change: transform, left, top;
+}
+
+@keyframes orb-spin-slow {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(10%);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(10%);
+  }
+}
+
+@keyframes orb-spin-reverse {
+  from {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(12%);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(12%);
+  }
+}
+
+.animate-orb-1 {
+  animation: orb-spin-slow 22s infinite linear;
+}
+
+.animate-orb-2 {
+  animation: orb-spin-reverse 18s infinite linear;
 }
 
 body {

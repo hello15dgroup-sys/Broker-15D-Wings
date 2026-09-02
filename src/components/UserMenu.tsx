@@ -91,10 +91,10 @@ export default function UserMenu() {
     <div className="relative z-[100] inline-block" ref={menuRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)} 
-        className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-full bg-white/[0.05] border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer shadow-lg active:scale-95"
+        className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-full bg-white border border-purple-200 flex items-center justify-center hover:bg-purple-50 hover:border-purple-400 transition-all cursor-pointer shadow-sm active:scale-95 text-gray-800"
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
-        <User className="w-5 h-5 text-white/80" />
+        <User className="w-5 h-5 text-gray-800" />
       </button>
 
       <AnimatePresence>
@@ -103,29 +103,29 @@ export default function UserMenu() {
             initial={{ opacity: 0, y: 10, scale: 0.95 }} 
             animate={{ opacity: 1, y: 0, scale: 1 }} 
             exit={{ opacity: 0, y: 10, scale: 0.95 }} 
-            className="absolute right-0 mt-3 w-56 bg-[#111] border border-white/10 rounded-2xl shadow-2xl overflow-hidden py-2 touch-manipulation"
+            className="absolute right-0 mt-3 w-56 bg-white border border-purple-200 rounded-2xl shadow-2xl overflow-hidden py-2 touch-manipulation z-[150]"
           >
-            <div className="px-4 py-3 border-b border-white/5 mb-1">
-               <p className="text-[10px] font-lexend tracking-widest text-fbblue">SYSTEM ACCESS</p>
+            <div className="px-4 py-3 border-b border-purple-100 mb-1 bg-[#fff6f6]" style={{ backgroundColor: '#fff6f6' }}>
+               <p className="text-[10px] font-sync font-bold tracking-widest text-purple-700 uppercase">SYSTEM ACCESS</p>
             </div>
             
-            <button className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-light text-gray-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer active:bg-white/10">
-              <Settings className="w-4 h-4" /> Profile Settings
+            <button className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-900 transition-colors cursor-pointer active:bg-purple-100">
+              <Settings className="w-4 h-4 text-purple-600" /> Profile Settings
             </button>
-            <button onClick={requestPushNotifications} className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-light text-gray-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer active:bg-white/10">
-              <BellRing className="w-4 h-4 text-fbblue" />
+            <button onClick={requestPushNotifications} className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-900 transition-colors cursor-pointer active:bg-purple-100">
+              <BellRing className="w-4 h-4 text-purple-600" />
               <span>{pushStatus ? pushStatus : 'Enable Push Alerts'}</span>
             </button>
-            <a href="https://15dwings.com.ng/faqs" target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-light text-gray-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer active:bg-white/10">
-              <HelpCircle className="w-4 h-4" /> Help & FAQs
+            <a href="https://15dwings.com.ng/faqs" target="_blank" rel="noopener noreferrer" className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-900 transition-colors cursor-pointer active:bg-purple-100">
+              <HelpCircle className="w-4 h-4 text-purple-600" /> Help & FAQs
             </a>
-            <a href="mailto:ops@15dwings.com.ng" className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-light text-gray-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer active:bg-white/10">
-              <Mail className="w-4 h-4" /> Contact Operations
+            <a href="mailto:ops@15dwings.com.ng" className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-900 transition-colors cursor-pointer active:bg-purple-100">
+              <Mail className="w-4 h-4 text-purple-600" /> Contact Operations
             </a>
             
             <button 
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-light text-red-400 hover:bg-white/[0.05] hover:text-red-300 transition-colors cursor-pointer border-t border-white/5 mt-1 active:bg-white/10"
+              className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer border-t border-purple-100 mt-1 active:bg-red-100"
             >
               <LogOut className="w-4 h-4" /> Sign Out
             </button>

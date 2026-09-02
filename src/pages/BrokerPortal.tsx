@@ -45,6 +45,7 @@ import { DecisionEngineCard } from "../components/broker/DecisionEngineCard";
 import { WhiteLabelProposalBuilder } from "../components/broker/WhiteLabelProposalBuilder";
 import { BookingCodeGenerator } from "../components/broker/BookingCodeGenerator";
 import { SystemizedCheckoutEngine } from "../components/broker/SystemizedCheckoutEngine";
+import { VipEscrowIframe } from "../components/broker/VipEscrowIframe";
 import { OperationalIntegrityIndex } from "../components/broker/OperationalIntegrityIndex";
 import { EyeOfGodTelemetry } from "../components/broker/EyeOfGodTelemetry";
 import { BrokerCRMWorkspace } from "../components/broker/BrokerCRMWorkspace";
@@ -1250,21 +1251,48 @@ export default function BrokerPortal() {
   if (!sessionVerified) {
     return (
       <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100 text-gray-900 flex items-center justify-center p-4 md:p-6 font-space overflow-hidden">
-        <div className="z-10 w-full max-w-md flex flex-col items-center pt-8 md:pt-14 pb-12">
+        {/* Ambient Swirl Animation (From Original Luxury Engine) */}
+        <div 
+          className="bg-swirl animate-orb-1" 
+          style={{ 
+            left: "25%", 
+            top: "30%", 
+            width: "55vw", 
+            height: "55vw", 
+            background: "radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, rgba(24, 119, 242, 0.08) 60%, transparent 80%)" 
+          }} 
+        />
+        <div 
+          className="bg-swirl animate-orb-2" 
+          style={{ 
+            left: "75%", 
+            top: "65%", 
+            width: "50vw", 
+            height: "50vw", 
+            background: "radial-gradient(circle, rgba(24, 119, 242, 0.12) 0%, rgba(147, 51, 234, 0.08) 60%, transparent 80%)" 
+          }} 
+        />
+
+        <motion.div 
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="z-10 w-full max-w-md flex flex-col items-center pt-8 md:pt-14 pb-12"
+        >
           {/* Header branding above card */}
           <div className="text-center space-y-3 mb-8 md:mb-12">
-            <span className="font-sync uppercase text-[10px] text-gray-600 tracking-[0.3em] font-bold block">
+            <span className="font-sync uppercase text-[11px] text-purple-700 tracking-[0.35em] font-bold block">
               15D WINGS
             </span>
-            <h2 className="font-sync uppercase font-bold text-xl md:text-2xl tracking-[0.2em] text-gray-900 pt-1">
+            <h2 className="font-sync uppercase font-bold text-2xl md:text-3xl tracking-[0.22em] text-gray-950 pt-1">
               {authStep === 'LOGIN' ? 'FLIGHT BROKER' : authStep === 'SIGNUP' ? 'CREATE BROKER ACCOUNT' : 'SMS VERIFICATION'}
             </h2>
-            <p className="font-sync uppercase text-purple-600 tracking-[0.3em] text-[9px] font-bold pt-1">
+            <p className="font-sync uppercase text-purple-700 tracking-[0.3em] text-[10px] font-bold pt-1">
               {authStep === 'LOGIN' ? 'BROKER PORTAL LOGIN' : authStep === 'SIGNUP' ? 'PHASE 1 REGISTRATION' : 'MOBILE OTP VERIFICATION'}
             </p>
           </div>
 
-          <div className="p-8 md:p-10 rounded-[2.5rem] w-full space-y-6 border border-purple-200 glass-vip shadow-[0_0_60px_rgba(0,0,0,0.85)] backdrop-blur-[10px] relative overflow-hidden mt-2">
+          <div className="p-8 md:p-10 rounded-[2.5rem] w-full space-y-6 border border-purple-200/90 bg-white/95 shadow-[0_25px_60px_-15px_rgba(100,50,200,0.12),0_0_0_1px_rgba(147,51,234,0.1)] backdrop-blur-xl relative overflow-hidden mt-2">
             <AnimatePresence mode="wait">
               {authStep === 'LOGIN' ? (
                 <motion.div
@@ -1277,7 +1305,7 @@ export default function BrokerPortal() {
                   {/* Google Sign In Button */}
                   <button
                     onClick={handleDirectSignIn}
-                    className="w-full py-3.5 px-4 bg-purple-100 hover:bg-white/15 border border-white/15 rounded-2xl flex items-center justify-center gap-3 text-xs md:text-sm font-medium text-gray-900 transition-all shadow-md group"
+                    className="w-full py-3.5 px-4 bg-white hover:bg-purple-50/80 border border-purple-200 rounded-2xl flex items-center justify-center gap-3 text-xs md:text-sm font-semibold text-gray-900 transition-all shadow-sm hover:shadow active:scale-[0.98] group cursor-pointer"
                   >
                     <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -1293,7 +1321,7 @@ export default function BrokerPortal() {
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-purple-200" />
                     </div>
-                    <span className="relative bg-[#080d16] px-3 text-[9px] text-gray-500 font-mono tracking-widest lowercase">
+                    <span className="relative bg-white px-4 text-[10px] text-gray-700 font-sync uppercase tracking-widest font-bold">
                       ─── OR SIGN IN WITH EMAIL ───
                     </span>
                   </div>
@@ -1301,20 +1329,20 @@ export default function BrokerPortal() {
                   {/* Email & Password Fields */}
                   <div className="space-y-4 text-left">
                     <div className="space-y-1.5">
-                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
                         EMAIL ADDRESS
                       </label>
                       <input
                         type="email"
                         value={inputEmail}
                         onChange={(e) => setInputEmail(e.target.value)}
-                        className="w-full border border-purple-200 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-white/80 backdrop-blur-md text-gray-900 focus:border-purple-500 focus:bg-white/90 placeholder:text-gray-600"
+                        className="w-full border-2 border-purple-100 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 placeholder:text-gray-400 shadow-sm"
                         placeholder="broker@charterdesk.com"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
                         PASSWORD
                       </label>
                       <input
@@ -1324,7 +1352,7 @@ export default function BrokerPortal() {
                         onKeyDown={(e) => {
                           if (e.key === "Enter") handleDirectSignIn();
                         }}
-                        className="w-full border border-purple-200 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-white/80 backdrop-blur-md text-gray-900 focus:border-purple-500 focus:bg-white/90 placeholder:text-gray-600"
+                        className="w-full border-2 border-purple-100 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 placeholder:text-gray-400 shadow-sm"
                         placeholder="••••••••••••••••"
                       />
                     </div>
@@ -1334,7 +1362,7 @@ export default function BrokerPortal() {
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-[10px] text-center w-full text-red-400"
+                      className="text-xs text-center w-full text-red-600 font-semibold"
                     >
                       {authError}
                     </motion.p>
@@ -1343,7 +1371,7 @@ export default function BrokerPortal() {
                   <button
                     onClick={handleDirectSignIn}
                     disabled={isAuthenticating}
-                    className="w-full py-4 rounded-2xl text-xs font-space lowercase tracking-[0.2em] font-bold bg-purple-600 text-white hover:bg-purple-600/90 transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] lowercase active:scale-[0.98]"
+                    className="w-full py-4 rounded-2xl text-xs font-sync uppercase tracking-[0.25em] font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-[0_10px_25px_rgba(147,51,234,0.35)] active:scale-[0.98] cursor-pointer"
                   >
                     {isAuthenticating ? "AUTHENTICATING..." : "SIGN IN"}
                   </button>
@@ -1354,9 +1382,9 @@ export default function BrokerPortal() {
                         setAuthError("");
                         setAuthStep("SIGNUP");
                       }}
-                      className="text-[11px] text-gray-600 hover:text-gray-900 transition-colors tracking-wide"
+                      className="text-xs text-gray-700 hover:text-gray-950 font-medium transition-colors tracking-wide"
                     >
-                      Don't have a broker account? <span className="text-purple-600 font-semibold">Sign Up</span>
+                      Don't have a broker account? <span className="text-purple-700 font-bold underline decoration-purple-300 underline-offset-4">Sign Up</span>
                     </button>
                   </div>
                 </motion.div>
@@ -1370,33 +1398,33 @@ export default function BrokerPortal() {
                 >
                   <div className="space-y-4">
                     <div className="space-y-1.5">
-                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
                         WORK EMAIL ADDRESS
                       </label>
                       <input
                         type="email"
                         value={inputEmail}
                         onChange={(e) => setInputEmail(e.target.value)}
-                        className="w-full border border-purple-200 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-white/80 backdrop-blur-md text-gray-900 focus:border-purple-500 focus:bg-white/90 placeholder:text-gray-600"
+                        className="w-full border-2 border-purple-100 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 placeholder:text-gray-400 shadow-sm"
                         placeholder="broker@charterdesk.com"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
                         PASSWORD
                       </label>
                       <input
                         type="password"
                         value={inputPassword}
                         onChange={(e) => setInputPassword(e.target.value)}
-                        className="w-full border border-purple-200 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-white/80 backdrop-blur-md text-gray-900 focus:border-purple-500 focus:bg-white/90 placeholder:text-gray-600"
+                        className="w-full border-2 border-purple-100 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 placeholder:text-gray-400 shadow-sm"
                         placeholder="••••••••••••••••"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
                         MOBILE PHONE NUMBER (FOR SMS OTP)
                       </label>
                       <div className="flex gap-2">
@@ -1404,7 +1432,7 @@ export default function BrokerPortal() {
                           <button
                             type="button"
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            className="flex items-center gap-2 px-4 py-3.5 bg-white/80 backdrop-blur-md border border-purple-200 hover:border-purple-500 rounded-2xl text-xs font-mono text-gray-900 outline-none transition-all cursor-pointer"
+                            className="flex items-center gap-2 px-4 py-3.5 bg-white border-2 border-purple-100 hover:border-purple-500 rounded-2xl text-xs font-mono font-bold text-gray-950 outline-none transition-all cursor-pointer shadow-sm"
                           >
                             <span>{countriesList.find(c => c.code === countryCode)?.flag || "🇳🇬"}</span>
                             <span>{countryCode}</span>
@@ -1416,18 +1444,18 @@ export default function BrokerPortal() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 10 }}
-                                className="absolute bottom-full left-0 mb-2 w-72 bg-slate-950 border border-white/15 rounded-2xl shadow-2xl z-[100] overflow-hidden backdrop-blur-xl"
+                                className="absolute bottom-full left-0 mb-2 w-72 bg-white border border-purple-200 rounded-2xl shadow-2xl z-[100] overflow-hidden backdrop-blur-xl"
                               >
-                                <div className="p-3 border-b border-purple-100 flex items-center gap-2 bg-white/80 backdrop-blur-md">
+                                <div className="p-3 border-b border-purple-100 flex items-center gap-2 bg-purple-50">
                                   <input
                                     type="text"
                                     placeholder="Search country..."
                                     value={countrySearch}
                                     onChange={(e) => setCountrySearch(e.target.value)}
-                                    className="w-full bg-transparent text-xs outline-none text-gray-900 placeholder:text-gray-600 font-lexend"
+                                    className="w-full bg-transparent text-xs outline-none text-gray-950 placeholder:text-gray-500 font-lexend"
                                   />
                                 </div>
-                                <div className="max-h-56 overflow-y-auto py-1.5">
+                                <div className="max-h-56 overflow-y-auto py-1.5 bg-white">
                                   {countriesList
                                     .filter(c => c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.includes(countrySearch))
                                     .map((c, i) => (
@@ -1438,7 +1466,7 @@ export default function BrokerPortal() {
                                           setCountryCode(c.code);
                                           setIsDropdownOpen(false);
                                         }}
-                                        className="w-full flex items-center justify-between px-4 py-3 text-xs text-left text-gray-700 hover:bg-purple-600 hover:text-gray-900 transition-colors"
+                                        className="w-full flex items-center justify-between px-4 py-3 text-xs text-left text-gray-800 hover:bg-purple-600 hover:text-white transition-colors"
                                       >
                                         <span className="font-lexend font-medium">{c.flag} {c.name}</span>
                                         <span className="font-mono text-gray-500">{c.code}</span>
@@ -1454,7 +1482,7 @@ export default function BrokerPortal() {
                           value={inputPhone}
                           onChange={(e) => setInputPhone(e.target.value)}
                           placeholder="801 234 5678"
-                          className="flex-1 bg-white/80 backdrop-blur-md border border-purple-200 rounded-2xl px-4 py-3.5 text-sm font-mono text-gray-900 outline-none focus:border-purple-500 transition-all placeholder:text-gray-600"
+                          className="flex-1 bg-purple-50/40 border-2 border-purple-100 rounded-2xl px-4 py-3.5 text-sm font-mono font-medium text-gray-950 outline-none focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all placeholder:text-gray-400 shadow-sm"
                         />
                       </div>
                     </div>
@@ -1464,7 +1492,7 @@ export default function BrokerPortal() {
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-[10px] text-center w-full text-red-400"
+                      className="text-xs text-center w-full text-red-600 font-semibold"
                     >
                       {authError}
                     </motion.p>
@@ -1473,14 +1501,14 @@ export default function BrokerPortal() {
                   <div className="space-y-2 pt-2">
                     <button
                       onClick={handleProceedToOtp}
-                      className="w-full py-4 rounded-2xl text-xs font-space lowercase tracking-[0.2em] font-bold bg-purple-600 text-white hover:bg-purple-600/90 transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] lowercase active:scale-[0.98]"
+                      className="w-full py-4 rounded-2xl text-xs font-sync uppercase tracking-[0.25em] font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-[0_10px_25px_rgba(147,51,234,0.35)] active:scale-[0.98] cursor-pointer"
                     >
                       SEND SMS VERIFICATION CODE
                     </button>
 
                     <button
                       onClick={() => setAuthStep("LOGIN")}
-                      className="w-full py-2 text-[10px] font-space lowercase tracking-widest text-gray-600 hover:text-gray-900 transition-colors lowercase text-center"
+                      className="w-full py-2 text-xs font-sync uppercase tracking-widest text-gray-700 hover:text-gray-950 transition-colors text-center font-semibold"
                     >
                       ← BACK TO SIGN IN
                     </button>
@@ -1495,17 +1523,17 @@ export default function BrokerPortal() {
                   className="space-y-5 text-left"
                 >
                   <div className="space-y-1.5">
-                    <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
+                    <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
                       PHONE NUMBER ({countryCode} {inputPhone || "801 234 5678"})
                     </label>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="font-space lowercase text-[8px] text-gray-600 block ml-1 tracking-widest lowercase">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
                         SMS VERIFICATION CODE
                       </label>
-                      <span className="text-[9px] text-purple-600 font-mono">DEMO PIN: 159382</span>
+                      <span className="text-[10px] text-purple-900 font-mono font-bold bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200">DEMO PIN: 159382</span>
                     </div>
 
                     <div className="grid grid-cols-6 gap-2 my-2">
@@ -1523,7 +1551,7 @@ export default function BrokerPortal() {
                               if (prevInput) prevInput.focus();
                             }
                           }}
-                          className="w-full h-12 text-center bg-white/80 backdrop-blur-md border border-purple-300 rounded-xl text-base font-mono font-bold text-purple-600 focus:border-purple-500 focus:bg-purple-100 outline-none transition-all"
+                          className="w-full h-12 text-center bg-purple-50/40 border-2 border-purple-200 rounded-xl text-lg font-mono font-bold text-purple-700 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 outline-none transition-all shadow-inner"
                         />
                       ))}
                     </div>
@@ -1533,7 +1561,7 @@ export default function BrokerPortal() {
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-[10px] text-center w-full text-red-400"
+                      className="text-xs text-center w-full text-red-600 font-semibold"
                     >
                       {authError}
                     </motion.p>
@@ -1543,14 +1571,14 @@ export default function BrokerPortal() {
                     <button
                       onClick={handleSmsVerify}
                       disabled={isAuthenticating}
-                      className="w-full py-4 rounded-2xl text-xs font-space lowercase tracking-[0.2em] font-bold bg-purple-600 text-white hover:bg-purple-600/90 transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] lowercase active:scale-[0.98]"
+                      className="w-full py-4 rounded-2xl text-xs font-sync uppercase tracking-[0.25em] font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-[0_10px_25px_rgba(147,51,234,0.35)] active:scale-[0.98] cursor-pointer"
                     >
                       {isAuthenticating ? "VERIFYING..." : "VERIFY & SIGN UP"}
                     </button>
 
                     <button
                       onClick={() => setAuthStep("SIGNUP")}
-                      className="w-full py-2 text-[10px] font-space lowercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors lowercase text-center"
+                      className="w-full py-2 text-xs font-sync uppercase tracking-widest text-gray-700 hover:text-gray-950 transition-colors text-center font-semibold"
                     >
                       ← EDIT REGISTRATION INFO
                     </button>
@@ -1560,7 +1588,7 @@ export default function BrokerPortal() {
             </AnimatePresence>
           </div>
           <RegulatoryDisclaimer />
-        </div>
+        </motion.div>
       </div>
     );
   }
@@ -2021,7 +2049,7 @@ export default function BrokerPortal() {
               {/* Book Flight iFrame Trigger */}
               <button
                 onClick={() => setShowBookFlightIframe(true)}
-                className="px-4 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 text-xs font-space lowercase tracking-wider font-bold transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 lowercase cursor-pointer active:scale-95"
+                className="px-5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-sync uppercase tracking-wider font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
               >
                 <Plane className="w-3.5 h-3.5" />
                 <span>BOOK FLIGHT</span>
@@ -2031,11 +2059,11 @@ export default function BrokerPortal() {
               <div className="relative">
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-3.5 rounded-full bg-white/90 border border-purple-200 text-gray-600 hover:text-gray-900 hover:border-purple-500/50 hover:bg-white/90 transition-all flex items-center justify-center cursor-pointer shadow-lg"
+                  className="relative p-3.5 rounded-full bg-white border border-purple-200 text-gray-800 hover:text-purple-700 hover:border-purple-400 hover:bg-purple-50 transition-all flex items-center justify-center cursor-pointer shadow-sm"
                 >
-                  <Bell className="w-4 h-4" />
+                  <Bell className="w-4 h-4 text-gray-800" />
                   {notifications.some(n => !n.read) && (
-                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-purple-600 rounded-full border border-black shadow-[0_0_10px_rgba(56,189,248,0.5)] animate-pulse" />
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-purple-600 rounded-full border-2 border-white shadow-sm animate-pulse" />
                   )}
                 </button>
               </div>
@@ -2044,9 +2072,8 @@ export default function BrokerPortal() {
           </header>
 
           {/* Welcome Graphic Card */}
-          <div className="w-full rounded-[2rem] bg-white shadow-xl border border-purple-100 overflow-hidden flex flex-col md:flex-row relative mt-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-100/50 to-white/10 pointer-events-none" />
-            <div className="p-8 md:p-12 flex-1 flex flex-col justify-center z-10">
+          <div className="w-full rounded-[2rem] bg-[#fff6f6] shadow-xl border border-purple-100 overflow-hidden flex flex-col md:flex-row relative mt-8" style={{ backgroundColor: '#fff6f6' }}>
+            <div className="p-8 md:p-12 flex-1 flex flex-col justify-center z-10 bg-[#fff6f6]" style={{ backgroundColor: '#fff6f6' }}>
               <h2 className="font-space text-3xl font-bold text-gray-900 tracking-tight lowercase mb-4">
                 welcome back to your luxury command center.
               </h2>
@@ -2054,7 +2081,7 @@ export default function BrokerPortal() {
                 everything you need to orchestrate seamless, world-class aviation experiences for your clients in one vibrant place.
               </p>
             </div>
-            <div className="w-full md:w-1/3 aspect-square md:aspect-auto relative min-h-[250px]">
+            <div className="w-full md:w-1/3 aspect-square md:aspect-auto relative min-h-[250px] bg-[#fff6f6]" style={{ backgroundColor: '#fff6f6' }}>
               <img 
                 src="/src/assets/images/jet_illustration_friendly_1787553630770.jpg" 
                 alt="Luxury Jet Graphic" 
@@ -2195,73 +2222,73 @@ export default function BrokerPortal() {
           <MissionClockWidget mission={mission} />
 
           {/* BROKER DESK NAVIGATION TABS */}
-          <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide border-b border-purple-200 mb-8 items-center justify-start">
+          <div className="flex gap-3 overflow-x-auto pb-6 scrollbar-hide border-b border-purple-200/80 mb-8 items-center justify-start">
             <button
               onClick={() => setActiveTab('crm_workspace')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'crm_workspace'
-                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
-                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
+                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
               }`}
             >
               <Users className="w-4 h-4" /> crm workspace
             </button>
             <button
               onClick={() => setActiveTab('proposal_builder')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'proposal_builder'
-                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
-                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
+                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
               }`}
             >
               <FileText className="w-4 h-4" /> proposal builder
             </button>
             <button
               onClick={() => setActiveTab('booking_code')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'booking_code'
-                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
-                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
+                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
               }`}
             >
               <Link className="w-4 h-4" /> client booking link
             </button>
             <button
               onClick={() => setActiveTab('checkout_engine')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'checkout_engine'
-                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
-                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
+                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
               }`}
             >
               <CreditCard className="w-4 h-4" /> payment & escrow
             </button>
             <button
               onClick={() => setActiveTab('operational_radar')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'operational_radar'
-                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
-                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
+                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
               }`}
             >
               <Radar className="w-4 h-4" /> fleet tracking
             </button>
             <button
               onClick={() => setActiveTab('telemetry_vault')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'telemetry_vault'
-                  ? 'bg-purple-600 text-gray-900 border-purple-600 shadow-[0_10px_20px_rgba(147,51,234,0.3)]'
-                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
+                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
+                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
               }`}
             >
               <Database className="w-4 h-4" /> flight logs
             </button>
             <button
               onClick={() => setActiveTab('status')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'status'
-                  ? 'bg-purple-100 text-purple-900 border-purple-200 shadow-sm'
-                  : 'bg-white text-gray-600 border-gray-200 hover:text-purple-600 hover:bg-purple-50 shadow-sm'
+                  ? 'bg-purple-100 text-purple-950 border-purple-300 shadow-sm'
+                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
               }`}
             >
               <Info className="w-4 h-4" /> flight details
@@ -2272,7 +2299,7 @@ export default function BrokerPortal() {
                 setSessionVerified(false);
                 showToast("Signed out successfully. Returning to login portal.", "info");
               }}
-              className="flex items-center gap-2 px-5 py-3 rounded-full text-sm font-space tracking-tight font-bold transition-all lowercase whitespace-nowrap shrink-0 border bg-white text-red-500 border-gray-200 hover:text-gray-900 hover:bg-red-500 hover:border-red-500 shadow-sm ml-auto"
+              className="flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border bg-white text-red-600 border-gray-200 hover:text-white hover:bg-red-600 hover:border-red-600 shadow-sm ml-auto"
             >
               <LogOut className="w-4 h-4" /> exit
             </button>
@@ -2321,7 +2348,7 @@ export default function BrokerPortal() {
 
           {activeTab === 'checkout_engine' && (
             <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-              <SystemizedCheckoutEngine
+              <VipEscrowIframe
                 amountUsd={totalVerifiedCost || 18687}
                 hoursToDeparture={isWithin72Hours ? 36 : 120}
               />

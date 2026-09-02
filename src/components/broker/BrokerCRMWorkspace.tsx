@@ -677,19 +677,19 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   return (
     <div className="w-full text-left font-sans space-y-6">
       {/* CRM Navigation Bar & Quick Actions */}
-      <div className="p-4 md:p-6 rounded-[2rem] border border-purple-200 glass-vip bg-gradient-to-br from-black/90 via-[#0a1220]/90 to-black/95 shadow-2xl relative overflow-hidden">
+      <div className="p-4 md:p-6 rounded-[2rem] border border-purple-200/90 bg-white/95 backdrop-blur-xl shadow-[0_15px_40px_-10px_rgba(100,50,200,0.08)] relative overflow-hidden">
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-purple-200">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-ping" />
-              <span className="font-space lowercase text-[10px] text-purple-600 tracking-[0.3em] font-bold lowercase">
+              <span className="font-sync uppercase text-[10px] text-purple-700 tracking-[0.3em] font-bold">
                 WHITE-LABEL FLIGHT BROKER CRM
               </span>
             </div>
-            <h2 className="font-space lowercase text-xl md:text-2xl font-bold tracking-wider text-gray-900 lowercase flex flex-wrap items-center gap-3">
+            <h2 className="font-sync uppercase text-xl md:text-2xl font-bold tracking-wider text-gray-950 flex flex-wrap items-center gap-3">
               <span>BROKER CONTROL CRM</span>
             </h2>
-            <p className="text-xs text-gray-600 font-light">
+            <p className="text-xs text-gray-700 font-normal">
               Full client pipeline, HNWI preferences, white-label quotes, and one-click execution bridge.
             </p>
           </div>
@@ -703,7 +703,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                   window.open("/vip-booking.html", "_blank");
                 }
               }} 
-              className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-600/90 text-gray-900 rounded-xl text-[10px] font-bold font-space lowercase lowercase transition-all shadow-[0_0_15px_rgba(24,119,242,0.3)] cursor-pointer"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[10px] font-bold font-sync uppercase transition-all shadow-md cursor-pointer"
             >
               <Plane className="w-3.5 h-3.5" />
               <span>BOOK FLIGHT</span>
@@ -712,7 +712,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             {onSignOut && (
               <button
                 onClick={onSignOut}
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-50 hover:bg-red-500/20 border border-purple-200 hover:border-red-500/40 text-gray-700 hover:text-red-400 rounded-xl text-[10px] font-bold font-space lowercase lowercase transition-all cursor-pointer"
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-white hover:bg-red-50 border border-gray-200 hover:border-red-300 text-gray-800 hover:text-red-600 rounded-xl text-[10px] font-bold font-sync uppercase transition-all cursor-pointer shadow-sm"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>SIGN OUT</span>
@@ -720,7 +720,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             )}
             <button
               onClick={() => setShowAddDealModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-space lowercase text-[10px] tracking-widest font-bold lowercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center gap-2 cursor-pointer active:scale-95"
+              className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-sync uppercase text-[10px] tracking-widest font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <Plus className="w-4 h-4" />
               <span>NEW DEAL INQUIRY</span>
@@ -728,7 +728,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
             <button
               onClick={() => setShowAddClientModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-purple-100 hover:bg-white/20 text-gray-900 border border-purple-200 font-space lowercase text-[10px] tracking-widest font-bold lowercase transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              className="px-4 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-950 border border-purple-200 font-sync uppercase text-[10px] tracking-widest font-bold transition-all flex items-center gap-2 cursor-pointer active:scale-95 shadow-sm"
             >
               <UserPlus className="w-4 h-4 text-purple-600" />
               <span>ADD HNWI CLIENT</span>
@@ -740,40 +740,44 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
         <div className="flex items-center gap-1.5 overflow-x-auto pt-4 scrollbar-none">
           <button
             onClick={() => setActiveSubTab('pipeline')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'pipeline'
-                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
             }`}
           >
             <Kanban className="w-3.5 h-3.5" />
             <span>SALES PIPELINE</span>
-            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-white/20 text-[9px] font-mono">
+            <span className={`ml-1 px-1.5 py-0.5 rounded-md text-[9px] font-mono ${
+              activeSubTab === 'pipeline' ? 'bg-white/25 text-white' : 'bg-purple-100 text-purple-900'
+            }`}>
               {deals.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('clients')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'clients'
-                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
             }`}
           >
             <Users className="w-3.5 h-3.5" />
             <span>HNWI CLIENTS</span>
-            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-white/20 text-[9px] font-mono">
+            <span className={`ml-1 px-1.5 py-0.5 rounded-md text-[9px] font-mono ${
+              activeSubTab === 'clients' ? 'bg-white/25 text-white' : 'bg-purple-100 text-purple-900'
+            }`}>
               {clients.length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('proposals')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'proposals'
-                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -782,10 +786,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('history')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'history'
-                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
             }`}
           >
             <History className="w-3.5 h-3.5" />
@@ -794,10 +798,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('analytics')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'analytics'
-                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5" />
@@ -806,10 +810,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('messaging')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'messaging'
-                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
@@ -818,25 +822,27 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('tasks')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'tasks'
-                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
             }`}
           >
             <CheckSquare className="w-3.5 h-3.5" />
             <span>TASKS & ALERTS</span>
-            <span className="ml-1 px-1.5 py-0.5 rounded-md bg-amber-500/30 text-amber-300 text-[9px] font-mono">
+            <span className={`ml-1 px-1.5 py-0.5 rounded-md text-[9px] font-mono ${
+              activeSubTab === 'tasks' ? 'bg-amber-400 text-amber-950 font-bold' : 'bg-amber-100 text-amber-900 font-bold'
+            }`}>
               {tasks.filter(t => !t.completed).length}
             </span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('directory')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'directory'
-                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
             }`}
           >
             <Plane className="w-3.5 h-3.5" />
@@ -845,10 +851,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => setActiveSubTab('team')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-space lowercase tracking-wider lowercase transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'team'
-                ? 'bg-purple-600 text-gray-900 font-bold shadow-md'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-purple-50'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
             }`}
           >
             <Briefcase className="w-3.5 h-3.5" />
