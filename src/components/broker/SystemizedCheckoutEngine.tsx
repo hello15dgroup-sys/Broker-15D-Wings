@@ -57,29 +57,29 @@ export const SystemizedCheckoutEngine: React.FC<SystemizedCheckoutEngineProps> =
   };
 
   return (
-    <div className="p-6 md:p-8 rounded-[2rem] border border-purple-200 glass-vip shadow-2xl relative overflow-hidden bg-gradient-to-br from-black/80 via-[#07131e]/90 to-black/90">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/5 blur-3xl pointer-events-none rounded-full" />
+    <div className="p-6 md:p-8 rounded-[2rem] border border-purple-200 shadow-xl relative overflow-hidden bg-white text-left">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-100/50 blur-3xl pointer-events-none rounded-full" />
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-purple-200">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-purple-100">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
-            <span className="font-space lowercase text-[9px] text-purple-600 tracking-[0.25em] font-bold lowercase">
-              MODULE 5 — CHECKOUT & PAYMENT ROUTING
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse" />
+            <span className="font-sync text-[10px] text-purple-700 tracking-[0.25em] font-bold uppercase">
+              PAYMENT & ESCROW SETTLEMENT ENGINE
             </span>
           </div>
-          <h3 className="font-space lowercase text-lg md:text-xl font-bold tracking-wider text-gray-900 lowercase">
-            Payment Locked & Safe
+          <h3 className="font-sync text-lg md:text-xl font-bold tracking-wider text-gray-950 uppercase">
+            Double-Entry Escrow Ledger
           </h3>
-          <p className="text-xs text-gray-600 font-light">
+          <p className="text-xs text-gray-600 font-medium">
             Automated zero-latency financial settlement via Providus Bank & Fireblocks Solana Escrow.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-mono tracking-wider lowercase font-bold flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" /> Double-Entry Ledger Active
+          <span className="px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-[10px] font-sync tracking-wider uppercase font-bold flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" /> Double-Entry Ledger Active
           </span>
         </div>
       </div>

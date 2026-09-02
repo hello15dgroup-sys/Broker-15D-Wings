@@ -34,7 +34,7 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
   const [copiedIntake, setCopiedIntake] = useState<boolean>(false);
 
   const selectedOperator = SAMPLE_AOC_OPERATORS.find(op => op.id === selectedOperatorId) || SAMPLE_AOC_OPERATORS[0];
-  const vipIntakeUrl = `https://15dwings.com.ng/portal?missionId=${missionCode}&verified=true`;
+  const vipIntakeUrl = `https://vip.15dwings.com.ng/portal?missionId=${missionCode}&verified=true`;
 
   const handleGenerateCode = () => {
     setIsGenerating(true);
@@ -56,28 +56,28 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
   };
 
   return (
-    <div className="p-6 md:p-8 rounded-[2rem] border border-purple-200 glass-vip shadow-2xl relative overflow-hidden bg-gradient-to-br from-black/80 via-[#0a1220]/90 to-black/90">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/5 blur-3xl pointer-events-none rounded-full" />
+    <div className="p-6 md:p-8 rounded-[2rem] border border-purple-200 shadow-xl relative overflow-hidden bg-white text-left">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-100/50 blur-3xl pointer-events-none rounded-full" />
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-purple-200">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-purple-100">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
-            <span className="font-space lowercase text-[9px] text-purple-600 tracking-[0.25em] font-bold lowercase">
-              MODULE 3 & 4 — BOOKING CODE & 3-TIER EXECUTION
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse" />
+            <span className="font-sync text-[10px] text-purple-700 tracking-[0.25em] font-bold uppercase">
+              CLIENT BOOKING LINK & AOC EXECUTION
             </span>
           </div>
-          <h3 className="font-space lowercase text-lg md:text-xl font-bold tracking-wider text-gray-900 lowercase">
-            Issue Booking Code & AOC Carrier
+          <h3 className="font-sync text-lg md:text-xl font-bold tracking-wider text-gray-950 uppercase">
+            Issue Booking Code & Passenger Intake Link
           </h3>
-          <p className="text-xs text-gray-600 font-light">
-            Attach verified airline operator to release booking mission code & passenger intake link.
+          <p className="text-xs text-gray-600 font-medium">
+            Attach verified airline carrier to release client intake link and booking mission code.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-full bg-purple-100 border border-purple-500/20 text-purple-600 text-[9px] font-mono tracking-wider lowercase font-semibold">
+          <span className="px-3.5 py-1.5 rounded-full bg-purple-100 border border-purple-300 text-purple-800 text-[10px] font-sync tracking-wider uppercase font-bold">
             {selectedOperator.tier.replace(/_/g, ' ')}
           </span>
         </div>
@@ -87,13 +87,13 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
         {/* Left Column: AOC Selection & Tier Matrix */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="font-space lowercase text-[9px] text-gray-600 tracking-widest lowercase block">
+            <label className="font-sync text-[10px] font-bold text-gray-700 tracking-wider uppercase block">
               SELECT AIRLINE OPERATOR (AOC REGISTRY)
             </label>
             <select
               value={selectedOperatorId}
               onChange={(e) => setSelectedOperatorId(e.target.value)}
-              className="w-full bg-white/80 backdrop-blur-md border border-purple-200 rounded-2xl px-4 py-3.5 text-xs text-gray-900 font-lexend focus:border-purple-500 outline-none transition-all cursor-pointer"
+              className="w-full bg-white border border-purple-200 rounded-2xl px-4 py-3.5 text-xs text-gray-900 font-semibold focus:border-purple-500 outline-none transition-all cursor-pointer shadow-sm"
             >
               {SAMPLE_AOC_OPERATORS.map((op) => (
                 <option key={op.id} value={op.id}>
@@ -104,22 +104,22 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
           </div>
 
           {/* 3-Tier Execution Matrix Info Box */}
-          <div className="space-y-2 p-4 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 text-xs">
+          <div className="space-y-2 p-4 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs">
             <div className="flex items-center justify-between pb-2 border-b border-purple-200">
-              <span className="font-space lowercase text-[9px] text-gray-600 lowercase flex items-center gap-1.5">
+              <span className="font-sync text-[10px] font-bold text-gray-700 uppercase flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-purple-600" /> EXECUTION TIER MATRIX
               </span>
-              <span className="font-mono text-purple-600 font-semibold">{selectedOperator.aocNumber}</span>
+              <span className="font-mono text-purple-700 font-bold">{selectedOperator.aocNumber}</span>
             </div>
 
             <div className="space-y-1.5 pt-1">
               <div className="flex justify-between text-gray-700">
-                <span className="text-[11px]">Assigned Aircraft:</span>
+                <span className="text-[11px] font-medium">Assigned Aircraft:</span>
                 <span className="font-mono font-bold text-gray-900">{selectedOperator.aircraftAvailable}</span>
               </div>
               <div className="flex justify-between text-gray-700">
-                <span className="text-[11px]">Primary Country:</span>
-                <span className="font-mono text-gray-600">{selectedOperator.country}</span>
+                <span className="text-[11px] font-medium">Primary Country:</span>
+                <span className="font-mono text-gray-700 font-semibold">{selectedOperator.country}</span>
               </div>
             </div>
           </div>
@@ -127,7 +127,7 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
           <button
             onClick={handleGenerateCode}
             disabled={isGenerating}
-            className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-space lowercase text-xs font-bold tracking-wider lowercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-sync text-xs font-bold tracking-wider uppercase transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
             <span>{isGenerating ? 'GENERATING CODE...' : 'ISSUE NEW BOOKING CODE'}</span>
@@ -135,40 +135,51 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
         </div>
 
         {/* Right Column: Code & VIP Intake Link */}
-        <div className="space-y-4 p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 flex flex-col justify-between">
+        <div className="space-y-4 p-6 rounded-2xl bg-purple-50/50 border border-purple-200 flex flex-col justify-between">
           <div className="space-y-3">
-            <span className="font-space lowercase text-[9px] text-gray-600 tracking-widest lowercase block">
+            <span className="font-sync text-[10px] font-bold text-gray-700 tracking-wider uppercase block">
               OFFICIAL MISSION BOOKING CODE
             </span>
-            <div className="p-4 rounded-xl bg-purple-100 border border-purple-500/30 flex items-center justify-between">
-              <span className="font-mono text-2xl font-bold tracking-wider text-purple-600">
+            <div className="p-4 rounded-xl bg-white border border-purple-300 flex items-center justify-between shadow-sm">
+              <span className="font-mono text-2xl font-bold tracking-wider text-purple-700">
                 {missionCode}
               </span>
-              <span className="px-2.5 py-1 rounded bg-purple-600/20 text-purple-600 text-[9px] font-mono lowercase font-bold">
-                LOCKED
+              <span className="px-2.5 py-1 rounded-full bg-purple-100 text-purple-800 text-[10px] font-sync uppercase font-bold border border-purple-200">
+                VERIFIED
               </span>
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <label className="font-space lowercase text-[9px] text-gray-600 tracking-widest lowercase block">
+              <label className="font-sync text-[10px] font-bold text-gray-700 tracking-wider uppercase block">
                 VIP PASSENGER INTAKE LINK (FOR CLIENT)
               </label>
-              <div className="p-3 rounded-xl bg-white border border-purple-200 text-xs font-mono text-gray-700 truncate">
+              <div className="p-3 rounded-xl bg-white border border-purple-200 text-xs font-mono text-gray-900 font-semibold truncate shadow-sm">
                 {vipIntakeUrl}
               </div>
-              <p className="text-[10px] text-gray-500 font-mono">
+              <p className="text-[11px] text-gray-600 font-medium">
                 Send to client to collect passport documents, catering requests & ground transport.
               </p>
             </div>
           </div>
 
-          <button
-            onClick={handleCopyIntakeLink}
-            className="w-full py-3.5 rounded-xl bg-purple-100 hover:bg-white/15 border border-purple-200 text-gray-900 font-mono text-xs font-semibold transition-all flex items-center justify-center gap-2 active:scale-95"
-          >
-            {copiedIntake ? <Check className="w-4 h-4 text-purple-600" /> : <Send className="w-4 h-4 text-purple-600" />}
-            <span>{copiedIntake ? 'Intake Link Copied!' : 'Copy Passenger Intake Link'}</span>
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 pt-2">
+            <button
+              onClick={handleCopyIntakeLink}
+              className="flex-1 py-3.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-sync text-xs font-bold uppercase transition-all flex items-center justify-center gap-2 active:scale-95 shadow-md cursor-pointer"
+            >
+              {copiedIntake ? <Check className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+              <span>{copiedIntake ? 'Intake Link Copied!' : 'Copy Passenger Intake Link'}</span>
+            </button>
+            <a
+              href={vipIntakeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-3.5 rounded-xl bg-white hover:bg-purple-50 border border-purple-300 text-purple-700 font-sync text-xs font-bold uppercase transition-all flex items-center justify-center gap-1.5 active:scale-95 shadow-sm cursor-pointer"
+              title="Preview Intake Portal"
+            >
+              <span>OPEN</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>

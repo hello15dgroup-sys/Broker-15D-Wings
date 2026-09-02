@@ -105,7 +105,7 @@ export default function UserMenu() {
             exit={{ opacity: 0, y: 10, scale: 0.95 }} 
             className="absolute right-0 mt-3 w-56 bg-white border border-purple-200 rounded-2xl shadow-2xl overflow-hidden py-2 touch-manipulation z-[150]"
           >
-            <div className="px-4 py-3 border-b border-purple-100 mb-1 bg-[#fff6f6]" style={{ backgroundColor: '#fff6f6' }}>
+            <div className="px-4 py-3 border-b border-purple-100 mb-1 bg-white" style={{ backgroundColor: '#ffffff' }}>
                <p className="text-[10px] font-sync font-bold tracking-widest text-purple-700 uppercase">SYSTEM ACCESS</p>
             </div>
             

@@ -34,70 +34,76 @@ export const EyeOfGodTelemetry: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-6 md:p-8 rounded-[2rem] border border-purple-200 glass-vip shadow-2xl relative overflow-hidden bg-gradient-to-br from-black/80 via-[#0a101b]/90 to-black/90 text-left">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-purple-200">
+    <div className="p-6 md:p-8 rounded-[2rem] border border-purple-200 shadow-xl relative overflow-hidden bg-white text-left">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-purple-100/50 blur-3xl pointer-events-none rounded-full" />
+
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-purple-100">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
-            <span className="font-sync text-[9px] text-purple-600 tracking-[0.25em] font-bold uppercase">
-              MODULE 8 — EYE OF GOD TELEMETRY
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse" />
+            <span className="font-sync text-[10px] text-purple-700 tracking-[0.25em] font-bold uppercase">
+              FLIGHT LOGS & TELEMETRY AUDIT
             </span>
           </div>
-          <h3 className="font-sync text-lg md:text-xl font-bold tracking-wider text-gray-900 uppercase">
-            Anti-Poaching Telemetry Vault
+          <h3 className="font-sync text-lg md:text-xl font-bold tracking-wider text-gray-950 uppercase">
+            Security & Mission Telemetry Vault
           </h3>
-          <p className="text-xs text-gray-600 font-light">
-            Continuous hardware canvas fingerprinting & ghost quote telemetry tracking.
+          <p className="text-xs text-gray-600 font-medium">
+            Real-time flight operational telemetry, encrypted session handshake & verification audit logs.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-full bg-purple-100 border border-purple-500/20 text-purple-600 text-[9px] font-mono tracking-wider uppercase font-semibold flex items-center gap-1.5">
-            <Eye className="w-3.5 h-3.5 text-purple-600" /> Active Security Barrier
+          <span className="px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-[10px] font-sync tracking-wider uppercase font-bold flex items-center gap-1.5">
+            <Eye className="w-3.5 h-3.5 text-emerald-600" /> Active Security Barrier
           </span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-6">
-        <div className="p-4 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 space-y-1">
-          <span className="text-[9px] text-gray-600 font-sync uppercase block flex items-center gap-1">
-            <Cpu className="w-3.5 h-3.5 text-purple-600" /> HARDWARE CANVAS HASH
+        <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-1.5 shadow-sm">
+          <span className="text-[10px] text-gray-700 font-sync uppercase font-bold block flex items-center gap-1.5">
+            <Cpu className="w-4 h-4 text-purple-600" /> HARDWARE CANVAS HASH
           </span>
-          <span className="text-sm font-mono font-bold text-purple-600">{canvasHash}</span>
+          <span className="text-sm font-mono font-bold text-purple-800">{canvasHash}</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 space-y-1">
-          <span className="text-[9px] text-gray-600 font-sync uppercase block flex items-center gap-1">
-            <Globe className="w-3.5 h-3.5 text-emerald-400" /> CLIENT IP ADDRESS
+        <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-1.5 shadow-sm">
+          <span className="text-[10px] text-gray-700 font-sync uppercase font-bold block flex items-center gap-1.5">
+            <Globe className="w-4 h-4 text-emerald-600" /> CLIENT IP ADDRESS
           </span>
-          <span className="text-sm font-mono font-bold text-gray-900">{ipAddress}</span>
+          <span className="text-sm font-mono font-bold text-gray-950">{ipAddress}</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-200 space-y-1">
-          <span className="text-[9px] text-gray-600 font-sync uppercase block flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> ANTI-POACHING STATUS
+        <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200 space-y-1.5 shadow-sm">
+          <span className="text-[10px] text-gray-700 font-sync uppercase font-bold block flex items-center gap-1.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" /> ANTI-POACHING STATUS
           </span>
-          <span className="text-sm font-mono font-bold text-emerald-400">ENFORCED (100%)</span>
+          <span className="text-sm font-mono font-bold text-emerald-700">ENFORCED (100%)</span>
         </div>
       </div>
 
       {/* Terminal Telemetry Log */}
-      <div className="p-4 rounded-2xl bg-white/40 border border-purple-200 space-y-3">
-        <div className="flex items-center justify-between pb-2 border-b border-purple-200 text-[10px] font-lexend text-gray-600">
-          <span className="flex items-center gap-1.5">
-            <Terminal className="w-3.5 h-3.5 text-purple-600" /> SYSTEM TELEMETRY AUDIT LOG
+      <div className="p-5 rounded-2xl bg-white border border-purple-200 space-y-3 shadow-sm">
+        <div className="flex items-center justify-between pb-3 border-b border-purple-100 text-[11px] font-sync text-gray-700">
+          <span className="flex items-center gap-2 font-bold uppercase text-purple-900 tracking-wider">
+            <Terminal className="w-4 h-4 text-purple-600" /> SYSTEM FLIGHT TELEMETRY AUDIT LOG
           </span>
-          <span className="font-mono text-purple-600">LIVE FEED</span>
+          <span className="font-mono text-purple-700 font-bold bg-purple-100 px-2 py-0.5 rounded-full text-[10px]">LIVE FEED</span>
         </div>
 
-        <div className="space-y-2 font-mono text-xs">
+        <div className="space-y-2 font-mono text-xs divide-y divide-purple-50">
           {logs.map((log) => (
-            <div key={log.id} className="flex justify-between items-center text-gray-700">
+            <div key={log.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 pt-2 text-gray-800">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-gray-500">[{log.time}]</span>
-                <span className="text-xs">{log.event}</span>
+                <span className="text-[11px] font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                  {log.time}
+                </span>
+                <span className="text-xs font-semibold text-gray-900">{log.event}</span>
               </div>
-              <span className="text-[10px] text-emerald-400 font-bold">{log.status}</span>
+              <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 font-bold px-2.5 py-0.5 rounded-full self-start sm:self-auto">
+                {log.status}
+              </span>
             </div>
           ))}
         </div>

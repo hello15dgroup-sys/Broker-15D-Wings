@@ -91,7 +91,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
     }
   };
 
-  const proposalLink = `https://15dwings.com.ng/verify/${missionId}?concierge=${encodeURIComponent(agencyName)}`;
+  const proposalLink = `https://vip.15dwings.com.ng/verify/${missionId}?concierge=${encodeURIComponent(agencyName)}`;
 
   const handleCopyLink = async () => {
     await copyToClipboard(proposalLink);
@@ -400,7 +400,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
                 <div className="flex items-center gap-3 pt-2 text-[10px] text-gray-600 font-mono border-t border-purple-200">
                   <QrCode className="w-8 h-8 text-purple-600 shrink-0" />
                   <div>
-                    <p className="text-gray-200">Dynamic Security QR: 15dwings.com.ng/verify/{missionId}</p>
+                    <p className="text-gray-200">Dynamic Security QR: vip.15dwings.com.ng/verify/{missionId}</p>
                     <p className="text-gray-500">Verified Ground Escrow & Safe Payment Guarantee</p>
                   </div>
                 </div>

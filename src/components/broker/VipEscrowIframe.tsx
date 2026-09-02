@@ -17,7 +17,7 @@ export const VipEscrowIframe: React.FC<VipEscrowIframeProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showInternalLedger, setShowInternalLedger] = useState(false);
 
-  const vipUrl = "https://vip.15dwings.com";
+  const vipUrl = "https://vip.15dwings.com.ng";
 
   const handleRefresh = () => {
     setIsLoading(true);
@@ -45,7 +45,7 @@ export const VipEscrowIframe: React.FC<VipEscrowIframeProps> = ({
               15D VIP PAYMENT & ESCROW PORTAL
             </h3>
             <p className="text-xs text-gray-600 font-medium font-sans">
-              Direct high-security settlement and escrow protocol powered by <span className="font-mono text-purple-700 font-bold">vip.15dwings.com</span>
+              Direct high-security settlement and escrow protocol powered by <span className="font-mono text-purple-700 font-bold">vip.15dwings.com.ng</span>
             </p>
           </div>
 
@@ -57,7 +57,7 @@ export const VipEscrowIframe: React.FC<VipEscrowIframeProps> = ({
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-sync uppercase font-bold tracking-wider transition-all shadow-md active:scale-95 cursor-pointer"
             >
-              <span>OPEN VIP.15DWINGS.COM</span>
+              <span>OPEN VIP.15DWINGS.COM.NG</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
 
@@ -128,7 +128,7 @@ export const VipEscrowIframe: React.FC<VipEscrowIframeProps> = ({
               <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
               <div className="text-center space-y-1">
                 <p className="font-sync text-xs font-bold text-gray-900 tracking-wider uppercase">
-                  CONNECTING TO VIP.15DWINGS.COM ESCROW GATEWAY
+                  CONNECTING TO VIP.15DWINGS.COM.NG ESCROW GATEWAY
                 </p>
                 <p className="text-xs text-gray-500">
                   Establishing encrypted handshake with financial settlement servers...
@@ -180,7 +180,7 @@ export const VipEscrowIframe: React.FC<VipEscrowIframeProps> = ({
               <div className="flex items-center justify-between px-6 py-4 border-b border-purple-100 bg-white">
                 <div className="flex items-center gap-3">
                   <span className="font-sync uppercase text-xs font-bold text-purple-700 tracking-wider">
-                    VIP.15DWINGS.COM
+                    VIP.15DWINGS.COM.NG
                   </span>
                   <span className="text-xs text-gray-400">|</span>
                   <span className="text-xs text-gray-700 font-medium">Full Escrow Terminal</span>
