@@ -611,6 +611,27 @@ export default function BrokerPortal() {
   const [authError, setAuthError] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setSessionVerified(true);
+        try { sessionStorage.setItem("broker_verified", "true"); } catch {}
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setSessionVerified(true);
+        try { sessionStorage.setItem("broker_verified", "true"); } catch {}
+      } else {
+        setSessionVerified(false);
+        try { sessionStorage.removeItem("broker_verified"); } catch {}
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   /* First-Time Broker Onboarding State */
   const [isBrokerOnboarded, setIsBrokerOnboarded] = useState<boolean>(() => {
     try {
@@ -1063,16 +1084,72 @@ export default function BrokerPortal() {
     setShowAIOnboarding(false);
   };
 
-    const handleDirectSignIn = async () => {
+  const handleGoogleSignIn = async () => {
     setAuthError("");
     setIsAuthenticating(true);
-    setTimeout(() => {
-        try {
-          sessionStorage.setItem("broker_verified", "true");
-        } catch {}
-        setSessionVerified(true);
-        setIsAuthenticating(false);
-    }, 800);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + window.location.pathname
+        }
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      setAuthError(err.message || "Failed to authenticate with Google.");
+      setIsAuthenticating(false);
+    }
+  };
+
+  const handleDirectSignIn = async () => {
+    if (!inputEmail || !inputPassword) {
+      setAuthError("Email and password are required.");
+      return;
+    }
+    setAuthError("");
+    setIsAuthenticating(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: inputEmail,
+        password: inputPassword,
+      });
+      if (error) throw error;
+      
+      try {
+        sessionStorage.setItem("broker_verified", "true");
+      } catch {}
+      setSessionVerified(true);
+    } catch (err: any) {
+      setAuthError(err.message || "Invalid login credentials.");
+    } finally {
+      setIsAuthenticating(false);
+    }
+  };
+
+  const handleEmailSignUp = async () => {
+    if (!inputEmail || !inputPassword) {
+      setAuthError("Email and password are required.");
+      return;
+    }
+    setAuthError("");
+    setIsAuthenticating(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: inputEmail,
+        password: inputPassword,
+      });
+      if (error) throw error;
+      
+      setAuthError("Account created! Please check your email for confirmation, or login if auto-confirmed.");
+      // Auto-verify for dev preview flexibility
+      setTimeout(() => {
+        setAuthStep("LOGIN");
+      }, 3000);
+    } catch (err: any) {
+      setAuthError(err.message || "Error creating account.");
+    } finally {
+      setIsAuthenticating(false);
+    }
   };
 
   const handleProceedToOtp = () => {
@@ -1301,7 +1378,7 @@ export default function BrokerPortal() {
                 >
                   {/* Google Sign In Button */}
                   <button
-                    onClick={handleDirectSignIn}
+                    onClick={handleGoogleSignIn}
                     className="w-full py-3.5 px-4 bg-white hover:bg-purple-50/80 border border-purple-200 rounded-2xl flex items-center justify-center gap-3 text-xs md:text-sm font-semibold text-gray-900 transition-all shadow-sm hover:shadow active:scale-[0.98] group cursor-pointer"
                   >
                     <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
@@ -1394,6 +1471,30 @@ export default function BrokerPortal() {
                   className="space-y-5 text-left"
                 >
                   <div className="space-y-4">
+                    {/* Google Sign Up Button */}
+                    <button
+                      onClick={handleGoogleSignIn}
+                      className="w-full py-3.5 px-4 bg-white hover:bg-purple-50/80 border border-purple-200 rounded-2xl flex items-center justify-center gap-3 text-xs md:text-sm font-semibold text-gray-900 transition-all shadow-sm hover:shadow active:scale-[0.98] group cursor-pointer"
+                    >
+                      <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      </svg>
+                      <span>Sign up with Google</span>
+                    </button>
+
+                    {/* Divider */}
+                    <div className="relative flex items-center justify-center my-3">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-purple-200" />
+                      </div>
+                      <span className="relative bg-white px-4 text-[10px] text-gray-700 font-sync uppercase tracking-widest font-bold">
+                        ─── OR SIGN UP WITH EMAIL ───
+                      </span>
+                    </div>
+
                     <div className="space-y-1.5">
                       <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
                         WORK EMAIL ADDRESS
@@ -1419,70 +1520,6 @@ export default function BrokerPortal() {
                         placeholder="••••••••••••••••"
                       />
                     </div>
-
-                    <div className="space-y-1.5">
-                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
-                        MOBILE PHONE NUMBER (FOR SMS OTP)
-                      </label>
-                      <div className="flex gap-2">
-                        <div className="relative shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                            className="flex items-center gap-2 px-4 py-3.5 bg-white border-2 border-purple-100 hover:border-purple-500 rounded-2xl text-xs font-mono font-bold text-gray-950 outline-none transition-all cursor-pointer shadow-sm"
-                          >
-                            <span>{countriesList.find(c => c.code === countryCode)?.flag || "🇳🇬"}</span>
-                            <span>{countryCode}</span>
-                          </button>
-
-                          <AnimatePresence>
-                            {isDropdownOpen && (
-                              <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                className="absolute bottom-full left-0 mb-2 w-72 bg-white border border-purple-200 rounded-2xl shadow-2xl z-[100] overflow-hidden backdrop-blur-xl"
-                              >
-                                <div className="p-3 border-b border-purple-100 flex items-center gap-2 bg-purple-50">
-                                  <input
-                                    type="text"
-                                    placeholder="Search country..."
-                                    value={countrySearch}
-                                    onChange={(e) => setCountrySearch(e.target.value)}
-                                    className="w-full bg-transparent text-xs outline-none text-gray-950 placeholder:text-gray-500 font-lexend"
-                                  />
-                                </div>
-                                <div className="max-h-56 overflow-y-auto py-1.5 bg-white">
-                                  {countriesList
-                                    .filter(c => c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.includes(countrySearch))
-                                    .map((c, i) => (
-                                      <button
-                                        key={i}
-                                        type="button"
-                                        onClick={() => {
-                                          setCountryCode(c.code);
-                                          setIsDropdownOpen(false);
-                                        }}
-                                        className="w-full flex items-center justify-between px-4 py-3 text-xs text-left text-gray-800 hover:bg-purple-600 hover:text-white transition-colors"
-                                      >
-                                        <span className="font-lexend font-medium">{c.flag} {c.name}</span>
-                                        <span className="font-mono text-gray-500">{c.code}</span>
-                                      </button>
-                                    ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                        <input
-                          type="tel"
-                          value={inputPhone}
-                          onChange={(e) => setInputPhone(e.target.value)}
-                          placeholder="801 234 5678"
-                          className="flex-1 bg-purple-50/40 border-2 border-purple-100 rounded-2xl px-4 py-3.5 text-sm font-mono font-medium text-gray-950 outline-none focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 transition-all placeholder:text-gray-400 shadow-sm"
-                        />
-                      </div>
-                    </div>
                   </div>
 
                   {authError && (
@@ -1497,10 +1534,11 @@ export default function BrokerPortal() {
 
                   <div className="space-y-2 pt-2">
                     <button
-                      onClick={handleProceedToOtp}
+                      onClick={handleEmailSignUp}
+                      disabled={isAuthenticating}
                       className="w-full py-4 rounded-2xl text-xs font-sync uppercase tracking-[0.25em] font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-[0_10px_25px_rgba(147,51,234,0.35)] active:scale-[0.98] cursor-pointer"
                     >
-                      SEND SMS VERIFICATION CODE
+                      {isAuthenticating ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
                     </button>
 
                     <button
@@ -2271,7 +2309,8 @@ export default function BrokerPortal() {
               <Database className="w-4 h-4" /> flight logs
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
+                await supabase.auth.signOut();
                 sessionStorage.removeItem("broker_verified");
                 setSessionVerified(false);
                 showToast("Signed out successfully. Returning to login portal.", "info");
@@ -2292,7 +2331,8 @@ export default function BrokerPortal() {
                 hasVerifiedOperator={hasVerifiedOperator}
                 onRequireOperator={() => setShowAOCModal(true)}
                 onBookFlight={() => setShowBookFlightIframe(true)}
-                onSignOut={() => {
+                onSignOut={async () => {
+                  await supabase.auth.signOut();
                   sessionStorage.removeItem("broker_verified");
                   setSessionVerified(false);
                   showToast("Signed out successfully. Returning to login portal.", "info");
