@@ -2291,6 +2291,7 @@ export default function BrokerPortal() {
                 brokerCompanyName={brokerCompany || "15D Executive Aviation Brokerage"}
                 hasVerifiedOperator={hasVerifiedOperator}
                 onRequireOperator={() => setShowAOCModal(true)}
+                onBookFlight={() => setShowBookFlightIframe(true)}
                 onSignOut={() => {
                   sessionStorage.removeItem("broker_verified");
                   setSessionVerified(false);

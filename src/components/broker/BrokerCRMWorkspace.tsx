@@ -501,6 +501,7 @@ interface BrokerCRMWorkspaceProps {
   hasVerifiedOperator?: boolean;
   onRequireOperator?: () => void;
   onSignOut?: () => void;
+  onBookFlight?: () => void;
 }
 
 export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
@@ -511,7 +512,8 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   onOpenProposalBuilder,
   hasVerifiedOperator = false,
   onRequireOperator,
-  onSignOut
+  onSignOut,
+  onBookFlight
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<
     'pipeline' | 'clients' | 'proposals' | 'history' | 'analytics' | 'messaging' | 'tasks' | 'directory' | 'team'
@@ -699,8 +701,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               onClick={() => {
                 if (!hasVerifiedOperator && onRequireOperator) {
                   onRequireOperator();
+                } else if (onBookFlight) {
+                  onBookFlight();
                 } else {
-                  window.open("/vip-booking.html", "_blank");
+                  window.open("https://fly.15dwings.com.ng", "_blank");
                 }
               }} 
               className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[10px] font-bold font-sync uppercase transition-all shadow-md cursor-pointer"
