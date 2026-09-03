@@ -21,6 +21,15 @@ export default function OperatorDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const sessionVerified = searchParams.get('verified') === 'true';
   const isPreview = searchParams.get('preview') === 'true';
+  const brokerRef = searchParams.get('broker_ref') || searchParams.get('ref') || searchParams.get('broker_id');
+
+  useEffect(() => {
+    if (brokerRef) {
+      try {
+        localStorage.setItem('15d_broker_ref', brokerRef);
+      } catch {}
+    }
+  }, [brokerRef]);
   const initialState = (sessionVerified || isPreview) ? 'DASHBOARD' : 'LOGIN';
   const [appState, setAppState] = useState<OperatorState>(initialState);
 
@@ -592,11 +601,27 @@ function OperatorCommandCentre() {
       const opId = 'OP-' + (emailAddress ? emailAddress.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, '') : Math.random().toString(36).substring(2, 8).toUpperCase());
       const companyName = emailAddress ? emailAddress.split('@')[0].toUpperCase().replace(/[^A-Z0-9]/g, ' ') + ' AVIATION' : '15D PARTNER OPERATOR';
 
-       const defaultOp = {
+       const activeBrokerRef = (typeof window !== 'undefined' ? (new URLSearchParams(window.location.search).get('broker_ref') || new URLSearchParams(window.location.search).get('ref') || new URLSearchParams(window.location.search).get('broker_id')) : null) || (typeof localStorage !== 'undefined' ? localStorage.getItem('15d_broker_ref') : null);
+      let linkedBrokerId: string | null = null;
+      if (activeBrokerRef) {
+        try {
+          const { data: bData } = await supabase
+            .from('brokers')
+            .select('id')
+            .or(`id.eq.${activeBrokerRef},referral_code.eq.${activeBrokerRef}`)
+            .maybeSingle();
+          if (bData) {
+            linkedBrokerId = bData.id;
+          }
+        } catch (e) {}
+      }
+
+      const defaultOp = {
         id: opId,
         user_id: isValidUuid ? userId : null,
         name: companyName,
         contact_email: emailAddress || 'hello.15dgroup@gmail.com',
+        onboarded_by_broker_id: linkedBrokerId,
         contact_phone: '',
         ove_state: 'REGISTERED',
         compliance_status: 'PENDING_KYC',

@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import re
+
+with open('src/components/broker/PremiumBookFlightPanel.tsx', 'r') as f:
+    content = f.read()
+
+new_content = """import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ExternalLink, ShieldCheck, Plane, Lock, Maximize2, RotateCw } from "lucide-react";
 
@@ -137,3 +142,7 @@ export const PremiumBookFlightPanel: React.FC<PremiumBookFlightPanelProps> = ({
     </AnimatePresence>
   );
 };
+"""
+
+with open('src/components/broker/PremiumBookFlightPanel.tsx', 'w') as f:
+    f.write(new_content)

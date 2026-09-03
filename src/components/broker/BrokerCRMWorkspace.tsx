@@ -11,6 +11,7 @@ import {
   Plane,
   ExternalLink,
   ShieldCheck,
+  ShieldAlert,
   Search,
   Plus,
   Filter,
@@ -45,6 +46,7 @@ import {
   Link
 } from 'lucide-react';
 import { formatCurrency, formatToLocalDate, copyToClipboard } from '../../lib/utils';
+import { supabase } from '../../lib/supabase';
 import { WhiteLabelProposalBuilder } from './WhiteLabelProposalBuilder';
 import { FeatureTourModal } from './FeatureTourModal';
 
@@ -149,174 +151,11 @@ export interface AircraftDirectoryItem {
 }
 
 /* Sample Initial Data for Immediate Interactive Richness */
-export const INITIAL_CLIENTS: ClientProfile[] = [
-  {
-    id: 'cli-001',
-    fullName: 'Chief Alani Adeleke',
-    email: 'a.adeleke@adelekegroup.com',
-    phone: '+234 803 112 8899',
-    company: 'Adeleke Holdings Ltd',
-    type: 'HNWI',
-    countryCode: '+234',
-    preferredAircraftClass: 'Heavy Jet (Challenger 650)',
-    tailAvoidances: ['Avoid N-registered', 'No Legacy 600'],
-    dietaryRestrictions: ['Halal', 'Dom Pérignon Vintage 2012', 'Gluten-Free'],
-    petPolicy: '2 French Bulldogs in cabin, pet carpet covers required',
-    securityDetails: 'Tarmac apron pickup required, 2 armed detail officers',
-    assignedBroker: 'Tunde Bakare (Head Broker)',
-    totalFlightsBooked: 14,
-    totalLifetimeSpendUsd: 620000,
-    passportVault: [
-      {
-        id: 'pass-1',
-        passengerName: 'Alani Adeleke',
-        passportNumber: 'A09823412',
-        nationality: 'Nigerian',
-        expiryDate: '2028-11-14',
-        status: 'Valid'
-      },
-      {
-        id: 'pass-2',
-        passengerName: 'Folake Adeleke',
-        passportNumber: 'A09823488',
-        nationality: 'Nigerian',
-        expiryDate: '2026-09-20',
-        status: 'Expiring Soon'
-      }
-    ]
-  },
-  {
-    id: 'cli-002',
-    fullName: 'Zenith Executive Fleet',
-    email: 'charter@zenithbank.com',
-    phone: '+234 1 278 7000',
-    company: 'Zenith Bank PLC',
-    type: 'Corporate',
-    countryCode: '+234',
-    preferredAircraftClass: 'Ultra Long Range (Gulfstream G650ER)',
-    tailAvoidances: ['No turboprops'],
-    dietaryRestrictions: ['European Executive Lunch', 'Espresso machine required'],
-    petPolicy: 'No pets on board',
-    securityDetails: 'VIP Terminal Lounge clearance, Executive Protection protocol',
-    assignedBroker: 'Amina Yusuf (Senior Broker)',
-    totalFlightsBooked: 28,
-    totalLifetimeSpendUsd: 1450000,
-    passportVault: [
-      {
-        id: 'pass-3',
-        passengerName: 'Dr. Ebenezer Onyeagwu',
-        passportNumber: 'B88723910',
-        nationality: 'Nigerian',
-        expiryDate: '2029-04-10',
-        status: 'Valid'
-      }
-    ]
-  },
-  {
-    id: 'cli-003',
-    fullName: 'Prince Abdulaziz Al-Saud',
-    email: 'office@alsaud-royal.sa',
-    phone: '+966 50 123 4567',
-    company: 'Royal Arabian Investment',
-    type: 'VIP Royal',
-    countryCode: '+966',
-    preferredAircraftClass: 'Ultra Long Range (Global 7500 / G650ER)',
-    tailAvoidances: ['Strictly 2020+ manufacture year'],
-    dietaryRestrictions: ['Strict Halal Gourmet', 'Zero Alcohol', 'Fresh Mango Juice'],
-    petPolicy: 'Falcon perches for 2 falcons',
-    securityDetails: 'Royal Guard Protocol, direct tarmac jetway access',
-    assignedBroker: 'Tunde Bakare (Head Broker)',
-    totalFlightsBooked: 8,
-    totalLifetimeSpendUsd: 890000,
-    passportVault: [
-      {
-        id: 'pass-4',
-        passengerName: 'Abdulaziz Al-Saud',
-        passportNumber: 'K99102938',
-        nationality: 'Saudi Arabian',
-        expiryDate: '2030-01-01',
-        status: 'Valid'
-      }
-    ]
-  }
-];
+export const INITIAL_CLIENTS: ClientProfile[] = [];
 
-export const INITIAL_DEALS: DealPipelineItem[] = [
-  {
-    id: 'deal-101',
-    dealCode: 'DEAL-892',
-    clientId: 'cli-001',
-    clientName: 'Chief Alani Adeleke',
-    stage: 'Proposal Viewed',
-    origin: 'Lagos (LOS)',
-    destination: 'London Biggin Hill (EGKB)',
-    aircraftCategory: 'Heavy Jet (Challenger 650)',
-    targetDate: '2026-08-25',
-    wholesaleCostUsd: 110000,
-    brokerMarkupPercent: 15,
-    totalValueUsd: 126500,
-    brokerCommissionUsd: 16500,
-    assignedBroker: 'Tunde Bakare',
-    lastUpdated: '2 hours ago',
-    missionCode: '15D-7F9E'
-  },
-  {
-    id: 'deal-102',
-    dealCode: 'DEAL-893',
-    clientId: 'cli-002',
-    clientName: 'Zenith Executive Fleet',
-    stage: 'Inquiry',
-    origin: 'Abuja (ABV)',
-    destination: 'Geneva (LSGG)',
-    aircraftCategory: 'Ultra Long Range (Gulfstream G650ER)',
-    targetDate: '2026-09-02',
-    wholesaleCostUsd: 145000,
-    brokerMarkupPercent: 12,
-    totalValueUsd: 162400,
-    brokerCommissionUsd: 17400,
-    assignedBroker: 'Amina Yusuf',
-    lastUpdated: '4 hours ago',
-    missionCode: '15D-802'
-  },
-  {
-    id: 'deal-103',
-    dealCode: 'DEAL-894',
-    clientId: 'cli-003',
-    clientName: 'Prince Abdulaziz Al-Saud',
-    stage: 'Contract Signed',
-    origin: 'Riyadh (RUH)',
-    destination: 'Nice Côte d\'Azur (NCE)',
-    aircraftCategory: 'Ultra Long Range (Global 7500)',
-    targetDate: '2026-08-18',
-    wholesaleCostUsd: 165000,
-    brokerMarkupPercent: 15,
-    totalValueUsd: 189750,
-    brokerCommissionUsd: 24750,
-    assignedBroker: 'Tunde Bakare',
-    lastUpdated: '1 day ago',
-    missionCode: '15D-910'
-  },
-  {
-    id: 'deal-104',
-    dealCode: 'DEAL-895',
-    clientId: 'cli-001',
-    clientName: 'Chief Alani Adeleke',
-    stage: 'Commission Settled',
-    origin: 'Lagos (LOS)',
-    destination: 'Port Harcourt (PHC)',
-    aircraftCategory: 'Super Midsize (Hawker 900XP)',
-    targetDate: '2026-08-01',
-    wholesaleCostUsd: 18500,
-    brokerMarkupPercent: 15,
-    totalValueUsd: 21275,
-    brokerCommissionUsd: 2775,
-    assignedBroker: 'Tunde Bakare',
-    lastUpdated: '3 days ago',
-    missionCode: '15D-654'
-  }
-];
+export const INITIAL_DEALS: DealPipelineItem[] = [];
 
-export const INITIAL_FLIGHT_HISTORY: FlightHistoryRecord[] = [
+export const history: FlightHistoryRecord[] = [
   {
     id: 'fl-01',
     missionCode: '15D-654',
@@ -518,8 +357,8 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   onBookFlight
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<
-    'pipeline' | 'clients' | 'proposals' | 'history' | 'analytics' | 'messaging' | 'tasks' | 'directory' | 'team'
-  >('pipeline');
+    'tasks' | 'pipeline' | 'clients' | 'proposals' | 'history' | 'analytics' | 'directory' | 'team'
+  >('tasks');
 
   /* First-time Tour & Trial Logic */
   const [showTour, setShowTour] = useState(() => {
@@ -554,7 +393,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   };
 
   /* State for Client Management */
-  const [clients, setClients] = useState<ClientProfile[]>(INITIAL_CLIENTS);
+  const [clients, setClients] = useState<ClientProfile[]>([]);
   const [selectedClient, setSelectedClient] = useState<ClientProfile | null>(null);
   const [clientSearch, setClientSearch] = useState('');
   const [showAddClientModal, setShowAddClientModal] = useState(false);
@@ -565,17 +404,109 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   const [newClientType, setNewClientType] = useState<ClientProfile['type']>('HNWI');
 
   /* State for Pipeline Kanban */
-  const [deals, setDeals] = useState<DealPipelineItem[]>(INITIAL_DEALS);
+  const [deals, setDeals] = useState<DealPipelineItem[]>([]);
+  const [history, setHistory] = useState<FlightHistoryRecord[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
   const [selectedDeal, setSelectedDeal] = useState<DealPipelineItem | null>(null);
   const [showAddDealModal, setShowAddDealModal] = useState(false);
-  const [newDealClient, setNewDealClient] = useState(INITIAL_CLIENTS[0].id);
+  const [newDealClient, setNewDealClient] = useState("");
   const [newDealOrigin, setNewDealOrigin] = useState('LOS');
   const [newDealDest, setNewDealDest] = useState('LHR');
   const [newDealAircraft, setNewDealAircraft] = useState('Heavy Jet (Challenger 650)');
   const [newDealCost, setNewDealCost] = useState(95000);
 
   /* State for Tasks */
-  const [tasks, setTasks] = useState<CRMTask[]>(INITIAL_TASKS);
+  const [tasks, setTasks] = useState<CRMTask[]>([]);
+
+  useEffect(() => {
+    async function fetchCRMData() {
+      setIsLoadingData(true);
+      try {
+        const { data: clientsData, error: clientsErr } = await supabase.from('clients').select('*');
+        if (!clientsErr && clientsData) {
+          setClients(clientsData.map(c => ({
+            id: c.id,
+            fullName: c.name,
+            email: c.email || '',
+            phone: c.phone || '',
+            company: c.type === 'Corporate' ? c.name : 'Private Office',
+            type: c.type || 'HNWI',
+            countryCode: '+234',
+            preferredAircraftClass: 'Heavy Jet',
+            tailAvoidances: [],
+            dietaryRestrictions: c.preferences ? Object.values(c.preferences) : [],
+            petPolicy: 'Standard',
+            securityDetails: 'None',
+            assignedBroker: c.broker_id,
+            totalFlightsBooked: 0,
+            totalLifetimeSpendUsd: c.total_spend || 0,
+            passportVault: []
+          })));
+        }
+
+        const { data: proposalsData, error: propsErr } = await supabase.from('proposals').select('*');
+        if (!propsErr && proposalsData) {
+          setDeals(proposalsData.map(p => ({
+            id: p.id,
+            dealCode: p.id.substring(0, 8).toUpperCase(),
+            clientId: p.broker_id,
+            clientName: p.client_name,
+            stage: p.status === 'DRAFT' ? 'Inquiry' : p.status === 'SENT' ? 'Quote Sent' : p.status === 'ACCEPTED' ? 'Contract Signed' : 'Inquiry',
+            origin: p.flight_details?.origin || 'TBD',
+            destination: p.flight_details?.destination || 'TBD',
+            aircraftCategory: p.flight_details?.aircraft || 'Heavy Jet',
+            targetDate: p.flight_details?.date || 'TBD',
+            wholesaleCostUsd: (p.total_price || 0) * 0.9,
+            brokerMarkupPercent: 10,
+            totalValueUsd: p.total_price || 0,
+            brokerCommissionUsd: (p.total_price || 0) * 0.1,
+            assignedBroker: p.broker_id,
+            lastUpdated: p.updated_at,
+            missionCode: p.id.substring(0, 6).toUpperCase()
+          })));
+        }
+        
+        const { data: historyData, error: histErr } = await supabase.from('flight_history').select('*');
+        if (!histErr && historyData) {
+          setHistory(historyData.map(h => ({
+            id: h.id,
+            missionCode: h.id.substring(0, 6).toUpperCase(),
+            clientName: 'Client',
+            flightDate: h.date,
+            route: h.route,
+            aircraftModel: h.aircraft,
+            wholesaleCostUsd: (h.amount || 0) * 0.9,
+            brokerProfitUsd: (h.amount || 0) * 0.1,
+            operatorName: 'Network Operator',
+            operatorRating: 5,
+            paymentRail: 'Providus NUBAN (NGN)',
+            status: h.status === 'COMPLETED' ? 'Completed' : 'Scheduled',
+            flightDuration: '4h 30m'
+          })));
+        }
+
+        const { data: tasksData, error: tasksErr } = await supabase.from('tasks').select('*').order('due_date', { ascending: true });
+        if (!tasksErr && tasksData) {
+          setTasks(tasksData.map(t => ({
+            id: t.id,
+            title: t.title,
+            clientName: '',
+            dueDate: t.due_date ? new Date(t.due_date).toLocaleDateString() : 'Today',
+            priority: 'High',
+            category: t.type === 'Call' ? 'Follow Up' : 'Charter Prep',
+            completed: t.status === 'completed',
+            autoGenerated: true
+          })));
+        }
+      } catch (err) {
+        console.error("Error fetching CRM data:", err);
+      } finally {
+        setIsLoadingData(false);
+      }
+    }
+    fetchCRMData();
+  }, []);
+
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
   /* State for Messages */
@@ -662,11 +593,14 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   };
 
   /* Add Task */
-  const handleAddTask = (e: React.FormEvent) => {
+  const handleAddTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTaskTitle) return;
+    
+    // Optimistic UI update
+    const tempId = `task-${Date.now()}`;
     const task: CRMTask = {
-      id: `task-${Date.now()}`,
+      id: tempId,
       title: newTaskTitle,
       dueDate: 'Today',
       priority: 'High',
@@ -675,6 +609,27 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
     };
     setTasks(prev => [task, ...prev]);
     setNewTaskTitle('');
+
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+      
+      const { data: brokerData } = await supabase.from('brokers').select('id').eq('auth_user_id', userData.user.id).single();
+      if (!brokerData) return;
+
+      const { data: newTask, error } = await supabase.from('tasks').insert({
+        broker_id: brokerData.id,
+        title: task.title,
+        type: 'Task',
+        status: 'pending'
+      }).select().single();
+
+      if (!error && newTask) {
+        setTasks(prev => prev.map(t => t.id === tempId ? { ...t, id: newTask.id } : t));
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSendMessage = (e: React.FormEvent) => {
@@ -749,7 +704,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                   if (onBookFlight) {
                     onBookFlight();
                   } else {
-                    window.open("https://fly.15dwings.com.ng", "_blank");
+                    window.open("https://fly.15dwings.com.ng", "_blank", "noopener,noreferrer");
                   }
                 });
               }} 
@@ -789,6 +744,23 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
         {/* 10 Essential CRM Tab Switches */}
         <div className="flex items-center gap-1.5 overflow-x-auto pt-4 scrollbar-none">
           <button
+            onClick={() => setActiveSubTab('tasks')}
+            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
+              activeSubTab === 'tasks'
+                ? 'bg-purple-600 text-white font-bold shadow-md'
+                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
+            }`}
+          >
+            <CheckSquare className="w-3.5 h-3.5" />
+            <span>TASKS & ALERTS</span>
+            <span className={`ml-1 px-1.5 py-0.5 rounded-md text-[9px] font-mono ${
+              activeSubTab === 'tasks' ? 'bg-amber-400 text-amber-950 font-bold' : 'bg-amber-100 text-amber-900 font-bold'
+            }`}>
+              {tasks.filter(t => !t.completed).length}
+            </span>
+          </button>
+
+          <button
             onClick={() => setActiveSubTab('pipeline')}
             className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'pipeline'
@@ -824,7 +796,10 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
           <button
             onClick={() => {
-              handleUseTrialFeature(() => setActiveSubTab('proposals'));
+              if (!hasVerifiedOperator && onRequireOperator) {
+                onRequireOperator();
+              }
+              setActiveSubTab('proposals');
             }}
             className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'proposals'
@@ -834,6 +809,11 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           >
             <FileText className="w-3.5 h-3.5" />
             <span>PROPOSAL BUILDER</span>
+            {!hasVerifiedOperator && (
+              <span className="px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 text-[8px] font-mono font-bold flex items-center gap-0.5">
+                <Lock className="w-2.5 h-2.5" /> LOCKED
+              </span>
+            )}
           </button>
 
           <button
@@ -860,34 +840,9 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             <span>REVENUE ANALYTICS</span>
           </button>
 
-          <button
-            onClick={() => setActiveSubTab('messaging')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-              activeSubTab === 'messaging'
-                ? 'bg-purple-600 text-white font-bold shadow-md'
-                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
-            }`}
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>CLIENT MESSAGING</span>
-          </button>
+          
 
-          <button
-            onClick={() => setActiveSubTab('tasks')}
-            className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
-              activeSubTab === 'tasks'
-                ? 'bg-purple-600 text-white font-bold shadow-md'
-                : 'text-gray-700 hover:text-gray-950 hover:bg-purple-50 font-medium'
-            }`}
-          >
-            <CheckSquare className="w-3.5 h-3.5" />
-            <span>TASKS & ALERTS</span>
-            <span className={`ml-1 px-1.5 py-0.5 rounded-md text-[9px] font-mono ${
-              activeSubTab === 'tasks' ? 'bg-amber-400 text-amber-950 font-bold' : 'bg-amber-100 text-amber-900 font-bold'
-            }`}>
-              {tasks.filter(t => !t.completed).length}
-            </span>
-          </button>
+          
 
           <button
             onClick={() => setActiveSubTab('directory')}
@@ -1318,13 +1273,41 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 3: WHITE-LABEL PROPOSAL BUILDER */}
       {activeSubTab === 'proposals' && (
-        <WhiteLabelProposalBuilder
-          missionId="15D-7F9E"
-          originCode="LOS"
-          destCode="EGKB"
-          aircraftName="Challenger 650 (5N-ZNT)"
-          baselineWholesaleCostUsd={110000}
-        />
+        hasVerifiedOperator ? (
+          <WhiteLabelProposalBuilder
+            missionId="15D-7F9E"
+            originCode="LOS"
+            destCode="EGKB"
+            aircraftName="Challenger 650 (5N-ZNT)"
+            baselineWholesaleCostUsd={110000}
+          />
+        ) : (
+          <div className="max-w-2xl mx-auto my-6 p-8 md:p-12 rounded-[2.5rem] border border-amber-200 bg-white/95 shadow-2xl text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600 shadow-inner">
+              <ShieldAlert className="w-8 h-8" />
+            </div>
+            <div className="space-y-2">
+              <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-sync font-bold tracking-widest uppercase inline-flex items-center gap-1.5">
+                <Lock className="w-3 h-3 text-amber-700" /> Charlatan Protection Protocol • Backend Clearance Required
+              </span>
+              <h3 className="font-space font-bold text-xl md:text-2xl text-gray-900 uppercase tracking-tight">
+                Proposal Designer Access Denied
+              </h3>
+              <p className="font-lexend text-xs md:text-sm text-gray-700 leading-relaxed max-w-lg mx-auto">
+                To keep charlatans and unauthorized intermediaries out of our ecosystem, 15D Wings requires an active licensed airline partner. Send your custom onboarding link to your partner airline to register on airlines.15dwings.com.ng. Our telemetry rail will automatically detect their backend clearance and unlock your Proposal Designer.
+              </p>
+            </div>
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={onRequireOperator}
+                className="px-6 py-3.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-sync uppercase text-xs font-bold tracking-wider shadow-lg shadow-purple-900/20 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>Invite Operator & Track Telemetry (airlines.15dwings.com.ng)</span>
+              </button>
+            </div>
+          </div>
+        )
       )}
 
       {/* SUB-TAB 4: TRIP HISTORY & LOGS */}
@@ -1357,7 +1340,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
-                {INITIAL_FLIGHT_HISTORY.map(flight => (
+                {history.map(flight => (
                   <tr key={flight.id} className="hover:bg-purple-50 transition-colors">
                     <td className="py-3 px-2 font-bold text-purple-600">{flight.missionCode}</td>
                     <td className="py-3 px-2 text-gray-900">{flight.clientName}</td>
@@ -1391,7 +1374,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 TOTAL CLOSED CHARTER VOLUME
               </span>
               <p className="text-2xl font-space lowercase lowercase font-bold text-gray-900 font-mono">
-                {formatCurrency(totalClosedVolume || 1850000, 'USD')}
+                {formatCurrency(totalClosedVolume || 0, 'USD')}
               </p>
               <span className="text-[10px] text-emerald-400 font-mono">↑ +24% vs last quarter</span>
             </div>
@@ -1401,7 +1384,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 NET BROKER COMFLIGHTS
               </span>
               <p className="text-2xl font-space lowercase lowercase font-bold text-purple-600 font-mono">
-                {formatCurrency(totalCommissions || 248500, 'USD')}
+                {formatCurrency(totalCommissions || 0, 'USD')}
               </p>
               <span className="text-[10px] text-purple-600 font-mono">Average margin: 13.4%</span>
             </div>
@@ -1411,7 +1394,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 PROVIDUS NGN CLEARING RAIL
               </span>
               <p className="text-2xl font-space lowercase lowercase font-bold text-emerald-400 font-mono">
-                ₦382,400,000
+                {formatCurrency(totalClosedVolume ? totalClosedVolume * 1500 : 0, 'NGN')}
               </p>
               <span className="text-[10px] text-gray-600 font-mono">Sub-second NUBAN settlement</span>
             </div>
@@ -1430,60 +1413,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       )}
 
       {/* SUB-TAB 6: MESSAGING */}
-      {activeSubTab === 'messaging' && (
-        <div className="p-6 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md backdrop-blur-[10px] space-y-4 max-w-3xl mx-auto">
-          <div className="pb-3 border-b border-purple-200 flex justify-between items-center">
-            <div>
-              <h3 className="font-space lowercase text-sm font-bold text-gray-900 lowercase">
-                CLIENT CONCIERGE CHAT HUB
-              </h3>
-              <p className="text-[10px] text-gray-600 font-mono">
-                Direct client interaction vault without exposing platform backend details.
-              </p>
-            </div>
-            <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] font-mono font-bold">
-              ● Client Online
-            </span>
-          </div>
-
-          <div className="space-y-3 min-h-[280px] max-h-[400px] overflow-y-auto pr-2">
-            {chatMessages.map(msg => (
-              <div
-                key={msg.id}
-                className={`flex flex-col ${msg.isClient ? 'items-start' : 'items-end'}`}
-              >
-                <div
-                  className={`p-3 rounded-2xl max-w-md text-xs font-mono space-y-1 ${
-                    msg.isClient
-                      ? 'bg-purple-100 text-gray-900 rounded-tl-none'
-                      : 'bg-purple-600 text-gray-900 rounded-tr-none'
-                  }`}
-                >
-                  <span className="text-[9px] opacity-75 block font-space lowercase lowercase">{msg.sender}</span>
-                  <p>{msg.text}</p>
-                  <span className="text-[8px] opacity-60 text-right block pt-1">{msg.time}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <form onSubmit={handleSendMessage} className="flex gap-2 pt-2 border-t border-purple-200">
-            <input
-              type="text"
-              placeholder="Type client concierge message..."
-              value={newMessageInput}
-              onChange={e => setNewMessageInput(e.target.value)}
-              className="flex-1 px-4 py-2.5 bg-purple-50 border border-purple-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-purple-500"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2.5 bg-purple-600 hover:bg-purple-600/90 text-gray-900 rounded-xl text-xs font-space lowercase font-bold lowercase cursor-pointer"
-            >
-              SEND
-            </button>
-          </form>
-        </div>
-      )}
+      
 
       {/* SUB-TAB 7: TASKS & ALERTS */}
       {activeSubTab === 'tasks' && (
@@ -1526,9 +1456,11 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                     type="checkbox"
                     checked={task.completed}
                     onChange={() =>
-                      setTasks(prev =>
-                        prev.map(t => (t.id === task.id ? { ...t, completed: !t.completed } : t))
-                      )
+                      {
+                      const newStatus = !task.completed;
+                      setTasks(prev => prev.map(t => (t.id === task.id ? { ...t, completed: newStatus } : t)));
+                      supabase.from('tasks').update({ status: newStatus ? 'completed' : 'pending' }).eq('id', task.id).then();
+                    }
                     }
                     className="w-4 h-4 rounded bg-white border-purple-300 text-purple-600 focus:ring-0 cursor-pointer"
                   />

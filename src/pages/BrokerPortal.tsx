@@ -9,6 +9,7 @@ import {
   Users,
   Plane,
   ShieldCheck,
+  ShieldAlert,
   CheckCircle2,
   ChevronDown,
   Upload,
@@ -41,6 +42,7 @@ import { FlightTracker } from "../components/FlightTracker";
 
 import { DecisionEngineCard } from "../components/broker/DecisionEngineCard";
 import { WhiteLabelProposalBuilder } from "../components/broker/WhiteLabelProposalBuilder";
+import { OperatorOnboardingModal } from "../components/broker/OperatorOnboardingModal";
 import { SystemizedCheckoutEngine } from "../components/broker/SystemizedCheckoutEngine";
 import { VipEscrowIframe } from "../components/broker/VipEscrowIframe";
 import { OperationalIntegrityIndex } from "../components/broker/OperationalIntegrityIndex";
@@ -597,6 +599,13 @@ export default function BrokerPortal() {
     searchParams.get("verified") === "true" || sessionStorage.getItem("broker_verified") === "true"
   );
   const [hasVerifiedOperator, setHasVerifiedOperator] = useState(false);
+  const [brokerDbRecord, setBrokerDbRecord] = useState<{
+    id: string;
+    referral_code?: string;
+    company_name?: string;
+    email?: string;
+    is_verified?: boolean;
+  } | null>(null);
 
 
   const [authStep, setAuthStep] = useState<'LOGIN' | 'SIGNUP' | 'SMS_OTP'>('LOGIN');
@@ -631,6 +640,56 @@ export default function BrokerPortal() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    async function checkOperator() {
+      if (!sessionVerified) {
+        setHasVerifiedOperator(false);
+        return;
+      }
+      try {
+        const { data: user } = await supabase.auth.getUser();
+        if (!user.user) {
+          setHasVerifiedOperator(false);
+          return;
+        }
+        
+        const { data: broker } = await supabase
+          .from('brokers')
+          .select('id, referral_code, company_name, email, is_verified')
+          .eq('auth_user_id', user.user.id)
+          .maybeSingle();
+        
+        if (broker) {
+          setBrokerDbRecord(broker);
+        }
+        
+        if (broker?.is_verified) {
+          setHasVerifiedOperator(true);
+          return;
+        }
+
+        if (broker?.id) {
+          const { data: operators } = await supabase
+            .from('operators')
+            .select('id, is_verified')
+            .eq('onboarded_by_broker_id', broker.id);
+          
+          if (operators && operators.length > 0 && operators.some(o => o.is_verified)) {
+            setHasVerifiedOperator(true);
+            return;
+          }
+        }
+        
+        setHasVerifiedOperator(false);
+      } catch (e) {
+        console.error('Error checking operator verification status:', e);
+        setHasVerifiedOperator(false);
+      }
+    }
+    checkOperator();
+  }, [sessionVerified]);
+
 
   /* First-Time Broker Onboarding State */
   const [isBrokerOnboarded, setIsBrokerOnboarded] = useState<boolean>(() => {
@@ -933,27 +992,27 @@ export default function BrokerPortal() {
 
     const defaultAlerts: NotificationItem[] = [
       {
-        id: "onboarding-welcome",
+        id: "broker-welcome",
         type: "system",
-        title: "Welcome Onboarding Protocol",
-        message: "Welcome back! To finalize your charter booking, please note that your total payment is split into two installments: a commitment deposit due upon signing, and the final balance, which must be settled 48 hours prior to takeoff. Thank you for securing your journey with 15D Wings.",
-        timestamp: new Date("2026-07-10T12:00:00Z").toISOString(),
+        title: "Welcome to Broker Command",
+        message: "Your CRM is active. Access live market rates, manage verified operators, and generate white-labeled proposals directly from this unified workspace.",
+        timestamp: new Date().toISOString(),
         read: false
       },
       {
-        id: "icc-clearance",
+        id: "margin-directive",
         type: "icc",
-        title: "ICC Strategic Directive 12-A",
-        message: "General Aviation corridor overflight clearance secured for VIP Flight. Clear skies established.",
-        timestamp: new Date("2026-07-10T12:05:00Z").toISOString(),
+        title: "Margin & Yield Control",
+        message: "Pricing Directive: You have full control to mark up margins on generated proposals based on your own discretion to maximize your yield per deal.",
+        timestamp: new Date().toISOString(),
         read: false
       },
       {
-        id: "operator-welcome",
-        type: "chat",
-        title: "Operator Dispatch Feed",
-        message: "Welcome aboard. Ground dispatch team stands ready at Lagos MMA General Aviation Terminal for immediate logistics deployment.",
-        timestamp: new Date("2026-07-10T12:10:00Z").toISOString(),
+        id: "settlement-engine",
+        type: "system",
+        title: "Guaranteed Certainty",
+        message: "All flights booked through this ecosystem benefit from our same-day payment settlement engine, guaranteeing certainty and protecting your operator network.",
+        timestamp: new Date().toISOString(),
         read: false
       }
     ];
@@ -2269,14 +2328,25 @@ export default function BrokerPortal() {
               <Users className="w-4 h-4" /> crm workspace
             </button>
             <button
-              onClick={() => setActiveTab('proposal_builder')}
+              onClick={() => {
+                if (!hasVerifiedOperator) {
+                  showToast("Access Restricted: Operator verification required from backend to use Proposal Designer.", "warning");
+                }
+                setActiveTab('proposal_builder');
+              }}
               className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
                 activeTab === 'proposal_builder'
                   ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
                   : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
               }`}
             >
-              <FileText className="w-4 h-4" /> proposal builder
+              <FileText className="w-4 h-4" />
+              <span>proposal builder</span>
+              {!hasVerifiedOperator && (
+                <span className="ml-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                  <Lock className="w-2.5 h-2.5" /> LOCKED
+                </span>
+              )}
             </button>
             <button
               onClick={() => setActiveTab('checkout_engine')}
@@ -2343,13 +2413,41 @@ export default function BrokerPortal() {
 
           {activeTab === 'proposal_builder' && (
             <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-              <WhiteLabelProposalBuilder
-                missionId={mission.id}
-                originCode={dep.substring(0, 3)}
-                destCode={dest.substring(0, 3)}
-                aircraftName={mission.operator_aircraft || mission.aircraft_class || "Midsize Jet (Hawker 900XP)"}
-                baselineWholesaleCostUsd={totalVerifiedCost || 16250}
-              />
+              {hasVerifiedOperator ? (
+                <WhiteLabelProposalBuilder
+                  missionId={mission.id}
+                  originCode={dep.substring(0, 3)}
+                  destCode={dest.substring(0, 3)}
+                  aircraftName={mission.operator_aircraft || mission.aircraft_class || "Midsize Jet (Hawker 900XP)"}
+                  baselineWholesaleCostUsd={totalVerifiedCost || 16250}
+                />
+              ) : (
+                <div className="max-w-2xl mx-auto my-8 p-8 md:p-12 rounded-[2.5rem] border border-amber-200 bg-white/95 shadow-2xl text-center space-y-6">
+                  <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600 shadow-inner">
+                    <ShieldAlert className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-2">
+                    <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-sync font-bold tracking-widest uppercase inline-flex items-center gap-1.5">
+                      <Lock className="w-3 h-3 text-amber-700" /> Charlatan Protection Protocol • Backend Clearance Required
+                    </span>
+                    <h3 className="font-space font-bold text-xl md:text-2xl text-gray-900 uppercase tracking-tight">
+                      Proposal Designer Access Denied
+                    </h3>
+                    <p className="font-lexend text-xs md:text-sm text-gray-700 leading-relaxed max-w-lg mx-auto">
+                      To keep charlatans and unauthorized intermediaries out of our ecosystem, 15D Wings requires an active licensed airline partner. Send your custom onboarding link to your partner airline to register on airlines.15dwings.com.ng. Our telemetry rail will automatically detect their backend clearance and unlock your Proposal Designer.
+                    </p>
+                  </div>
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button
+                      onClick={() => setShowAOCModal(true)}
+                      className="px-6 py-3.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-sync uppercase text-xs font-bold tracking-wider shadow-lg shadow-purple-900/20 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>Invite Operator & Track Telemetry (airlines.15dwings.com.ng)</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -2423,112 +2521,18 @@ export default function BrokerPortal() {
           </motion.div>
         )}
 
-        {showAOCModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-white/80 backdrop-blur-md backdrop-blur-[10px] p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border border-purple-200 glass-vip bg-gradient-to-br from-[#0a1220]/95 via-black/95 to-[#050810]/95 shadow-[0_0_60px_rgba(0,0,0,0.85)] space-y-6 text-left relative"
-            >
-              <button
-                onClick={() => setShowAOCModal(false)}
-                className="absolute top-6 right-6 text-gray-600 hover:text-gray-900 transition-all cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="flex items-center gap-3">
-                <ShieldCheck className="w-8 h-8 text-purple-600" />
-                <div>
-                  <h2 className="font-space lowercase font-bold text-lg md:text-xl tracking-wider lowercase text-gray-900">
-                    OPERATOR VERIFICATION REQUIRED
-                  </h2>
-                  <p className="font-lexend text-xs text-purple-600">
-                    Verification Gateway & AOC Onboarding
-                  </p>
-                </div>
-              </div>
-
-              <p className="font-lexend text-xs text-gray-700 leading-relaxed">
-                Your broker account must be verified by a licensed operator before using flight booking and proposal features. Please onboard a licensed operator below to activate your full workspace.
-              </p>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setHasVerifiedOperator(true);
-                  setShowAOCModal(false);
-                  showToast("Licensed operator successfully onboarded and verified!", "success");
-                }}
-                className="space-y-4 pt-2"
-              >
-                <div className="space-y-1.5">
-                  <label className="font-space lowercase text-[10px] lowercase text-gray-600 font-bold tracking-wider">
-                    OPERATOR / AIRLINE NAME
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={operatorName}
-                    onChange={(e) => setOperatorName(e.target.value)}
-                    placeholder="e.g. ExecuJet Executive Aviation"
-                    className="w-full px-4 py-3 rounded-xl bg-purple-50 border border-purple-200 text-sm text-gray-900 placeholder-gray-500 font-lexend focus:outline-none focus:border-purple-500"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="font-space lowercase text-[10px] lowercase text-gray-600 font-bold tracking-wider">
-                    AIR OPERATOR CERTIFICATE (AOC) / LICENSE NUMBER
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={operatorAocNumber}
-                    onChange={(e) => setOperatorAocNumber(e.target.value)}
-                    placeholder="e.g. AOC-2026-9041"
-                    className="w-full px-4 py-3 rounded-xl bg-purple-50 border border-purple-200 text-sm text-gray-900 placeholder-gray-500 font-lexend focus:outline-none focus:border-purple-500"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="font-space lowercase text-[10px] lowercase text-gray-600 font-bold tracking-wider">
-                    AIRCRAFT TAIL NUMBER
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={operatorEmail}
-                    onChange={(e) => setOperatorEmail(e.target.value)}
-                    placeholder="e.g. 5N-B15D"
-                    className="w-full px-4 py-3 rounded-xl bg-purple-50 border border-purple-200 text-sm text-gray-900 placeholder-gray-500 font-lexend focus:outline-none focus:border-purple-500"
-                  />
-                </div>
-
-                <div className="pt-4 flex items-center justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowAOCModal(false)}
-                    className="px-5 py-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-gray-700 font-lexend text-xs transition-all cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-600/90 text-gray-900 font-space lowercase text-xs font-bold lowercase transition-all shadow-[0_0_20px_rgba(24,119,242,0.4)] cursor-pointer"
-                  >
-                    ONBOARD A LICENSED OPERATOR
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
+        <OperatorOnboardingModal
+          isOpen={showAOCModal}
+          onClose={() => setShowAOCModal(false)}
+          brokerId={brokerDbRecord?.id}
+          brokerReferralCode={brokerDbRecord?.referral_code}
+          brokerEmail={brokerDbRecord?.email || inputEmail}
+          brokerCompany={brokerDbRecord?.company_name || brokerCompany}
+          onVerificationSuccess={() => {
+            setHasVerifiedOperator(true);
+            showToast("Licensed operator clearance verified on backend! Proposal tools unlocked.", "success");
+          }}
+        />
       </AnimatePresence>
       </div>
     </div>
