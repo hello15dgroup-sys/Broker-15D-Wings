@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
@@ -41,10 +41,12 @@ import {
   ChevronDown,
   Globe,
   Award,
-  LogOut
+  LogOut,
+  Link
 } from 'lucide-react';
 import { formatCurrency, formatToLocalDate, copyToClipboard } from '../../lib/utils';
 import { WhiteLabelProposalBuilder } from './WhiteLabelProposalBuilder';
+import { FeatureTourModal } from './FeatureTourModal';
 
 /* Types for CRM Core */
 export interface ClientProfile {
@@ -519,6 +521,38 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
     'pipeline' | 'clients' | 'proposals' | 'history' | 'analytics' | 'messaging' | 'tasks' | 'directory' | 'team'
   >('pipeline');
 
+  /* First-time Tour & Trial Logic */
+  const [showTour, setShowTour] = useState(() => {
+    try {
+      return localStorage.getItem('15d_broker_tour_seen') !== 'true';
+    } catch { return true; }
+  });
+  
+  const [trialUsed, setTrialUsed] = useState(() => {
+    try {
+      return localStorage.getItem('15d_broker_trial_used') === 'true';
+    } catch { return false; }
+  });
+
+  const handleTourComplete = () => {
+    try { localStorage.setItem('15d_broker_tour_seen', 'true'); } catch {}
+    setShowTour(false);
+  };
+
+  const handleUseTrialFeature = (callback: () => void) => {
+    if (trialUsed && !hasVerifiedOperator) {
+      if (onRequireOperator) onRequireOperator();
+      return;
+    }
+    
+    // Mark trial as used
+    if (!trialUsed) {
+      try { localStorage.setItem('15d_broker_trial_used', 'true'); } catch {}
+      setTrialUsed(true);
+    }
+    callback();
+  };
+
   /* State for Client Management */
   const [clients, setClients] = useState<ClientProfile[]>(INITIAL_CLIENTS);
   const [selectedClient, setSelectedClient] = useState<ClientProfile | null>(null);
@@ -697,15 +731,27 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <button
+              onClick={() => {
+                const inviteLink = `${window.location.origin}/operator-onboarding?ref=${missionId}`;
+                handleCopyText(inviteLink, "operator_link");
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-xl text-[10px] font-bold font-sync uppercase transition-all shadow-sm cursor-pointer"
+              title="Copy link to invite a new operator"
+            >
+              {copiedLink === "operator_link" ? <Check className="w-3.5 h-3.5" /> : <Link className="w-3.5 h-3.5" />}
+              <span>{copiedLink === "operator_link" ? "COPIED!" : "INVITE OPERATOR"}</span>
+            </button>
+
             <button 
               onClick={() => {
-                if (!hasVerifiedOperator && onRequireOperator) {
-                  onRequireOperator();
-                } else if (onBookFlight) {
-                  onBookFlight();
-                } else {
-                  window.open("https://fly.15dwings.com.ng", "_blank");
-                }
+                handleUseTrialFeature(() => {
+                  if (onBookFlight) {
+                    onBookFlight();
+                  } else {
+                    window.open("https://fly.15dwings.com.ng", "_blank");
+                  }
+                });
               }} 
               className="flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-[10px] font-bold font-sync uppercase transition-all shadow-md cursor-pointer"
             >
@@ -777,7 +823,9 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           </button>
 
           <button
-            onClick={() => setActiveSubTab('proposals')}
+            onClick={() => {
+              handleUseTrialFeature(() => setActiveSubTab('proposals'));
+            }}
             className={`px-3.5 py-2 rounded-xl text-[10px] font-sync uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer ${
               activeSubTab === 'proposals'
                 ? 'bg-purple-600 text-white font-bold shadow-md'
@@ -1858,6 +1906,9 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Feature Tour Modal on First Login */}
+      {showTour && <FeatureTourModal onComplete={handleTourComplete} />}
     </div>
   );
 };
