@@ -56,7 +56,7 @@ export default function CCIGate({ mission }: { mission: Mission }) {
             
             {selected.includes(exp.id) && (
               <motion.div 
-                layoutId="active-bg"
+                layoutId={`active-bg-${exp.id}`}
                 className="absolute inset-0 bg-fbblue/5 pointer-events-none" 
               />
             )}

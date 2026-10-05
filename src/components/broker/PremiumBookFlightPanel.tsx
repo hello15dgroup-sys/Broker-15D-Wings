@@ -17,7 +17,7 @@ export const PremiumBookFlightPanel: React.FC<PremiumBookFlightPanelProps> = ({
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   
-  const BOOKING_URL = "https://fly.15dwings.com.ng";
+  const BOOKING_URL = "https://15dwings.com.ng/flight%20request";
 
   // Handle escape key to close
   useEffect(() => {

@@ -43,7 +43,11 @@ a[href*="spline.design"] {
   }
 
   .ui-sync {
-    @apply font-space lowercase font-bold tracking-tight text-[12px];
+    font-family: "Syncopate", sans-serif;
+    text-transform: uppercase;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    font-size: 11px;
   }
 }
 

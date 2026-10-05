@@ -4,6 +4,8 @@
  * Backend Endpoint: https://bookingapi.15dwingsltd.workers.dev
  */
 
+import { supabase } from './supabase';
+
 export const BOOKING_API_BASE = "https://bookingapi.15dwingsltd.workers.dev";
 
 export interface FleetSpec {
@@ -199,30 +201,43 @@ export const POPULAR_AIRPORTS: AirportResult[] = [
 ];
 
 /**
- * Fetch available fleet parameters and rates from Cloudflare Worker
+ * Fetch available fleet parameters and rates directly from Supabase backend
  */
 export async function getFleet(): Promise<Record<string, FleetSpec>> {
   try {
+    const { data: dbFleet } = await supabase.from('fleet_aircraft').select('*');
+    if (dbFleet && dbFleet.length > 0) {
+      const fleetMap: Record<string, FleetSpec> = {};
+      for (const item of dbFleet) {
+        const key = (item.category || item.model || 'AIRCRAFT').toUpperCase().replace(/\s+/g, '_');
+        fleetMap[key] = {
+          code: key as any,
+          label: item.model,
+          speedKmH: Math.round((item.cruise_speed_ktas || 450) * 1.852),
+          hourlyRateUsd: Number(item.hourly_rate_usd) || 5000,
+          minHours: 1,
+          maxRangeKm: Math.round((item.max_range_nm || 3500) * 1.852),
+          maxSeats: item.pax_capacity || 8,
+          models: item.model,
+          image: item.image_url || undefined
+        };
+      }
+      return fleetMap;
+    }
+
     const res = await fetch(`${BOOKING_API_BASE}/api/v1/fleet`, {
       headers: { "Accept": "application/json" }
     });
-    if (!res.ok) throw new Error(`Fleet request failed: ${res.status}`);
-    const data = await res.json() as { ok: boolean; fleet?: Record<string, FleetSpec> };
-    if (data.ok && data.fleet) {
-      // Merge with images
-      const merged: Record<string, FleetSpec> = {};
-      for (const [key, val] of Object.entries(data.fleet)) {
-        merged[key] = {
-          ...val,
-          image: FALLBACK_FLEET[key]?.image || FALLBACK_FLEET.LIGHT.image
-        };
+    if (res.ok) {
+      const data = await res.json() as { ok: boolean; fleet?: Record<string, FleetSpec> };
+      if (data.ok && data.fleet && Object.keys(data.fleet).length > 0) {
+        return data.fleet;
       }
-      return merged;
     }
   } catch (err) {
-    console.warn("Using fallback fleet data due to API error:", err);
+    console.warn("Fleet query error:", err);
   }
-  return FALLBACK_FLEET;
+  return {};
 }
 
 /**

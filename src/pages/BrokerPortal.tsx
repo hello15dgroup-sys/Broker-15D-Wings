@@ -24,9 +24,14 @@ import {
   FileText,
   CreditCard,
   Radar,
-  Database
+  Database,
+  Menu,
 } from "lucide-react";
-import { formatCurrency, calculateFlightTime, formatToLocalDate } from "../lib/utils";
+import {
+  formatCurrency,
+  calculateFlightTime,
+  formatToLocalDate,
+} from "../lib/utils";
 const Spline = lazy(() => import("@splinetool/react-spline"));
 
 import RegulatoryDisclaimer from "../components/RegulatoryDisclaimer";
@@ -34,7 +39,6 @@ import PassengerManifestForm from "../components/PassengerManifestForm";
 import AircraftSelectionForm from "../components/AircraftSelectionForm";
 import MissionCustomizationForm from "../components/MissionCustomizationForm";
 import RescheduleFlightForm from "../components/RescheduleFlightForm";
-import VoiceAssistant from "../components/VoiceAssistant";
 import UserMenu from "../components/UserMenu";
 import MissionChat from "../components/chat/MissionChat";
 import { MissionClockWidget } from "../components/MissionClockWidget";
@@ -49,6 +53,11 @@ import { OperationalIntegrityIndex } from "../components/broker/OperationalInteg
 import { EyeOfGodTelemetry } from "../components/broker/EyeOfGodTelemetry";
 import { BrokerCRMWorkspace } from "../components/broker/BrokerCRMWorkspace";
 import { PremiumBookFlightPanel } from "../components/broker/PremiumBookFlightPanel";
+import {
+  BrokerIOSNavigationDrawer,
+  BrokerTabType,
+  CrmSubTabType,
+} from "../components/broker/BrokerIOSNavigationDrawer";
 
 import heavyJetImg from "../assets/images/heavy_challenger_650_1780611482208.png";
 import vljImg from "../assets/images/vlj_phenom_100_1780611441744.png";
@@ -476,9 +485,7 @@ function FlightCountdown({
 
   if (timeLeft.isOver) {
     return (
-      <span className="text-red-500 font-space lowercase tracking-widest text-[10px] lowercase font-bold">
-        EXPIRED
-      </span>
+      <span className="text-red-500    text-[10px]  font-bold">EXPIRED</span>
     );
   }
 
@@ -486,20 +493,20 @@ function FlightCountdown({
 
   return (
     <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-100 border border-purple-500/20 rounded-lg text-xs font-mono text-gray-900 mt-2 select-none shadow-[0_0_10px_rgba(24,119,242,0.1)]">
-      <div className="flex gap-1 items-center font-bold tracking-wider text-xs">
+      <div className="flex gap-1 items-center font-bold   text-xs">
         <span className="text-gray-900 font-mono">{pad(timeLeft.days)}</span>
-        <span className="text-gray-500 text-[9px] lowercase font-sans">d</span>
+        <span className="text-gray-500 text-[9px]  font-sans">d</span>
         <span className="text-gray-900/20">:</span>
         <span className="text-gray-900 font-mono">{pad(timeLeft.hours)}</span>
-        <span className="text-gray-500 text-[9px] lowercase font-sans">h</span>
+        <span className="text-gray-500 text-[9px]  font-sans">h</span>
         <span className="text-gray-900/20">:</span>
         <span className="text-gray-900 font-mono">{pad(timeLeft.minutes)}</span>
-        <span className="text-gray-500 text-[9px] lowercase font-sans">m</span>
+        <span className="text-gray-500 text-[9px]  font-sans">m</span>
         <span className="text-gray-900/20">:</span>
         <span className="text-purple-600 font-mono animate-pulse">
           {pad(timeLeft.seconds)}
         </span>
-        <span className="text-purple-600/50 text-[9px] lowercase font-sans">s</span>
+        <span className="text-purple-600/50 text-[9px]  font-sans">s</span>
       </div>
     </div>
   );
@@ -508,12 +515,12 @@ function FlightCountdown({
 interface ToastState {
   message: string;
   type: "success" | "info" | "warning" | "error";
-  id: number;
+  id: string;
 }
 
 interface NotificationItem {
   id: string;
-  type: 'system' | 'icc' | 'chat';
+  type: "system" | "icc" | "chat";
   title: string;
   message: string;
   timestamp: string;
@@ -589,14 +596,15 @@ const countriesList = [
   { name: "Bahrain", code: "+973", flag: "🇧🇭" },
   { name: "Jordan", code: "+962", flag: "🇯🇴" },
   { name: "Lebanon", code: "+961", flag: "🇱🇧" },
-  { name: "Iraq", code: "+964", flag: "🇮🇶" }
+  { name: "Iraq", code: "+964", flag: "🇮🇶" },
 ].sort((a, b) => a.name.localeCompare(b.name));
 
 export default function BrokerPortal() {
   const [searchParams, setSearchParams] = useSearchParams();
   const missionId = searchParams.get("missionId");
   const [sessionVerified, setSessionVerified] = useState(
-    searchParams.get("verified") === "true" || sessionStorage.getItem("broker_verified") === "true"
+    searchParams.get("verified") === "true" ||
+      sessionStorage.getItem("broker_verified") === "true",
   );
   const [hasVerifiedOperator, setHasVerifiedOperator] = useState(false);
   const [brokerDbRecord, setBrokerDbRecord] = useState<{
@@ -607,8 +615,9 @@ export default function BrokerPortal() {
     is_verified?: boolean;
   } | null>(null);
 
-
-  const [authStep, setAuthStep] = useState<'LOGIN' | 'SIGNUP' | 'SMS_OTP'>('LOGIN');
+  const [authStep, setAuthStep] = useState<"LOGIN" | "SIGNUP" | "SMS_OTP">(
+    "LOGIN",
+  );
   const [inputId, setInputId] = useState(missionId || "");
   const [inputEmail, setInputEmail] = useState("");
   const [inputPassword, setInputPassword] = useState("");
@@ -616,7 +625,14 @@ export default function BrokerPortal() {
   const [countryCode, setCountryCode] = useState("+234");
   const [countrySearch, setCountrySearch] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [otpDigits, setOtpDigits] = useState<string[]>(["1", "5", "9", "3", "8", "2"]);
+  const [otpDigits, setOtpDigits] = useState<string[]>([
+    "1",
+    "5",
+    "9",
+    "3",
+    "8",
+    "2",
+  ]);
   const [authError, setAuthError] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -624,17 +640,25 @@ export default function BrokerPortal() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setSessionVerified(true);
-        try { sessionStorage.setItem("broker_verified", "true"); } catch {}
+        try {
+          sessionStorage.setItem("broker_verified", "true");
+        } catch {}
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         setSessionVerified(true);
-        try { sessionStorage.setItem("broker_verified", "true"); } catch {}
+        try {
+          sessionStorage.setItem("broker_verified", "true");
+        } catch {}
       } else {
         setSessionVerified(false);
-        try { sessionStorage.removeItem("broker_verified"); } catch {}
+        try {
+          sessionStorage.removeItem("broker_verified");
+        } catch {}
       }
     });
 
@@ -653,17 +677,17 @@ export default function BrokerPortal() {
           setHasVerifiedOperator(false);
           return;
         }
-        
+
         const { data: broker } = await supabase
-          .from('brokers')
-          .select('id, referral_code, company_name, email, is_verified')
-          .eq('auth_user_id', user.user.id)
+          .from("brokers")
+          .select("id, referral_code, company_name, email, is_verified")
+          .eq("auth_user_id", user.user.id)
           .maybeSingle();
-        
+
         if (broker) {
           setBrokerDbRecord(broker);
         }
-        
+
         if (broker?.is_verified) {
           setHasVerifiedOperator(true);
           return;
@@ -671,30 +695,36 @@ export default function BrokerPortal() {
 
         if (broker?.id) {
           const { data: operators } = await supabase
-            .from('operators')
-            .select('id, is_verified')
-            .eq('onboarded_by_broker_id', broker.id);
-          
-          if (operators && operators.length > 0 && operators.some(o => o.is_verified)) {
+            .from("operators")
+            .select("id, is_verified")
+            .eq("onboarded_by_broker_id", broker.id);
+
+          if (
+            operators &&
+            operators.length > 0 &&
+            operators.some((o) => o.is_verified)
+          ) {
             setHasVerifiedOperator(true);
             return;
           }
         }
-        
+
         setHasVerifiedOperator(false);
       } catch (e) {
-        console.error('Error checking operator verification status:', e);
+        console.error("Error checking operator verification status:", e);
         setHasVerifiedOperator(false);
       }
     }
     checkOperator();
   }, [sessionVerified]);
 
-
   /* First-Time Broker Onboarding State */
   const [isBrokerOnboarded, setIsBrokerOnboarded] = useState<boolean>(() => {
     try {
-      return typeof localStorage !== 'undefined' && localStorage.getItem("15d_broker_onboarded") === "true";
+      return (
+        typeof localStorage !== "undefined" &&
+        localStorage.getItem("15d_broker_onboarded") === "true"
+      );
     } catch {
       return false;
     }
@@ -708,9 +738,18 @@ export default function BrokerPortal() {
   const [operatorEmail, setOperatorEmail] = useState("");
 
   const [activeTab, setActiveTab] = useState<
-    "crm_workspace" | "proposal_builder" | "checkout_engine" | "operational_radar" | "telemetry_vault" | "customization" | "manifest"
+    | "crm_workspace"
+    | "proposal_builder"
+    | "checkout_engine"
+    | "operational_radar"
+    | "telemetry_vault"
+    | "customization"
+    | "manifest"
   >("crm_workspace");
 
+  const [activeCrmSubTab, setActiveCrmSubTab] =
+    useState<CrmSubTabType>("tasks");
+  const [showIOSMenu, setShowIOSMenu] = useState(false);
   const [showAOCModal, setShowAOCModal] = useState(false);
 
   /* Notifications & APV lock states */
@@ -745,7 +784,7 @@ export default function BrokerPortal() {
   const queryClient = useQueryClient();
 
   const showToast = (message: string, type: ToastState["type"] = "success") => {
-    const id = Date.now();
+    const id = `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     setToasts((prev) => [...prev, { message, type, id }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -763,14 +802,11 @@ export default function BrokerPortal() {
       if (email) {
         try {
           // Dynamic edge cluster fetch eagerly matching transactional states
-          const res = await fetch(
-            `/api/mission/${missionId}/init`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ missionId }),
-            },
-          );
+          const res = await fetch(`/api/mission/${missionId}/init`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ missionId }),
+          });
           const json = (await res.json()) as { success?: boolean; state?: any };
           if (json.success && json.state) {
             return json.state;
@@ -858,8 +894,8 @@ export default function BrokerPortal() {
       aircraft_name: "Bombardier Challenger 605",
       tail_number: "5N-B15D",
       model: "Challenger 605",
-      category: "Heavy Jet"
-    }
+      category: "Heavy Jet",
+    },
   };
 
   const mission = rawFlight
@@ -972,7 +1008,10 @@ export default function BrokerPortal() {
   }, []);
 
   useEffect(() => {
-    if (mission?.payment_status === "AWAITING_VERIFICATION" && activeTab !== "checkout_engine") {
+    if (
+      mission?.payment_status === "AWAITING_VERIFICATION" &&
+      activeTab !== "checkout_engine"
+    ) {
       setActiveTab("checkout_engine");
     }
   }, [mission?.payment_status, activeTab]);
@@ -995,63 +1034,80 @@ export default function BrokerPortal() {
         id: "broker-welcome",
         type: "system",
         title: "Welcome to Broker Command",
-        message: "Your CRM is active. Access live market rates, manage verified operators, and generate white-labeled proposals directly from this unified workspace.",
+        message:
+          "Your CRM is active. Access live market rates, manage verified operators, and generate white-labeled proposals directly from this unified workspace.",
         timestamp: new Date().toISOString(),
-        read: false
+        read: false,
       },
       {
         id: "margin-directive",
         type: "icc",
         title: "Margin & Yield Control",
-        message: "Pricing Directive: You have full control to mark up margins on generated proposals based on your own discretion to maximize your yield per deal.",
+        message:
+          "Pricing Directive: You have full control to mark up margins on generated proposals based on your own discretion to maximize your yield per deal.",
         timestamp: new Date().toISOString(),
-        read: false
+        read: false,
       },
       {
         id: "settlement-engine",
         type: "system",
         title: "Guaranteed Certainty",
-        message: "All flights booked through this ecosystem benefit from our same-day payment settlement engine, guaranteeing certainty and protecting your operator network.",
+        message:
+          "All flights booked through this ecosystem benefit from our same-day payment settlement engine, guaranteeing certainty and protecting your operator network.",
         timestamp: new Date().toISOString(),
-        read: false
-      }
+        read: false,
+      },
     ];
 
     let updated = loaded.length > 0 ? [...loaded] : [...defaultAlerts];
 
-    const addIfNew = (id: string, type: 'system' | 'icc' | 'chat', title: string, message: string) => {
-      if (!updated.some(n => n.id === id)) {
+    const addIfNew = (
+      id: string,
+      type: "system" | "icc" | "chat",
+      title: string,
+      message: string,
+    ) => {
+      if (!updated.some((n) => n.id === id)) {
         updated.unshift({
           id,
           type,
           title,
           message,
           timestamp: new Date().toISOString(),
-          read: false
+          read: false,
         });
       }
     };
 
-    if (mission.payment_status === "AWAITING_VERIFICATION" || mission.payment_status === "CONFIRMING") {
+    if (
+      mission.payment_status === "AWAITING_VERIFICATION" ||
+      mission.payment_status === "CONFIRMING"
+    ) {
       addIfNew(
         `pay-verif-${mission.payment_status}`,
         "system",
         "Payment Verification Active",
-        "Database Alert: Payment verification initiated. The security audit team is currently confirming your wire receipt."
+        "Database Alert: Payment verification initiated. The security audit team is currently confirming your wire receipt.",
       );
-    } else if (mission.payment_status === "CONFIRMED" || mission.payment_status === "SETTLED") {
+    } else if (
+      mission.payment_status === "CONFIRMED" ||
+      mission.payment_status === "SETTLED"
+    ) {
       addIfNew(
         `pay-confirmed-${mission.payment_status}`,
         "system",
         "Commitment Payment Secured",
-        "Database Alert: Commitment deposit verified successfully. Aircraft dispatch and flight crews have been locked."
+        "Database Alert: Commitment deposit verified successfully. Aircraft dispatch and flight crews have been locked.",
       );
-    } else if (mission.payment_status === "REJECTED" || mission.payment_status === "FAILED") {
+    } else if (
+      mission.payment_status === "REJECTED" ||
+      mission.payment_status === "FAILED"
+    ) {
       addIfNew(
         `pay-rejected-${mission.payment_status}`,
         "system",
         "Payment Settlement Exception",
-        "Database Alert: Transaction Settlement Exception. Mismatch detected. Please re-upload proof of payment."
+        "Database Alert: Transaction Settlement Exception. Mismatch detected. Please re-upload proof of payment.",
       );
     }
 
@@ -1060,7 +1116,7 @@ export default function BrokerPortal() {
         "status-rotating",
         "icc",
         "ICC Refinement Directive",
-        "Strategic Directive: Flight is currently in ROTATING status for operational corridor refinement."
+        "Strategic Directive: Flight is currently in ROTATING status for operational corridor refinement.",
       );
     }
 
@@ -1106,22 +1162,22 @@ export default function BrokerPortal() {
   useEffect(() => {
     if (!missionId) return;
     const subscription = supabase
-      .channel('payment-status-updates')
+      .channel("payment-status-updates")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'payment_states',
-          filter: `mission_id=eq.${missionId}`
+          event: "*",
+          schema: "public",
+          table: "payment_states",
+          filter: `mission_id=eq.${missionId}`,
         },
         (payload) => {
           refetch();
-          if (payload.new && (payload.new as any).status === 'active') {
-            setLocalStatus('ACTIVATED');
-            setLocalPaymentStatus('SETTLED');
+          if (payload.new && (payload.new as any).status === "active") {
+            setLocalStatus("ACTIVATED");
+            setLocalPaymentStatus("SETTLED");
           }
-        }
+        },
       )
       .subscribe();
     return () => {
@@ -1148,10 +1204,10 @@ export default function BrokerPortal() {
     setIsAuthenticating(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+        provider: "google",
         options: {
-          redirectTo: window.location.origin + window.location.pathname
-        }
+          redirectTo: window.location.origin + window.location.pathname,
+        },
       });
       if (error) throw error;
     } catch (err: any) {
@@ -1173,7 +1229,7 @@ export default function BrokerPortal() {
         password: inputPassword,
       });
       if (error) throw error;
-      
+
       try {
         sessionStorage.setItem("broker_verified", "true");
       } catch {}
@@ -1198,8 +1254,10 @@ export default function BrokerPortal() {
         password: inputPassword,
       });
       if (error) throw error;
-      
-      setAuthError("Account created! Please check your email for confirmation, or login if auto-confirmed.");
+
+      setAuthError(
+        "Account created! Please check your email for confirmation, or login if auto-confirmed.",
+      );
       // Auto-verify for dev preview flexibility
       setTimeout(() => {
         setAuthStep("LOGIN");
@@ -1214,7 +1272,9 @@ export default function BrokerPortal() {
   const handleProceedToOtp = () => {
     setAuthError("");
     if (!inputPhone) {
-      setAuthError("Phone number is required for SMS verification during account creation.");
+      setAuthError(
+        "Phone number is required for SMS verification during account creation.",
+      );
       return;
     }
     setAuthStep("SMS_OTP");
@@ -1225,7 +1285,8 @@ export default function BrokerPortal() {
     setIsAuthenticating(true);
     try {
       let targetId = inputId.trim().toUpperCase();
-      let targetEmail = inputEmail.trim().toLowerCase() || "broker@charterdesk.com";
+      let targetEmail =
+        inputEmail.trim().toLowerCase() || "broker@charterdesk.com";
 
       if (!targetId) {
         const { data: firstFlight } = await supabase
@@ -1260,7 +1321,10 @@ export default function BrokerPortal() {
 
   const handleCompleteBrokerOnboarding = () => {
     if (!brokerFirstName || !brokerSurname || !brokerCompany) {
-      showToast("Please complete all required broker verification fields.", "warning");
+      showToast(
+        "Please complete all required broker verification fields.",
+        "warning",
+      );
       return;
     }
     try {
@@ -1268,7 +1332,10 @@ export default function BrokerPortal() {
       localStorage.setItem("15d_broker_company", brokerCompany);
     } catch {}
     setIsBrokerOnboarded(true);
-    showToast("Broker identity & carrier proof verified successfully!", "success");
+    showToast(
+      "Broker identity & carrier proof verified successfully!",
+      "success",
+    );
   };
 
   const handleOtpDigitChange = (index: number, val: string) => {
@@ -1299,14 +1366,11 @@ export default function BrokerPortal() {
 
     const syncWithEdge = async () => {
       try {
-        await fetch(
-          `/api/mission/${missionId}/init`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ missionId }),
-          },
-        );
+        await fetch(`/api/mission/${missionId}/init`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ missionId }),
+        });
       } catch (e) {
         console.warn("Dynamic state synchronization heartbeat offline:", e);
       }
@@ -1380,33 +1444,34 @@ export default function BrokerPortal() {
     setShowReceiptUpload(true);
   };
 
-  
   if (!sessionVerified) {
     return (
-      <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100 text-gray-900 flex items-center justify-center p-4 md:p-6 font-space overflow-hidden">
+      <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100 text-gray-900 flex items-center justify-center p-4 md:p-6  overflow-hidden">
         {/* Ambient Swirl Animation (From Original Luxury Engine) */}
-        <div 
-          className="bg-swirl animate-orb-1" 
-          style={{ 
-            left: "25%", 
-            top: "30%", 
-            width: "55vw", 
-            height: "55vw", 
-            background: "radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, rgba(24, 119, 242, 0.08) 60%, transparent 80%)" 
-          }} 
+        <div
+          className="bg-swirl animate-orb-1"
+          style={{
+            left: "25%",
+            top: "30%",
+            width: "55vw",
+            height: "55vw",
+            background:
+              "radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, rgba(24, 119, 242, 0.08) 60%, transparent 80%)",
+          }}
         />
-        <div 
-          className="bg-swirl animate-orb-2" 
-          style={{ 
-            left: "75%", 
-            top: "65%", 
-            width: "50vw", 
-            height: "50vw", 
-            background: "radial-gradient(circle, rgba(24, 119, 242, 0.12) 0%, rgba(147, 51, 234, 0.08) 60%, transparent 80%)" 
-          }} 
+        <div
+          className="bg-swirl animate-orb-2"
+          style={{
+            left: "75%",
+            top: "65%",
+            width: "50vw",
+            height: "50vw",
+            background:
+              "radial-gradient(circle, rgba(24, 119, 242, 0.12) 0%, rgba(147, 51, 234, 0.08) 60%, transparent 80%)",
+          }}
         />
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
@@ -1418,16 +1483,24 @@ export default function BrokerPortal() {
               15D WINGS
             </span>
             <h2 className="font-sync uppercase font-bold text-2xl md:text-3xl tracking-[0.22em] text-gray-950 pt-1">
-              {authStep === 'LOGIN' ? 'FLIGHT BROKER' : authStep === 'SIGNUP' ? 'CREATE BROKER ACCOUNT' : 'SMS VERIFICATION'}
+              {authStep === "LOGIN"
+                ? "FLIGHT BROKER"
+                : authStep === "SIGNUP"
+                  ? "CREATE BROKER ACCOUNT"
+                  : "SMS VERIFICATION"}
             </h2>
             <p className="font-sync uppercase text-purple-700 tracking-[0.3em] text-[10px] font-bold pt-1">
-              {authStep === 'LOGIN' ? 'BROKER PORTAL LOGIN' : authStep === 'SIGNUP' ? 'PHASE 1 REGISTRATION' : 'MOBILE OTP VERIFICATION'}
+              {authStep === "LOGIN"
+                ? "BROKER PORTAL LOGIN"
+                : authStep === "SIGNUP"
+                  ? "PHASE 1 REGISTRATION"
+                  : "MOBILE OTP VERIFICATION"}
             </p>
           </div>
 
           <div className="p-8 md:p-10 rounded-[2.5rem] w-full space-y-6 border border-purple-200/90 bg-white/95 shadow-[0_25px_60px_-15px_rgba(100,50,200,0.12),0_0_0_1px_rgba(147,51,234,0.1)] backdrop-blur-xl relative overflow-hidden mt-2">
             <AnimatePresence mode="wait">
-              {authStep === 'LOGIN' ? (
+              {authStep === "LOGIN" ? (
                 <motion.div
                   key="login-step"
                   initial={{ opacity: 0, x: -10 }}
@@ -1441,10 +1514,22 @@ export default function BrokerPortal() {
                     className="w-full py-3.5 px-4 bg-white hover:bg-purple-50/80 border border-purple-200 rounded-2xl flex items-center justify-center gap-3 text-xs md:text-sm font-semibold text-gray-900 transition-all shadow-sm hover:shadow active:scale-[0.98] group cursor-pointer"
                   >
                     <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                      <path
+                        fill="#4285F4"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                      />
+                      <path
+                        fill="#EA4335"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                      />
                     </svg>
                     <span>Sign in with Google</span>
                   </button>
@@ -1454,7 +1539,7 @@ export default function BrokerPortal() {
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-purple-200" />
                     </div>
-                    <span className="relative bg-white px-4 text-[10px] text-gray-700 font-sync uppercase tracking-widest font-bold">
+                    <span className="relative bg-white px-4 text-[10px] text-gray-700 font-sync uppercase   font-bold">
                       ─── OR SIGN IN WITH EMAIL ───
                     </span>
                   </div>
@@ -1462,7 +1547,7 @@ export default function BrokerPortal() {
                   {/* Email & Password Fields */}
                   <div className="space-y-4 text-left">
                     <div className="space-y-1.5">
-                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1   font-bold">
                         EMAIL ADDRESS
                       </label>
                       <input
@@ -1475,7 +1560,7 @@ export default function BrokerPortal() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1   font-bold">
                         PASSWORD
                       </label>
                       <input
@@ -1517,11 +1602,14 @@ export default function BrokerPortal() {
                       }}
                       className="text-xs text-gray-700 hover:text-gray-950 font-medium transition-colors tracking-wide"
                     >
-                      Don't have a broker account? <span className="text-purple-700 font-bold underline decoration-purple-300 underline-offset-4">Sign Up</span>
+                      Don't have a broker account?{" "}
+                      <span className="text-purple-700 font-bold underline decoration-purple-300 underline-offset-4">
+                        Sign Up
+                      </span>
                     </button>
                   </div>
                 </motion.div>
-              ) : authStep === 'SIGNUP' ? (
+              ) : authStep === "SIGNUP" ? (
                 <motion.div
                   key="signup-step"
                   initial={{ opacity: 0, x: 10 }}
@@ -1536,10 +1624,22 @@ export default function BrokerPortal() {
                       className="w-full py-3.5 px-4 bg-white hover:bg-purple-50/80 border border-purple-200 rounded-2xl flex items-center justify-center gap-3 text-xs md:text-sm font-semibold text-gray-900 transition-all shadow-sm hover:shadow active:scale-[0.98] group cursor-pointer"
                     >
                       <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                        <path
+                          fill="#4285F4"
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        />
+                        <path
+                          fill="#34A853"
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        />
+                        <path
+                          fill="#FBBC05"
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                        />
+                        <path
+                          fill="#EA4335"
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                        />
                       </svg>
                       <span>Sign up with Google</span>
                     </button>
@@ -1549,13 +1649,13 @@ export default function BrokerPortal() {
                       <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-purple-200" />
                       </div>
-                      <span className="relative bg-white px-4 text-[10px] text-gray-700 font-sync uppercase tracking-widest font-bold">
+                      <span className="relative bg-white px-4 text-[10px] text-gray-700 font-sync uppercase   font-bold">
                         ─── OR SIGN UP WITH EMAIL ───
                       </span>
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1   font-bold">
                         WORK EMAIL ADDRESS
                       </label>
                       <input
@@ -1568,7 +1668,7 @@ export default function BrokerPortal() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1   font-bold">
                         PASSWORD
                       </label>
                       <input
@@ -1597,12 +1697,14 @@ export default function BrokerPortal() {
                       disabled={isAuthenticating}
                       className="w-full py-4 rounded-2xl text-xs font-sync uppercase tracking-[0.25em] font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-[0_10px_25px_rgba(147,51,234,0.35)] active:scale-[0.98] cursor-pointer"
                     >
-                      {isAuthenticating ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
+                      {isAuthenticating
+                        ? "CREATING ACCOUNT..."
+                        : "CREATE ACCOUNT"}
                     </button>
 
                     <button
                       onClick={() => setAuthStep("LOGIN")}
-                      className="w-full py-2 text-xs font-sync uppercase tracking-widest text-gray-700 hover:text-gray-950 transition-colors text-center font-semibold"
+                      className="w-full py-2 text-xs font-sync uppercase   text-gray-700 hover:text-gray-950 transition-colors text-center font-semibold"
                     >
                       ← BACK TO SIGN IN
                     </button>
@@ -1617,17 +1719,20 @@ export default function BrokerPortal() {
                   className="space-y-5 text-left"
                 >
                   <div className="space-y-1.5">
-                    <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
-                      PHONE NUMBER ({countryCode} {inputPhone || "801 234 5678"})
+                    <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1   font-bold">
+                      PHONE NUMBER ({countryCode} {inputPhone || "801 234 5678"}
+                      )
                     </label>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 tracking-widest font-bold">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1   font-bold">
                         SMS VERIFICATION CODE
                       </label>
-                      <span className="text-[10px] text-purple-900 font-mono font-bold bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200">DEMO PIN: 159382</span>
+                      <span className="text-[10px] text-purple-900 font-mono font-bold bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200">
+                        DEMO PIN: 159382
+                      </span>
                     </div>
 
                     <div className="grid grid-cols-6 gap-2 my-2">
@@ -1638,10 +1743,14 @@ export default function BrokerPortal() {
                           type="text"
                           maxLength={1}
                           value={digit}
-                          onChange={(e) => handleOtpDigitChange(idx, e.target.value)}
+                          onChange={(e) =>
+                            handleOtpDigitChange(idx, e.target.value)
+                          }
                           onKeyDown={(e) => {
                             if (e.key === "Backspace" && !digit && idx > 0) {
-                              const prevInput = document.getElementById(`otp-input-${idx - 1}`);
+                              const prevInput = document.getElementById(
+                                `otp-input-${idx - 1}`,
+                              );
                               if (prevInput) prevInput.focus();
                             }
                           }}
@@ -1672,7 +1781,7 @@ export default function BrokerPortal() {
 
                     <button
                       onClick={() => setAuthStep("SIGNUP")}
-                      className="w-full py-2 text-xs font-sync uppercase tracking-widest text-gray-700 hover:text-gray-950 transition-colors text-center font-semibold"
+                      className="w-full py-2 text-xs font-sync uppercase   text-gray-700 hover:text-gray-950 transition-colors text-center font-semibold"
                     >
                       ← EDIT REGISTRATION INFO
                     </button>
@@ -1686,10 +1795,6 @@ export default function BrokerPortal() {
       </div>
     );
   }
-
-
-
-
 
   const { dep, dest } = parseLegs(mission);
   const statusText = translateStatus(mission.status);
@@ -1768,7 +1873,7 @@ export default function BrokerPortal() {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-purple-200"></div>
             </div>
-            <div className="relative flex justify-center text-[10px] font-lexend tracking-widest">
+            <div className="relative flex justify-center text-[10px] font-lexend  ">
               <span className="bg-[#111] px-2 text-gray-500">OR</span>
             </div>
           </div>
@@ -1790,736 +1895,851 @@ export default function BrokerPortal() {
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100 text-gray-900 font-space pt-24 pb-20 px-4 md:px-8">
+    <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100 text-gray-900  pt-24 pb-20 px-4 md:px-8">
       {/* Background jet interior overlay (subtle) */}
-      <div 
+      <div
         className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none bg-cover bg-center mix-blend-multiply"
-        style={{ backgroundImage: "url('/src/assets/images/private_jet_interior_light_1787553612955.jpg')" }}
+        style={{
+          backgroundImage:
+            "url('/src/assets/images/private_jet_interior_light_1787553612955.jpg')",
+        }}
       />
       <div className="relative z-10">
-      {/* Premium Toast Overlays */}
-      <div className="fixed top-6 right-6 z-[300] flex flex-col gap-3 max-w-md w-full pointer-events-none">
-        <AnimatePresence>
-          {toasts.map((t) => (
-            <motion.div
-              key={t.id}
-              initial={{ opacity: 0, y: -20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-              className="pointer-events-auto w-full p-4 rounded-2xl glass-vip border shadow-2xl flex items-start gap-3 backdrop-blur-[10px]"
-              style={{
-                borderColor:
-                  t.type === "success"
-                    ? "rgba(16, 185, 129, 0.2)"
-                    : t.type === "error"
-                      ? "rgba(239, 68, 68, 0.2)"
-                      : t.type === "warning"
-                        ? "rgba(245, 158, 11, 0.2)"
-                        : "rgba(59, 130, 246, 0.2)",
-                background:
-                  "linear-gradient(135deg, rgba(10,10,10,0.9) 0%, rgba(20,20,20,0.95) 100%)",
-              }}
-            >
-              {t.type === "success" && (
-                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-              )}
-              {t.type === "error" && (
-                <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-              )}
-              {t.type === "warning" && (
-                <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-              )}
-              {t.type === "info" && (
-                <Clock className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
-              )}
-
-              <div className="flex-1">
-                <p className="text-xs text-gray-900/90 font-light leading-relaxed">
-                  {t.message}
-                </p>
-              </div>
-              <button
-                onClick={() =>
-                  setToasts((prev) => prev.filter((item) => item.id !== t.id))
-                }
-                className="text-gray-900/40 hover:text-gray-900/80 transition-colors p-1"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-
-      <div className="relative z-10 w-full h-full">
-        <AnimatePresence>
-          {showAIOnboarding && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[110] flex items-center justify-center bg-white/80 backdrop-blur-md px-4 backdrop-blur-[10px]"
-            >
+        {/* Premium Toast Overlays */}
+        <div className="fixed top-6 right-6 z-[300] flex flex-col gap-3 max-w-md w-full pointer-events-none">
+          <AnimatePresence>
+            {toasts.map((t) => (
               <motion.div
-                initial={{ y: 20, scale: 0.95 }}
-                animate={{ y: 0, scale: 1 }}
-                className="bg-[#111] border border-purple-200 p-8 rounded-[2rem] max-w-sm w-full relative shadow-2xl overflow-hidden"
+                key={t.id}
+                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.95,
+                  transition: { duration: 0.2 },
+                }}
+                className="pointer-events-auto w-full p-4 rounded-2xl glass-vip border shadow-2xl flex items-start gap-3 backdrop-blur-[10px]"
+                style={{
+                  borderColor:
+                    t.type === "success"
+                      ? "rgba(16, 185, 129, 0.2)"
+                      : t.type === "error"
+                        ? "rgba(239, 68, 68, 0.2)"
+                        : t.type === "warning"
+                          ? "rgba(245, 158, 11, 0.2)"
+                          : "rgba(59, 130, 246, 0.2)",
+                  background:
+                    "linear-gradient(135deg, rgba(10,10,10,0.9) 0%, rgba(20,20,20,0.95) 100%)",
+                }}
               >
-                <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-600/20 blur-3xl rounded-full pointer-events-none" />
-                <h3 className="text-xl font-light mb-4">
-                  Welcome to your Portal
-                </h3>
-                <p className="text-sm text-gray-600 font-light leading-relaxed mb-6">
-                  Your portal is ready. Tap the{" "}
-                  <strong className="text-purple-600">AI Voice Support</strong>{" "}
-                  button in the bottom right corner at any time to speak with
-                  your assistant.
-                </p>
-                <p className="text-sm text-gray-600 font-light leading-relaxed mb-8 border-t border-purple-200 pt-6">
-                  You can also add extra experiences to your flight in the CABIN
-                  EXPERIENCE tab.
-                </p>
+                {t.type === "success" && (
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                )}
+                {t.type === "error" && (
+                  <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                )}
+                {t.type === "warning" && (
+                  <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                )}
+                {t.type === "info" && (
+                  <Clock className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
+                )}
+
+                <div className="flex-1">
+                  <p className="text-xs text-gray-900/90 font-light leading-relaxed">
+                    {t.message}
+                  </p>
+                </div>
                 <button
-                  onClick={handleCloseOnboarding}
-                  className="w-full bg-white text-black py-4 rounded-xl text-xs font-light hover:bg-gray-200 transition-all"
+                  onClick={() =>
+                    setToasts((prev) => prev.filter((item) => item.id !== t.id))
+                  }
+                  className="text-gray-900/40 hover:text-gray-900/80 transition-colors p-1"
                 >
-                  CONTINUE
+                  <X className="w-4 h-4" />
                 </button>
               </motion.div>
-            </motion.div>
-          )}
+            ))}
+          </AnimatePresence>
+        </div>
 
-          {showExperienceIframe && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col"
-            >
-              <div className="flex justify-between items-center p-4 md:px-8 border-b border-purple-200 bg-white">
-                <div className="flex items-center gap-3">
+        <div className="relative z-10 w-full h-full">
+          <AnimatePresence>
+            {showAIOnboarding && (
+              <motion.div
+                key="modal-ai-onboarding"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[110] flex items-center justify-center bg-white/80 backdrop-blur-md px-4 backdrop-blur-[10px]"
+              >
+                <motion.div
+                  initial={{ y: 20, scale: 0.95 }}
+                  animate={{ y: 0, scale: 1 }}
+                  className="bg-[#111] border border-purple-200 p-8 rounded-[2rem] max-w-sm w-full relative shadow-2xl overflow-hidden"
+                >
+                  <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-600/20 blur-3xl rounded-full pointer-events-none" />
+                  <h3 className="text-xl font-light mb-4">
+                    Welcome to your Portal
+                  </h3>
+                  <p className="text-sm text-gray-600 font-light leading-relaxed mb-6">
+                    Your portal is ready. Tap the{" "}
+                    <strong className="text-purple-600">
+                      AI Voice Support
+                    </strong>{" "}
+                    button in the bottom right corner at any time to speak with
+                    your assistant.
+                  </p>
+                  <p className="text-sm text-gray-600 font-light leading-relaxed mb-8 border-t border-purple-200 pt-6">
+                    You can also add extra experiences to your flight in the
+                    CABIN EXPERIENCE tab.
+                  </p>
+                  <button
+                    onClick={handleCloseOnboarding}
+                    className="w-full bg-white text-black py-4 rounded-xl text-xs font-light hover:bg-gray-200 transition-all"
+                  >
+                    CONTINUE
+                  </button>
+                </motion.div>
+              </motion.div>
+            )}
+
+            {showExperienceIframe && (
+              <motion.div
+                key="modal-experiences-portal"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col"
+              >
+                <div className="flex justify-between items-center p-4 md:px-8 border-b border-purple-200 bg-white">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setShowExperienceIframe(false)}
+                      className="p-2.5 bg-purple-100 hover:bg-white/20 text-gray-900 rounded-xl flex items-center gap-2 text-xs    transition-all border border-white/15 cursor-pointer active:scale-95 shadow-md"
+                      title="Back to Broker Portal"
+                    >
+                      <ArrowLeft className="w-4 h-4 text-gray-900" />
+                      <span className="hidden sm:inline">BACK</span>
+                    </button>
+                    <h3 className="text-gray-900    text-sm ">
+                      15D EXPERIENCES PORTAL
+                    </h3>
+                  </div>
                   <button
                     onClick={() => setShowExperienceIframe(false)}
-                    className="p-2.5 bg-purple-100 hover:bg-white/20 text-gray-900 rounded-xl flex items-center gap-2 text-xs font-space lowercase lowercase tracking-wider transition-all border border-white/15 cursor-pointer active:scale-95 shadow-md"
-                    title="Back to Broker Portal"
+                    className="p-3 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors cursor-pointer"
+                    title="Close"
                   >
-                    <ArrowLeft className="w-4 h-4 text-gray-900" />
-                    <span className="hidden sm:inline">BACK</span>
-                  </button>
-                  <h3 className="text-gray-900 font-space lowercase tracking-widest text-sm lowercase">
-                    15D EXPERIENCES PORTAL
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setShowExperienceIframe(false)}
-                  className="p-3 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors cursor-pointer"
-                  title="Close"
-                >
-                  <X className="w-5 h-5 text-gray-900" />
-                </button>
-              </div>
-              <div className="flex-1 w-full bg-white">
-                <iframe
-                  src="https://experience.15dwings.com.ng"
-                  className="w-full h-full border-none"
-                  title="15D Experiences"
-                />
-              </div>
-            </motion.div>
-          )}
-
-          {showBookFlightIframe && (
-            <PremiumBookFlightPanel
-              onClose={() => setShowBookFlightIframe(false)}
-              sessionVerified={sessionVerified}
-              onLoginRequest={() => {
-                setShowBookFlightIframe(false);
-                setAuthStep("LOGIN");
-                setSessionVerified(false);
-              }}
-              onSuccess={(reqId) => {
-                setShowBookFlightIframe(false);
-                setSearchParams({ missionId: reqId, verified: "true" });
-                setSessionVerified(true);
-                sessionStorage.setItem("broker_verified", "true");
-                refetch();
-              }}
-            />
-          )}
-
-          {showRescheduleIframe && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
-            >
-              <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-white rounded-3xl border border-purple-200 shadow-2xl flex flex-col my-auto scrollbar-hide">
-                <div className="flex justify-between items-center p-6 border-b border-purple-200 bg-white sticky top-0 z-10">
-                  <h3 className="text-gray-900 font-space lowercase font-bold tracking-widest text-sm lowercase">
-                    Reschedule Flight
-                  </h3>
-                  <button
-                    onClick={() => setShowRescheduleIframe(false)}
-                    className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
-                  >
-                    <X className="w-4 h-4 text-gray-900" />
+                    <X className="w-5 h-5 text-gray-900" />
                   </button>
                 </div>
-                <div className="flex-1 w-full bg-white relative">
-                  <RescheduleFlightForm
-                    mission={mission}
-                    onSuccess={() => {
-                      setShowRescheduleIframe(false);
-                      showToast(
-                        "Flight successfully rescheduled! Your timeline & specifications have been updated.",
-                        "success",
-                      );
-                    }}
+                <div className="flex-1 w-full bg-white">
+                  <iframe
+                    src="https://experience.15dwings.com.ng"
+                    className="w-full h-full border-none"
+                    title="15D Experiences"
                   />
                 </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
 
-          {showAircraftIframe && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
-            >
-              <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-white rounded-3xl border border-purple-200 shadow-2xl flex flex-col my-auto scrollbar-hide">
-                <div className="flex justify-between items-center p-6 border-b border-purple-200 bg-white sticky top-0 z-10">
-                  <h3 className="text-gray-900 font-space lowercase font-bold tracking-widest text-sm lowercase">
-                    Select Aircraft
-                  </h3>
-                  <button
-                    onClick={() => setShowAircraftIframe(false)}
-                    className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
-                  >
-                    <X className="w-4 h-4 text-gray-900" />
-                  </button>
-                </div>
-                <div className="flex-1 w-full bg-white relative">
-                  <AircraftSelectionForm
-                    mission={mission}
-                    onSuccess={() => {
-                      setShowAircraftIframe(false);
-                      refetch();
-                      // @ts-ignore
-                      queryClient.invalidateQueries(["mission_aircraft_portal", missionId]);
-                    }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )}
+            {showBookFlightIframe && (
+              <PremiumBookFlightPanel
+                key="modal-book-flight-panel"
+                onClose={() => setShowBookFlightIframe(false)}
+                sessionVerified={sessionVerified}
+                onLoginRequest={() => {
+                  setShowBookFlightIframe(false);
+                  setAuthStep("LOGIN");
+                  setSessionVerified(false);
+                }}
+                onSuccess={(reqId) => {
+                  setShowBookFlightIframe(false);
+                  setSearchParams({ missionId: reqId, verified: "true" });
+                  setSessionVerified(true);
+                  sessionStorage.setItem("broker_verified", "true");
+                  refetch();
+                }}
+              />
+            )}
 
-          {showManifestIframe && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
-            >
-              <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-white rounded-3xl border border-purple-200 shadow-2xl flex flex-col my-auto scrollbar-hide">
-                <div className="flex justify-between items-center p-6 border-b border-purple-200 bg-white sticky top-0 z-10">
-                  <h3 className="text-gray-900 font-space lowercase font-bold tracking-widest text-sm lowercase">
-                    Passenger Manifest
-                  </h3>
-                  <button
-                    onClick={() => setShowManifestIframe(false)}
-                    className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
-                  >
-                    <X className="w-4 h-4 text-gray-900" />
-                  </button>
+            {showRescheduleIframe && (
+              <motion.div
+                key="modal-reschedule-flight"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
+              >
+                <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-white rounded-3xl border border-purple-200 shadow-2xl flex flex-col my-auto scrollbar-hide">
+                  <div className="flex justify-between items-center p-6 border-b border-purple-200 bg-white sticky top-0 z-10">
+                    <h3 className="text-gray-900  font-bold   text-sm ">
+                      Reschedule Flight
+                    </h3>
+                    <button
+                      onClick={() => setShowRescheduleIframe(false)}
+                      className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
+                    >
+                      <X className="w-4 h-4 text-gray-900" />
+                    </button>
+                  </div>
+                  <div className="flex-1 w-full bg-white relative">
+                    <RescheduleFlightForm
+                      mission={mission}
+                      onSuccess={() => {
+                        setShowRescheduleIframe(false);
+                        showToast(
+                          "Flight successfully rescheduled! Your timeline & specifications have been updated.",
+                          "success",
+                        );
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="flex-1 w-full bg-white relative">
-                  <PassengerManifestForm
+              </motion.div>
+            )}
+
+            {showAircraftIframe && (
+              <motion.div
+                key="modal-aircraft-selection"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
+              >
+                <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-white rounded-3xl border border-purple-200 shadow-2xl flex flex-col my-auto scrollbar-hide">
+                  <div className="flex justify-between items-center p-6 border-b border-purple-200 bg-white sticky top-0 z-10">
+                    <h3 className="text-gray-900  font-bold   text-sm ">
+                      Select Aircraft
+                    </h3>
+                    <button
+                      onClick={() => setShowAircraftIframe(false)}
+                      className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
+                    >
+                      <X className="w-4 h-4 text-gray-900" />
+                    </button>
+                  </div>
+                  <div className="flex-1 w-full bg-white relative">
+                    <AircraftSelectionForm
+                      mission={mission}
+                      onSuccess={() => {
+                        setShowAircraftIframe(false);
+                        refetch();
+                        // @ts-ignore
+                        queryClient.invalidateQueries([
+                          "mission_aircraft_portal",
+                          missionId,
+                        ]);
+                      }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {showManifestIframe && (
+              <motion.div
+                key="modal-manifest-upload"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4 overflow-y-auto"
+              >
+                <div className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-white rounded-3xl border border-purple-200 shadow-2xl flex flex-col my-auto scrollbar-hide">
+                  <div className="flex justify-between items-center p-6 border-b border-purple-200 bg-white sticky top-0 z-10">
+                    <h3 className="text-gray-900  font-bold   text-sm ">
+                      Passenger Manifest
+                    </h3>
+                    <button
+                      onClick={() => setShowManifestIframe(false)}
+                      className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
+                    >
+                      <X className="w-4 h-4 text-gray-900" />
+                    </button>
+                  </div>
+                  <div className="flex-1 w-full bg-white relative">
+                    <PassengerManifestForm
+                      missionId={missionId!}
+                      onSuccess={() => {
+                        setShowManifestIframe(false);
+                        refetch();
+                        setManifestUploaded(true);
+                        showToast(
+                          "Passenger manifest successfully uploaded.",
+                          "success",
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {showReceiptUpload && (
+              <motion.div
+                key="modal-receipt-upload"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4"
+              >
+                <div className="w-full max-w-lg glass-vip rounded-3xl overflow-hidden border border-purple-200 shadow-2xl">
+                  <div className="flex justify-end p-4">
+                    <button
+                      onClick={() => setShowReceiptUpload(false)}
+                      className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
+                    >
+                      <X className="w-4 h-4 text-gray-900" />
+                    </button>
+                  </div>
+                  <PaymentReceiptForm
                     missionId={missionId!}
                     onSuccess={() => {
-                      setShowManifestIframe(false);
+                      setLocalStatus("AWAITING_CONFIRMATION");
+                      setLocalPaymentStatus("CONFIRMING");
+                      setShowReceiptUpload(false);
                       refetch();
-                      setManifestUploaded(true);
                       showToast(
-                        "Passenger manifest successfully uploaded.",
+                        "Payment receipt uploaded. We are reviewing your booking.",
                         "success",
                       );
                     }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {showReceiptUpload && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] bg-white/40 backdrop-blur-[10px] flex flex-col items-center justify-center p-4"
-            >
-              <div className="w-full max-w-lg glass-vip rounded-3xl overflow-hidden border border-purple-200 shadow-2xl">
-                <div className="flex justify-end p-4">
-                  <button
-                    onClick={() => setShowReceiptUpload(false)}
-                    className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors"
-                  >
-                    <X className="w-4 h-4 text-gray-900" />
-                  </button>
-                </div>
-                <PaymentReceiptForm
-                  missionId={missionId!}
-                  onSuccess={() => {
-                    setLocalStatus("AWAITING_CONFIRMATION");
-                    setLocalPaymentStatus("CONFIRMING");
-                    setShowReceiptUpload(false);
-                    refetch();
-                    showToast(
-                      "Payment receipt uploaded. We are reviewing your booking.",
-                      "success",
-                    );
-                  }}
-                  onSkip={async () => {
-                    setLocalStatus("AWAITING_CONFIRMATION");
-                    setLocalPaymentStatus("CONFIRMING");
-                    setShowReceiptUpload(false);
-                    try {
-                      const { error } = await supabase
-                        .from("missions")
-                        .update({
-                          payment_status: "CONFIRMING",
-                          status: "AWAITING_CONFIRMATION",
-                        })
-                        .eq("id", missionId);
-                      
-                      await supabase.from('payment_states').upsert({
-                        mission_id: missionId,
-                        status: 'awaiting_payment',
-                        updated_at: new Date().toISOString()
-                      }, { onConflict: 'mission_id' });
-                        
+                    onSkip={async () => {
+                      setLocalStatus("AWAITING_CONFIRMATION");
+                      setLocalPaymentStatus("CONFIRMING");
+                      setShowReceiptUpload(false);
                       try {
-                        await fetch('/api/mail/send-funding-notice', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ missionId })
-                        });
-                      } catch (mailErr) {
-                        console.warn("Mail dispatch deferred:", mailErr);
-                      }
+                        const { error } = await supabase
+                          .from("missions")
+                          .update({
+                            payment_status: "CONFIRMING",
+                            status: "AWAITING_CONFIRMATION",
+                          })
+                          .eq("id", missionId);
 
-                      if (error) {
-                        console.warn(
-                          "Supabase RLS Error during status update:",
-                          error.message,
+                        await supabase.from("payment_states").upsert(
+                          {
+                            mission_id: missionId,
+                            status: "awaiting_payment",
+                            updated_at: new Date().toISOString(),
+                          },
+                          { onConflict: "mission_id" },
+                        );
+
+                        try {
+                          await fetch("/api/mail/send-funding-notice", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ missionId }),
+                          });
+                        } catch (mailErr) {
+                          console.warn("Mail dispatch deferred:", mailErr);
+                        }
+
+                        if (error) {
+                          console.warn(
+                            "Supabase RLS Error during status update:",
+                            error.message,
+                          );
+                        }
+                      } catch (err: any) {
+                        console.error(
+                          "Failed to update status on skip:",
+                          err.message,
                         );
                       }
-                    } catch (err: any) {
-                      console.error(
-                        "Failed to update status on skip:",
-                        err.message,
-                      );
-                    }
-                    refetch();
-                    showToast("We are reviewing your booking.", "info");
-                  }}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {}
-        <div className="max-w-4xl mx-auto space-y-12">
-          <header className="flex flex-row items-start justify-between gap-4 pt-4 w-full">
-            <div className="space-y-2 text-left">
-              <h1 className="font-space text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900 lowercase flex items-center gap-4">
-                flight concierge desk ✨
-              </h1>
-            </div>
-            <div className="flex items-center gap-3">
-              {/* Book Flight iFrame Trigger */}
-              <button
-                onClick={() => setShowBookFlightIframe(true)}
-                className="px-5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-sync uppercase tracking-wider font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
-              >
-                <Plane className="w-3.5 h-3.5" />
-                <span>BOOK FLIGHT</span>
-              </button>
-
-              {/* Unified Notification Bell */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className="relative p-3.5 rounded-full bg-white border border-purple-200 text-gray-800 hover:text-purple-700 hover:border-purple-400 hover:bg-purple-50 transition-all flex items-center justify-center cursor-pointer shadow-sm"
-                >
-                  <Bell className="w-4 h-4 text-gray-800" />
-                  {notifications.some(n => !n.read) && (
-                    <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-purple-600 rounded-full border-2 border-white shadow-sm animate-pulse" />
-                  )}
-                </button>
-              </div>
-              <UserMenu />
-            </div>
-          </header>
-
-          {/* Welcome Graphic Card */}
-          <div className="w-full rounded-[2rem] bg-white shadow-xl border border-purple-100 overflow-hidden flex flex-col md:flex-row relative mt-8" style={{ backgroundColor: '#ffffff' }}>
-            <div className="p-8 md:p-12 flex-1 flex flex-col justify-center z-10 bg-white" style={{ backgroundColor: '#ffffff' }}>
-              <h2 className="font-space text-3xl font-bold text-gray-900 tracking-tight lowercase mb-4">
-                welcome back to your luxury command center.
-              </h2>
-              <p className="font-space text-gray-600 text-lg leading-relaxed max-w-lg lowercase">
-                everything you need to orchestrate seamless, world-class aviation experiences for your clients in one vibrant place.
-              </p>
-            </div>
-            <div className="w-full md:w-1/3 aspect-square md:aspect-auto relative min-h-[250px] bg-white" style={{ backgroundColor: '#ffffff' }}>
-              <img 
-                src="/src/assets/images/jet_illustration_friendly_1787553630770.jpg" 
-                alt="Luxury Jet Graphic" 
-                className="absolute inset-0 w-full h-full object-cover object-center mix-blend-multiply" 
-              />
-            </div>
-          </div>
-
-
-          {/* UNIFIED NOTIFICATION CENTER DRAWER */}
-          <AnimatePresence>
-            {showNotifications && (
-              <>
-                {/* Backdrop overlay */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setShowNotifications(false)}
-                  className="fixed inset-0 z-[150] bg-white/80 backdrop-blur-md backdrop-blur-[10px]"
-                />
-
-                {/* Sidebar Panel */}
-                <motion.div
-                  initial={{ x: "100%" }}
-                  animate={{ x: 0 }}
-                  exit={{ x: "100%" }}
-                  transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                  className="fixed right-0 top-0 bottom-0 w-full max-w-md z-[160] bg-white border-l border-purple-200 shadow-2xl p-6 flex flex-col justify-between"
-                >
-                  <div className="flex flex-col h-full">
-                    {/* Header */}
-                    <div className="flex items-center justify-between pb-6 border-b border-purple-100">
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-light tracking-tight text-gray-900 flex items-center gap-2">
-                          <Bell className="w-4 h-4 text-purple-600" />
-                          Unified Alerts
-                        </h3>
-                        <p className="font-space lowercase text-[8px] text-gray-500 tracking-[0.2em] lowercase">
-                          System Alerts • Directives • Chat
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            const updated = notifications.map(n => ({ ...n, read: true }));
-                            setNotifications(updated);
-                            localStorage.setItem(`notifications_${mission.id}`, JSON.stringify(updated));
-                          }}
-                          className="px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-[9px] font-space lowercase tracking-wider lowercase text-gray-600 hover:text-gray-900 transition-all cursor-pointer"
-                        >
-                          Mark all read
-                        </button>
-                        <button
-                          onClick={() => setShowNotifications(false)}
-                          className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors cursor-pointer"
-                        >
-                          <X className="w-4 h-4 text-gray-900" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Alert list - Persistent Log Scroll */}
-                    <div className="flex-1 overflow-y-auto py-6 space-y-4 pr-1 custom-scrollbar">
-                      {notifications.length === 0 ? (
-                        <div className="text-center py-12 space-y-2">
-                          <p className="text-gray-500 text-xs">No notifications recorded.</p>
-                        </div>
-                      ) : (
-                        notifications.map((notif) => (
-                          <div
-                            key={notif.id}
-                            className={`p-4 rounded-2xl border transition-all relative overflow-hidden ${
-                              notif.read 
-                                ? "bg-white/[0.01] border-purple-100 opacity-70" 
-                                : "bg-gradient-to-br from-fbblue/5 to-white/[0.02] border-purple-200 shadow-md"
-                            }`}
-                          >
-                            {!notif.read && (
-                              <div className="absolute top-3 right-3 w-1.5 h-1.5 bg-purple-600 rounded-full" />
-                            )}
-                            
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                {notif.type === "system" && (
-                                  <span className="px-2 py-0.5 rounded text-[7px] font-space lowercase tracking-wider bg-purple-600/20 text-purple-600 border border-purple-500/30 lowercase">
-                                    System
-                                  </span>
-                                )}
-                                {notif.type === "icc" && (
-                                  <span className="px-2 py-0.5 rounded text-[7px] font-space lowercase tracking-wider bg-gold/20 text-gold border border-gold/30 lowercase">
-                                    ICC Directive
-                                  </span>
-                                )}
-                                {notif.type === "chat" && (
-                                  <span className="px-2 py-0.5 rounded text-[7px] font-space lowercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 lowercase">
-                                    Chat Feed
-                                  </span>
-                                )}
-                                <span className="text-[8px] text-gray-500 font-mono">
-                                  {new Date(notif.timestamp).toUTCString().replace("GMT", "UTC")}
-                                </span>
-                              </div>
-                              <h4 className="text-xs font-semibold text-gray-900 pt-1">
-                                {notif.title}
-                              </h4>
-                              <p className="text-xs text-gray-600 leading-relaxed font-light">
-                                {notif.message}
-                              </p>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              </>
+                      refetch();
+                      showToast("We are reviewing your booking.", "info");
+                    }}
+                  />
+                </div>
+              </motion.div>
             )}
           </AnimatePresence>
 
-          {mission.status === "ROTATING" && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-6 rounded-2xl border transition-all bg-amber-500/10 border-amber-500/20 mb-8"
-            >
-              <h4 className="text-amber-500 text-sm mb-2">
-                Operational refinement in progress.
-              </h4>
-              <p className="text-gray-600 text-xs font-light leading-relaxed">
-                Execution pathway being adjusted to preserve integrity. Buffers
-                exist to protect execution against airspace and crew volatility.
-                No action required on your part.
-              </p>
-            </motion.div>
-          )}
+          {}
+          <div className="max-w-4xl mx-auto space-y-12">
+            <header className="flex flex-col items-start justify-start gap-8 pt-4 w-full">
+              {/* iOS Hamburger Menu Trigger Button */}
+              <button
+                onClick={() => setShowIOSMenu(true)}
+                className="px-3.5 py-2.5 rounded-2xl bg-white border border-purple-200 hover:border-purple-400 hover:bg-purple-50 text-gray-900 text-xs font-sync uppercase   font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer active:scale-95 group shrink-0"
+                title="Open Complete Feature Menu"
+              >
+                <Menu className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
+                <span className="hidden sm:inline">ALL FEATURES</span>
+                <span className="sm:hidden">MENU</span>
+              </button>
 
-          <MissionClockWidget mission={mission} />
+              <div className="space-y-1 text-left">
+                <h1 className=" text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900  flex items-center gap-2 sm:gap-4">
+                  flight concierge desk ✨
+                </h1>
+              </div>
+            </header>
 
-          {/* BROKER DESK NAVIGATION TABS */}
-          <div className="flex gap-3 overflow-x-auto pb-6 scrollbar-hide border-b border-purple-200/80 mb-8 items-center justify-start">
-            <button
-              onClick={() => setActiveTab('crm_workspace')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
-                activeTab === 'crm_workspace'
-                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
-                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
-              }`}
+            {/* Welcome Graphic Card */}
+            <div
+              className="w-full rounded-[2rem] bg-white shadow-xl border border-purple-100 overflow-hidden flex flex-col md:flex-row relative mt-8"
+              style={{ backgroundColor: "#ffffff" }}
             >
-              <Users className="w-4 h-4" /> crm workspace
-            </button>
-            <button
-              onClick={() => {
-                if (!hasVerifiedOperator) {
-                  showToast("Access Restricted: Operator verification required from backend to use Proposal Designer.", "warning");
-                }
-                setActiveTab('proposal_builder');
-              }}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
-                activeTab === 'proposal_builder'
-                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
-                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
-              }`}
-            >
-              <FileText className="w-4 h-4" />
-              <span>proposal builder</span>
-              {!hasVerifiedOperator && (
-                <span className="ml-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
-                  <Lock className="w-2.5 h-2.5" /> LOCKED
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab('checkout_engine')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
-                activeTab === 'checkout_engine'
-                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
-                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
-              }`}
-            >
-              <CreditCard className="w-4 h-4" /> payment & escrow
-            </button>
-            <button
-              onClick={() => setActiveTab('operational_radar')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
-                activeTab === 'operational_radar'
-                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
-                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
-              }`}
-            >
-              <Radar className="w-4 h-4" /> fleet tracking
-            </button>
-            <button
-              onClick={() => setActiveTab('telemetry_vault')}
-              className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border ${
-                activeTab === 'telemetry_vault'
-                  ? 'bg-purple-600 text-white border-purple-600 shadow-[0_4px_14px_rgba(147,51,234,0.35)]'
-                  : 'bg-white text-gray-800 border-gray-200 hover:text-purple-700 hover:bg-purple-50 shadow-sm'
-              }`}
-            >
-              <Database className="w-4 h-4" /> flight logs
-            </button>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut();
-                sessionStorage.removeItem("broker_verified");
-                setSessionVerified(false);
-                showToast("Signed out successfully. Returning to login portal.", "info");
-              }}
-              className="flex items-center gap-2 px-5 py-3 rounded-full text-xs font-sync tracking-wider font-bold transition-all uppercase whitespace-nowrap shrink-0 border bg-white text-red-600 border-gray-200 hover:text-white hover:bg-red-600 hover:border-red-600 shadow-sm ml-auto"
-            >
-              <LogOut className="w-4 h-4" /> exit
-            </button>
-          </div>
-
-          {/* ACTIVE BROKER MODULE RENDERER */}
-          <AnimatePresence mode="wait">
-          {activeTab === 'crm_workspace' && (
-            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-              <BrokerCRMWorkspace
-                missionId={mission.id}
-                brokerCompanyName={brokerCompany || "15D Executive Aviation Brokerage"}
-                hasVerifiedOperator={hasVerifiedOperator}
-                onRequireOperator={() => setShowAOCModal(true)}
-                onBookFlight={() => setShowBookFlightIframe(true)}
-                onSignOut={async () => {
-                  await supabase.auth.signOut();
-                  sessionStorage.removeItem("broker_verified");
-                  setSessionVerified(false);
-                  showToast("Signed out successfully. Returning to login portal.", "info");
-                }}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === 'proposal_builder' && (
-            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-              {hasVerifiedOperator ? (
-                <WhiteLabelProposalBuilder
-                  missionId={mission.id}
-                  originCode={dep.substring(0, 3)}
-                  destCode={dest.substring(0, 3)}
-                  aircraftName={mission.operator_aircraft || mission.aircraft_class || "Midsize Jet (Hawker 900XP)"}
-                  baselineWholesaleCostUsd={totalVerifiedCost || 16250}
+              <div
+                className="p-8 md:p-12 flex-1 flex flex-col justify-center z-10 bg-white"
+                style={{ backgroundColor: "#ffffff" }}
+              >
+                <h2 className=" text-3xl font-bold text-gray-900 tracking-tight  mb-4">
+                  welcome back to your luxury command center.
+                </h2>
+                <p className=" text-gray-600 text-lg leading-relaxed max-w-lg ">
+                  everything you need to orchestrate seamless, world-class
+                  aviation experiences for your clients in one vibrant place.
+                </p>
+              </div>
+              <div
+                className="w-full md:w-1/3 aspect-square md:aspect-auto relative min-h-[250px] bg-white"
+                style={{ backgroundColor: "#ffffff" }}
+              >
+                <img
+                  src="/src/assets/images/jet_illustration_friendly_1787553630770.jpg"
+                  alt="Luxury Jet Graphic"
+                  className="absolute inset-0 w-full h-full object-cover object-center mix-blend-multiply"
                 />
-              ) : (
-                <div className="max-w-2xl mx-auto my-8 p-8 md:p-12 rounded-[2.5rem] border border-amber-200 bg-white/95 shadow-2xl text-center space-y-6">
-                  <div className="w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600 shadow-inner">
-                    <ShieldAlert className="w-8 h-8" />
-                  </div>
-                  <div className="space-y-2">
-                    <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-sync font-bold tracking-widest uppercase inline-flex items-center gap-1.5">
-                      <Lock className="w-3 h-3 text-amber-700" /> Charlatan Protection Protocol • Backend Clearance Required
-                    </span>
-                    <h3 className="font-space font-bold text-xl md:text-2xl text-gray-900 uppercase tracking-tight">
-                      Proposal Designer Access Denied
-                    </h3>
-                    <p className="font-lexend text-xs md:text-sm text-gray-700 leading-relaxed max-w-lg mx-auto">
-                      To keep charlatans and unauthorized intermediaries out of our ecosystem, 15D Wings requires an active licensed airline partner. Send your custom onboarding link to your partner airline to register on airlines.15dwings.com.ng. Our telemetry rail will automatically detect their backend clearance and unlock your Proposal Designer.
-                    </p>
-                  </div>
-                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button
-                      onClick={() => setShowAOCModal(true)}
-                      className="px-6 py-3.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-sync uppercase text-xs font-bold tracking-wider shadow-lg shadow-purple-900/20 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
-                    >
-                      <ShieldCheck className="w-4 h-4" />
-                      <span>Invite Operator & Track Telemetry (airlines.15dwings.com.ng)</span>
-                    </button>
-                  </div>
+              </div>
+            </div>
+
+            {/* UNIFIED NOTIFICATION CENTER DRAWER */}
+            <AnimatePresence>
+              {showNotifications && (
+                <div key="unified-notification-drawer-container">
+                  {/* Backdrop overlay */}
+                  <motion.div
+                    key="notif-backdrop"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setShowNotifications(false)}
+                    className="fixed inset-0 z-[150] bg-white/80 backdrop-blur-md backdrop-blur-[10px]"
+                  />
+
+                  {/* Sidebar Panel */}
+                  <motion.div
+                    key="notif-sidebar"
+                    initial={{ x: "100%" }}
+                    animate={{ x: 0 }}
+                    exit={{ x: "100%" }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="fixed right-0 top-0 bottom-0 w-full max-w-md z-[160] bg-white border-l border-purple-200 shadow-2xl p-6 flex flex-col justify-between"
+                  >
+                    <div className="flex flex-col h-full">
+                      {/* Header */}
+                      <div className="flex items-center justify-between pb-6 border-b border-purple-100">
+                        <div className="space-y-1">
+                          <h3 className="text-lg font-light tracking-tight text-gray-900 flex items-center gap-2">
+                            <Bell className="w-4 h-4 text-purple-600" />
+                            Unified Alerts
+                          </h3>
+                          <p className=" text-[8px] text-gray-500 tracking-[0.2em] ">
+                            System Alerts • Directives • Chat
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              const updated = notifications.map((n) => ({
+                                ...n,
+                                read: true,
+                              }));
+                              setNotifications(updated);
+                              localStorage.setItem(
+                                `notifications_${mission.id}`,
+                                JSON.stringify(updated),
+                              );
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-[9px]     text-gray-600 hover:text-gray-900 transition-all cursor-pointer"
+                          >
+                            Mark all read
+                          </button>
+                          <button
+                            onClick={() => setShowNotifications(false)}
+                            className="p-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors cursor-pointer"
+                          >
+                            <X className="w-4 h-4 text-gray-900" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Alert list - Persistent Log Scroll */}
+                      <div className="flex-1 overflow-y-auto py-6 space-y-4 pr-1 custom-scrollbar">
+                        {notifications.length === 0 ? (
+                          <div className="text-center py-12 space-y-2">
+                            <p className="text-gray-500 text-xs">
+                              No notifications recorded.
+                            </p>
+                          </div>
+                        ) : (
+                          notifications.map((notif, nIdx) => (
+                            <div
+                              key={`${notif.id}_${nIdx}`}
+                              className={`p-4 rounded-2xl border transition-all relative overflow-hidden ${
+                                notif.read
+                                  ? "bg-white/[0.01] border-purple-100 opacity-70"
+                                  : "bg-gradient-to-br from-fbblue/5 to-white/[0.02] border-purple-200 shadow-md"
+                              }`}
+                            >
+                              {!notif.read && (
+                                <div className="absolute top-3 right-3 w-1.5 h-1.5 bg-purple-600 rounded-full" />
+                              )}
+
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  {notif.type === "system" && (
+                                    <span className="px-2 py-0.5 rounded text-[7px]    bg-purple-600/20 text-purple-600 border border-purple-500/30 ">
+                                      System
+                                    </span>
+                                  )}
+                                  {notif.type === "icc" && (
+                                    <span className="px-2 py-0.5 rounded text-[7px]    bg-gold/20 text-gold border border-gold/30 ">
+                                      ICC Directive
+                                    </span>
+                                  )}
+                                  {notif.type === "chat" && (
+                                    <span className="px-2 py-0.5 rounded text-[7px]    bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 ">
+                                      Chat Feed
+                                    </span>
+                                  )}
+                                  <span className="text-[8px] text-gray-500 font-mono">
+                                    {new Date(notif.timestamp)
+                                      .toUTCString()
+                                      .replace("GMT", "UTC")}
+                                  </span>
+                                </div>
+                                <h4 className="text-xs font-semibold text-gray-900 pt-1">
+                                  {notif.title}
+                                </h4>
+                                <p className="text-xs text-gray-600 leading-relaxed font-light">
+                                  {notif.message}
+                                </p>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               )}
-            </motion.div>
-          )}
+            </AnimatePresence>
 
-          {activeTab === 'checkout_engine' && (
-            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-              <VipEscrowIframe
-                amountUsd={totalVerifiedCost || 18687}
-                hoursToDeparture={isWithin72Hours ? 36 : 120}
+            {mission.status === "ROTATING" && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-6 rounded-2xl border transition-all bg-amber-500/10 border-amber-500/20 mb-8"
+              >
+                <h4 className="text-amber-500 text-sm mb-2">
+                  Operational refinement in progress.
+                </h4>
+                <p className="text-gray-600 text-xs font-light leading-relaxed">
+                  Execution pathway being adjusted to preserve integrity.
+                  Buffers exist to protect execution against airspace and crew
+                  volatility. No action required on your part.
+                </p>
+              </motion.div>
+            )}
+
+            <MissionClockWidget mission={mission} />
+
+            {/* BROKER COMMAND NAVIGATION - CLEAN EXECUTIVE DESK SWITCHER */}
+            <div className="bg-white rounded-2xl p-2.5 md:p-3 border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2">
+                {/* Directory Trigger */}
+                <button
+                  onClick={() => setShowIOSMenu(true)}
+                  className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 shrink-0 grow sm:grow-0"
+                  title="Open Complete Feature Menu"
+                >
+                  <Menu className="w-4 h-4" />
+                  <span>Feature Directory</span>
+                </button>
+
+                {/* Active Tab Badge indicator on mobile */}
+                <div className="sm:hidden px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800 text-xs font-medium truncate grow text-center">
+                  {activeTab === "crm_workspace" && "CRM Workspace"}
+                  {activeTab === "proposal_builder" && "Proposal Builder"}
+                  {activeTab === "checkout_engine" && "Payment Vault"}
+                  {activeTab === "operational_radar" && "Fleet Radar"}
+                  {activeTab === "telemetry_vault" && "Flight Logs"}
+                </div>
+              </div>
+
+              {/* Segmented Desk Switcher */}
+              <div className="hidden sm:flex flex-wrap items-center gap-1.5 grow justify-center md:justify-end">
+                <button
+                  onClick={() => setActiveTab("crm_workspace")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                    activeTab === "crm_workspace"
+                      ? "bg-purple-600 text-white shadow-xs"
+                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>CRM & Deals</span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (!hasVerifiedOperator) {
+                      showToast(
+                        "Access Restricted: Operator verification required from backend to use Proposal Designer.",
+                        "warning",
+                      );
+                    }
+                    setActiveTab("proposal_builder");
+                  }}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                    activeTab === "proposal_builder"
+                      ? "bg-purple-600 text-white shadow-xs"
+                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Proposals</span>
+                  {!hasVerifiedOperator && (
+                    <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-amber-100 text-amber-900 border border-amber-200">
+                      Locked
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab("checkout_engine")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                    activeTab === "checkout_engine"
+                      ? "bg-purple-600 text-white shadow-xs"
+                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>Escrow</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("operational_radar")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                    activeTab === "operational_radar"
+                      ? "bg-purple-600 text-white shadow-xs"
+                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  <Radar className="w-3.5 h-3.5" />
+                  <span>Fleet & Empty Legs</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("telemetry_vault")}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
+                    activeTab === "telemetry_vault"
+                      ? "bg-purple-600 text-white shadow-xs"
+                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  <Database className="w-3.5 h-3.5" />
+                  <span>Flight Logs</span>
+                </button>
+
+                <button
+                  onClick={async () => {
+                    await supabase.auth.signOut();
+                    sessionStorage.removeItem("broker_verified");
+                    setSessionVerified(false);
+                    showToast(
+                      "Signed out successfully. Returning to login portal.",
+                      "info",
+                    );
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer border bg-white text-red-600 border-slate-200 hover:bg-red-50 shadow-2xs ml-auto"
+                  title="Sign out of Broker Suite"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Exit</span>
+                </button>
+              </div>
+            </div>
+
+            {/* ACTIVE BROKER MODULE RENDERER */}
+            <AnimatePresence mode="wait">
+              {activeTab === "crm_workspace" && (
+                <motion.div
+                  key="broker-tab-crm_workspace"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <BrokerCRMWorkspace
+                    missionId={mission.id}
+                    brokerCompanyName={
+                      brokerCompany || "15D Executive Aviation Brokerage"
+                    }
+                    hasVerifiedOperator={hasVerifiedOperator}
+                    onRequireOperator={() => setShowAOCModal(true)}
+                    onBookFlight={() => setShowBookFlightIframe(true)}
+                    activeSubTab={activeCrmSubTab}
+                    onSubTabChange={setActiveCrmSubTab}
+                    onSignOut={async () => {
+                      await supabase.auth.signOut();
+                      sessionStorage.removeItem("broker_verified");
+                      setSessionVerified(false);
+                      showToast(
+                        "Signed out successfully. Returning to login portal.",
+                        "info",
+                      );
+                    }}
+                  />
+                </motion.div>
+              )}
+
+              {activeTab === "proposal_builder" && (
+                <motion.div
+                  key="broker-tab-proposal_builder"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  {hasVerifiedOperator ? (
+                    <WhiteLabelProposalBuilder
+                      missionId={mission.id}
+                      originCode={dep.substring(0, 3)}
+                      destCode={dest.substring(0, 3)}
+                      aircraftName={
+                        mission.operator_aircraft ||
+                        mission.aircraft_class ||
+                        "Midsize Jet (Hawker 900XP)"
+                      }
+                      baselineWholesaleCostUsd={totalVerifiedCost || 16250}
+                    />
+                  ) : (
+                    <div className="max-w-2xl mx-auto my-8 p-8 md:p-12 rounded-3xl border border-amber-200 bg-white shadow-lg text-center space-y-5">
+                      <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600">
+                        <ShieldAlert className="w-7 h-7" />
+                      </div>
+                      <div className="space-y-2">
+                        <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 text-xs font-medium inline-flex items-center gap-1.5">
+                          <Lock className="w-3 h-3 text-amber-700" /> Carrier
+                          AOC Verification Required
+                        </span>
+                        <h3 className="text-xl font-semibold text-slate-900">
+                          Proposal Designer Access Locked
+                        </h3>
+                        <p className="text-xs md:text-sm text-slate-600 leading-relaxed max-w-lg mx-auto">
+                          To safeguard air charter transactions, 15D Wings
+                          requires an active verified airline operator partner.
+                          Send your custom onboarding link to your partner
+                          airline to register on airlines.15dwings.com.ng to
+                          unlock your white-label proposal suite.
+                        </p>
+                      </div>
+                      <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <button
+                          onClick={() => setShowAOCModal(true)}
+                          className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-medium shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                        >
+                          <ShieldCheck className="w-4 h-4" />
+                          <span>Invite Carrier Operator</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {activeTab === "checkout_engine" && (
+                <motion.div
+                  key="broker-tab-checkout_engine"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <VipEscrowIframe
+                    amountUsd={totalVerifiedCost || 18687}
+                    hoursToDeparture={isWithin72Hours ? 36 : 120}
+                  />
+                </motion.div>
+              )}
+
+              {activeTab === "operational_radar" && (
+                <motion.div
+                  key="broker-tab-operational_radar"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <OperationalIntegrityIndex missionId={mission.id} />
+                </motion.div>
+              )}
+
+              {activeTab === "telemetry_vault" && (
+                <motion.div
+                  key="broker-tab-telemetry_vault"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                >
+                  <EyeOfGodTelemetry />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            {[
+              "ACTIVATED",
+              "EXECUTING",
+              "DEPARTED",
+              "ARRIVED",
+              "IN_FLIGHT",
+            ].includes(mission.status?.toUpperCase()) && (
+              <MissionChat
+                missionId={missionId || ""}
+                role="CLIENT"
+                senderId={mission.client_name || "Client"}
               />
-            </motion.div>
-          )}
-
-          {activeTab === 'operational_radar' && (
-            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-              <OperationalIntegrityIndex missionId={mission.id} />
-            </motion.div>
-          )}
-
-          {activeTab === 'telemetry_vault' && (
-            <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3, ease: "easeInOut" }}>
-              <EyeOfGodTelemetry />
-            </motion.div>
-          )}
-
-          </AnimatePresence>
-          {[
-            "ACTIVATED",
-            "EXECUTING",
-            "DEPARTED",
-            "ARRIVED",
-            "IN_FLIGHT",
-          ].includes(mission.status?.toUpperCase()) && (
-            <MissionChat missionId={missionId || ""} role="CLIENT" senderId={mission.client_name || "Client"} />
-          )}
-
-          <div className="pt-20 border-t border-purple-100 flex justify-center">
-            <VoiceAssistant />
+            )}
           </div>
         </div>
-      </div>
 
-      {}
-      <AnimatePresence>
-        {showCustomizationModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white/80 backdrop-blur-md backdrop-blur-[10px] p-4"
-          >
+        {}
+        <AnimatePresence>
+          {showCustomizationModal && (
             <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="w-full max-w-2xl max-h-[95vh] overflow-y-auto rounded-[2rem] scrollbar-hide"
+              key="modal-customization-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-white/80 backdrop-blur-md backdrop-blur-[10px] p-4"
             >
-              <MissionCustomizationForm
-                missionId={mission.id}
-                currentCustomizations={mission.mission_customizations}
-                onSuccess={() => {
-                  setShowCustomizationModal(false);
-                  refetch();
-                  showToast(
-                    "Flight details confirmed. Payment details updated.",
-                    "success",
-                  );
-                }}
-                onClose={() => setShowCustomizationModal(false)}
-              />
+              <motion.div
+                key="modal-customization-content"
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.95 }}
+                className="w-full max-w-2xl max-h-[95vh] overflow-y-auto rounded-[2rem] scrollbar-hide"
+              >
+                <MissionCustomizationForm
+                  missionId={mission.id}
+                  currentCustomizations={mission.mission_customizations}
+                  onSuccess={() => {
+                    setShowCustomizationModal(false);
+                    refetch();
+                    showToast(
+                      "Flight details confirmed. Payment details updated.",
+                      "success",
+                    );
+                  }}
+                  onClose={() => setShowCustomizationModal(false)}
+                />
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
+          )}
+        </AnimatePresence>
 
         <OperatorOnboardingModal
           isOpen={showAOCModal}
@@ -2530,10 +2750,55 @@ export default function BrokerPortal() {
           brokerCompany={brokerDbRecord?.company_name || brokerCompany}
           onVerificationSuccess={() => {
             setHasVerifiedOperator(true);
-            showToast("Licensed operator clearance verified on backend! Proposal tools unlocked.", "success");
+            showToast(
+              "Licensed operator clearance verified on backend! Proposal tools unlocked.",
+              "success",
+            );
           }}
         />
-      </AnimatePresence>
+
+        {/* Mobile & iOS Hamburger Drawer Navigation */}
+        <BrokerIOSNavigationDrawer
+          isOpen={showIOSMenu}
+          onClose={() => setShowIOSMenu(false)}
+          activeTab={activeTab}
+          onSelectTab={(tab) => {
+            if ((tab === "proposal_builder" || tab === "operational_radar") && !hasVerifiedOperator) {
+              showToast(
+                `Access Restricted: Operator verification required from backend to view ${tab === "operational_radar" ? "Live Fleet & Empty Legs" : "Proposal Designer"}.`,
+                "warning",
+              );
+              setShowAOCModal(true);
+              return; // Prevent navigating to the tab
+            }
+            setActiveTab(tab);
+          }}
+          activeCrmSubTab={activeCrmSubTab}
+          onSelectCrmSubTab={(subTab) => {
+            setActiveTab("crm_workspace");
+            setActiveCrmSubTab(subTab);
+          }}
+          hasVerifiedOperator={hasVerifiedOperator}
+          onOpenOperatorVerification={() => setShowAOCModal(true)}
+          onOpenBookFlight={() => setShowBookFlightIframe(true)}
+          onOpenReschedule={() => setShowRescheduleIframe(true)}
+          onOpenExperiences={() => setShowExperienceIframe(true)}
+          onSignOut={async () => {
+            await supabase.auth.signOut();
+            sessionStorage.removeItem("broker_verified");
+            setSessionVerified(false);
+            showToast(
+              "Signed out successfully. Returning to login portal.",
+              "info",
+            );
+          }}
+          brokerCompanyName={
+            brokerCompany || "15D Executive Aviation Brokerage"
+          }
+          brokerEmail={
+            brokerDbRecord?.email || inputEmail || "broker@15dwings.com.ng"
+          }
+        />
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ export default function PassengerManifestForm({ missionId, onSuccess, theme = 'd
   const [isUploading, setIsUploading] = useState(false);
   const [driveToken, setDriveToken] = useState<string | null>(null);
   const [passengers, setPassengers] = useState<any[]>([{
-    id: Date.now(),
+    id: `pax-0-${Date.now()}`,
     surname: '',
     given_name: '',
     dob: '',
@@ -109,7 +109,7 @@ export default function PassengerManifestForm({ missionId, onSuccess, theme = 'd
 
   const addPassenger = () => {
     setPassengers(prev => [...prev, {
-      id: Date.now(),
+      id: `pax-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       surname: '',
       given_name: '',
       dob: '',
@@ -284,7 +284,7 @@ export default function PassengerManifestForm({ missionId, onSuccess, theme = 'd
 
       <form onSubmit={handleSubmit} className="space-y-12">
         {passengers.map((p, index) => (
-          <div key={p.id} className="space-y-8 p-8 rounded-3xl border relative group transition-all glass-vip border-white/10 shadow-xl">
+          <div key={p.id ? `${p.id}` : `pax-${index}`} className="space-y-8 p-8 rounded-3xl border relative group transition-all glass-vip border-white/10 shadow-xl">
             <div className="flex justify-between items-center border-b pb-4 border-white/10">
               <h3 className="font-sync text-fbblue text-[10px] tracking-[0.3em] font-bold uppercase">Passenger {index + 1}</h3>
               {passengers.length > 1 && (
