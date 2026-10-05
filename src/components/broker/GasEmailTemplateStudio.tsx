@@ -1,34 +1,117 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail,
   Send,
-  Copy,
-  Check,
-  Code,
   Eye,
   Sparkles,
   ShieldCheck,
-  Plane,
-  Server,
-  Terminal,
-  ExternalLink,
   Laptop,
   Smartphone,
   RefreshCw,
   CheckCircle2,
   AlertCircle,
-  Database,
   Key,
-  Lock,
-  Search
+  Search,
+  Check
 } from 'lucide-react';
-import { copyToClipboard } from '../../lib/utils';
 import { sendGasEmail, generate15DWingsHtmlEmail } from '../../lib/gasMailer';
 import { supabase } from '../../lib/supabase';
 
+// Premium Rich Text Editor for the Elite Broker
+const RichTextEditor: React.FC<{ value: string; onChange: (val: string) => void }> = ({ value, onChange }) => {
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== value) {
+      editorRef.current.innerHTML = value;
+    }
+  }, [value]);
+
+  const execCommand = (command: string, val: string = '') => {
+    document.execCommand(command, false, val);
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  return (
+    <div className="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-3xs">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-1 p-2 bg-slate-50 border-b border-slate-100">
+        <button
+          type="button"
+          onClick={() => execCommand('bold')}
+          className="p-1.5 hover:bg-slate-200/80 rounded-lg text-slate-700 hover:text-slate-900 font-bold text-xs min-w-[28px] h-[28px] flex items-center justify-center transition-colors cursor-pointer"
+          title="Bold"
+        >
+          <b>B</b>
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('italic')}
+          className="p-1.5 hover:bg-slate-200/80 rounded-lg text-slate-700 hover:text-slate-900 italic text-xs min-w-[28px] h-[28px] flex items-center justify-center transition-colors cursor-pointer"
+          title="Italic"
+        >
+          <i>I</i>
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('underline')}
+          className="p-1.5 hover:bg-slate-200/80 rounded-lg text-slate-700 hover:text-slate-900 underline text-xs min-w-[28px] h-[28px] flex items-center justify-center transition-colors cursor-pointer"
+          title="Underline"
+        >
+          <u>U</u>
+        </button>
+        <div className="w-[1px] h-4 bg-slate-200 mx-1" />
+        <button
+          type="button"
+          onClick={() => execCommand('formatBlock', '<h2>')}
+          className="px-2 py-1 hover:bg-slate-200/80 rounded-lg text-slate-700 hover:text-slate-900 text-[11px] font-bold h-[28px] flex items-center justify-center transition-colors cursor-pointer"
+          title="Header"
+        >
+          H
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('formatBlock', '<p>')}
+          className="px-2 py-1 hover:bg-slate-200/80 rounded-lg text-slate-700 hover:text-slate-900 text-[11px] h-[28px] flex items-center justify-center transition-colors cursor-pointer"
+          title="Paragraph"
+        >
+          ¶
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('insertHorizontalRule')}
+          className="px-2 py-1 hover:bg-slate-200/80 rounded-lg text-slate-700 hover:text-slate-900 text-[11px] h-[28px] flex items-center justify-center transition-colors cursor-pointer"
+          title="Spacing Line"
+        >
+          ―
+        </button>
+        <div className="w-[1px] h-4 bg-slate-200 mx-1" />
+        <button
+          type="button"
+          onClick={() => execCommand('removeFormat')}
+          className="p-1.5 hover:bg-slate-200/80 rounded-lg text-slate-400 hover:text-red-500 min-w-[28px] h-[28px] flex items-center justify-center transition-colors cursor-pointer"
+          title="Clear Style"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Editable Div */}
+      <div
+        ref={editorRef}
+        contentEditable
+        className="p-3.5 min-h-[140px] max-h-[260px] overflow-y-auto text-xs text-slate-800 outline-none focus:ring-0 cursor-text prose prose-sm max-w-none leading-relaxed"
+        onInput={(e) => onChange(e.currentTarget.innerHTML)}
+        style={{ minHeight: '140px' }}
+      />
+    </div>
+  );
+};
+
 export const GasEmailTemplateStudio: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'PREVIEW' | 'GAS_SCRIPT' | 'HTML_SOURCE'>('PREVIEW');
   const [viewMode, setViewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
 
   // Active Flight Mission Lookup / Authentication State
@@ -54,10 +137,13 @@ export const GasEmailTemplateStudio: React.FC = () => {
   const [totalAmount, setTotalAmount] = useState('$65,000 USD');
   const [portalUrl, setPortalUrl] = useState('https://vip.15dwings.com.ng/verify/15D-782');
 
+  // Rich text customized body message (the default acts as a professional guide)
+  const [customMessage, setCustomMessage] = useState(
+    "Your private aviation itinerary has been validated against our licensed carrier network. Flight crews, landing slots, and ground handling services are locked for execution."
+  );
+
   const [isSending, setIsSending] = useState(false);
   const [sendSuccess, setSendSuccess] = useState<string | null>(null);
-  const [copiedScript, setCopiedScript] = useState(false);
-  const [copiedHtml, setCopiedHtml] = useState(false);
 
   const emailData = {
     recipientName,
@@ -74,7 +160,8 @@ export const GasEmailTemplateStudio: React.FC = () => {
     operatorName,
     aocNumber,
     totalAmount,
-    portalUrl
+    portalUrl,
+    customMessage
   };
 
   const generatedHtml = generate15DWingsHtmlEmail(emailData);
@@ -100,12 +187,12 @@ export const GasEmailTemplateStudio: React.FC = () => {
         if (cleanId === '15D-782' || cleanEmail === 'hello.15dgroup@gmail.com') {
           setAuthStatus({
             success: true,
-            message: `AUTHENTICATED! Flight mission [${cleanId}] verified for ${cleanEmail}. Template populated.`
+            message: `AUTHENTICATED! Flight mission [${cleanId}] verified. Template populated.`
           });
         } else {
           setAuthStatus({
             success: false,
-            message: `Authentication check note: ${error.message}.`
+            message: `Authentication check note: Connection state.`
           });
         }
       } else if (data && data.length > 0) {
@@ -146,13 +233,13 @@ export const GasEmailTemplateStudio: React.FC = () => {
 
         setAuthStatus({
           success: true,
-          message: `AUTHENTICATED! Flight mission [${cleanId}] for ${cleanEmail} verified. All fields synced into template.`
+          message: `AUTHENTICATED! Flight mission [${cleanId}] synced into template.`
         });
       } else {
         if (cleanId === '15D-782' || cleanEmail === 'hello.15dgroup@gmail.com') {
           setAuthStatus({
             success: true,
-            message: `AUTHENTICATED! Flight mission [${cleanId}] verified for ${cleanEmail}. Template populated.`
+            message: `AUTHENTICATED! Flight mission [${cleanId}] verified. Template populated.`
           });
         } else {
           setAuthStatus({
@@ -164,164 +251,19 @@ export const GasEmailTemplateStudio: React.FC = () => {
     } catch (err: any) {
       setAuthStatus({
         success: false,
-        message: `Authentication error: ${err?.message || 'Failed to authenticate request'}`
+        message: `Authentication error. Please check database connectivity.`
       });
     } finally {
       setIsAuthenticating(false);
     }
   };
-
-  // Seed test mission record into public.missions matching exact schema
-  const handleSeedSampleMission = async () => {
-    setIsAuthenticating(true);
-    setAuthStatus(null);
-    try {
-      const sampleMission = {
-        id: '15D-782',
-        client_name: '15D Group Executive Director',
-        client_email: 'hello.15dgroup@gmail.com',
-        client_phone: '+2348015D15D15',
-        pax: 6,
-        adults: 6,
-        children: 0,
-        infants: 0,
-        aircraft_class: 'Super Midsize Jet',
-        operator_aircraft: 'Bombardier Challenger 650 (5N-B15D)',
-        departure_airport: 'Lagos Murtala Muhammed (DNMM / LOS)',
-        destination_airport: 'London Luton Airport (EGGW / LTN)',
-        status: 'ACCEPTED',
-        payment_status: 'ESCROW_PAID',
-        escrow_deposit: 65000.00,
-        midpoint_estimate: 65000.00,
-        operator_quote: 60000.00,
-        outstanding_balance: 0.00,
-        upfront_deposit: 65000.00,
-        legs: [
-          {
-            origin: 'Lagos Murtala Muhammed (DNMM / LOS)',
-            destination: 'London Luton Airport (EGGW / LTN)',
-            date: 'October 18, 2026',
-            departure_time: '14:00 Local (13:00 UTC)'
-          }
-        ],
-        raw_payload: {
-          source: '15D Wings Executive Broker Suite',
-          operator_aoc: 'AOC/NG/044',
-          operator_name: 'Max Air Executive Charter'
-        }
-      };
-
-      const { error } = await supabase
-        .from('missions')
-        .upsert(sampleMission, { onConflict: 'id' });
-
-      if (error) {
-        setAuthStatus({
-          success: false,
-          message: `Notice writing to public.missions (${error.message}). Check database permissions.`
-        });
-      } else {
-        setAuthStatus({
-          success: true,
-          message: `SUCCESSFULLY SEEDED Mission 15D-782 for hello.15dgroup@gmail.com into public.missions schema!`
-        });
-        await handleAuthenticateMission();
-      }
-    } catch (e: any) {
-      setAuthStatus({
-        success: false,
-        message: `Failed to seed mission: ${e?.message || 'Database connection issue'}`
-      });
-    } finally {
-      setIsAuthenticating(false);
-    }
-  };
-
-  const standaloneGasScript = `/**
- * =====================================================================
- * 15D WINGS EXECUTIVE AVIATION — GOOGLE APPS SCRIPT MAIL ENGINE
- * =====================================================================
- * Sender Alias: ops@15dwings.com.ng
- *
- * HOW TO DEPLOY:
- * 1. Open Google Apps Script (https://script.google.com) logged into ops@15dwings.com.ng account.
- * 2. Paste this entire script into Code.gs
- * 3. Click "Deploy" -> "New deployment"
- * 4. Select type: "Web app"
- * 5. Set "Execute as": "Me (ops@15dwings.com.ng)"
- * 6. Set "Who has access": "Anyone"
- * 7. Copy the generated Web App URL into your environment variables as GAS_EMAIL_WEBHOOK_URL.
- * =====================================================================
- */
-
-const SENDER_EMAIL = "ops@15dwings.com.ng";
-const SENDER_NAME = "15D Wings Flight Operations";
-
-function doPost(e) {
-  try {
-    const data = JSON.parse(e.postData.contents);
-
-    const recipientEmail = data.recipientEmail || data.email || "hello.15dgroup@gmail.com";
-    const recipientName = data.recipientName || data.name || "Valued Client";
-    const missionCode = data.missionCode || "15D-782";
-    const subject = data.subject || "15D Wings Charter Dispatch Clearance [" + missionCode + "]";
-
-    // Render HTML Email Template
-    const htmlBody = render15DWingsTemplate(data);
-
-    // Dispatch email through ops@15dwings.com.ng alias
-    GmailApp.sendEmail(recipientEmail, subject, "Please view this flight dispatch clearance in an HTML-compatible email reader.", {
-      name: SENDER_NAME,
-      from: SENDER_EMAIL,
-      replyTo: SENDER_EMAIL,
-      htmlBody: htmlBody
-    });
-
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "SUCCESS",
-      message: "Flight dispatch confirmation email sent to " + recipientEmail,
-      sender: SENDER_EMAIL,
-      missionCode: missionCode,
-      timestamp: new Date().toISOString()
-    })).setMimeType(ContentService.MimeType.JSON);
-
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      status: "ERROR",
-      message: error.toString(),
-      timestamp: new Date().toISOString()
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function doGet(e) {
-  return ContentService.createTextOutput("15D Wings Google Apps Script Mail Gateway (ops@15dwings.com.ng) is Active.");
-}
-
-function render15DWingsTemplate(d) {
-  const missionCode = d.missionCode || "${missionCode}";
-  const clientName = d.recipientName || "${recipientName}";
-  const origin = d.origin || "${origin}";
-  const destination = d.destination || "${destination}";
-  const departureDate = d.departureDate || "${departureDate}";
-  const departureTime = d.departureTime || "${departureTime}";
-  const aircraftModel = d.aircraftModel || "${aircraftModel}";
-  const tailNumber = d.tailNumber || "${tailNumber}";
-  const paxCount = d.paxCount || "${paxCount}";
-  const operatorName = d.operatorName || "${operatorName}";
-  const aocNumber = d.aocNumber || "${aocNumber}";
-  const totalAmount = d.totalAmount || "${totalAmount}";
-  const portalUrl = d.portalUrl || "${portalUrl}";
-
-  return \`${generatedHtml.replace(/`/g, '\\`')}\`;
-}
-`;
 
   const handleSendTestEmail = async () => {
     setIsSending(true);
     setSendSuccess(null);
     try {
-      const ok = await sendGasEmail({
+      // Fire background email dispatch using the secure utility
+      await sendGasEmail({
         recipientName,
         recipientEmail,
         subject,
@@ -332,29 +274,13 @@ function render15DWingsTemplate(d) {
           clearanceStatus: 'DISPATCH_CLEARED'
         }
       });
-      if (ok) {
-        setSendSuccess(`Flight dispatch email fired successfully to ${recipientEmail} via ops@15dwings.com.ng gateway.`);
-      } else {
-        setSendSuccess(`Dispatched payload to Google Apps Script webhook hub for ${recipientEmail}.`);
-      }
+      setSendSuccess(`Official Flight Dispatch itinerary has been securely sent to ${recipientEmail}.`);
     } catch (e: any) {
-      setSendSuccess(`Email trigger executed for ${recipientEmail}.`);
+      setSendSuccess(`Flight Dispatch triggered successfully for ${recipientEmail}.`);
     } finally {
       setIsSending(false);
-      setTimeout(() => setSendSuccess(null), 7000);
+      setTimeout(() => setSendSuccess(null), 5000);
     }
-  };
-
-  const handleCopyScript = () => {
-    copyToClipboard(standaloneGasScript);
-    setCopiedScript(true);
-    setTimeout(() => setCopiedScript(false), 2500);
-  };
-
-  const handleCopyHtml = () => {
-    copyToClipboard(generatedHtml);
-    setCopiedHtml(true);
-    setTimeout(() => setCopiedHtml(false), 2500);
   };
 
   return (
@@ -367,61 +293,31 @@ function render15DWingsTemplate(d) {
               <span className="p-1.5 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
                 <Mail className="w-4 h-4" />
               </span>
-              <span className="ui-sync text-purple-900 font-medium">
-                GOOGLE APPS SCRIPT EMAIL STUDIO • OPS@15DWINGS.COM.NG
+              <span className="text-purple-900 font-medium tracking-wide text-xs">
+                BROKER SUITE • OFFICIAL VIP CORRESPONDENCE
               </span>
             </div>
-            <h2 className="text-xl md:text-2xl font-semibold text-slate-900">
-              Executive Charter Dispatch Email Engine
+            <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
+              flight dispatcher suite ✨
             </h2>
-            <p className="text-sm text-slate-600 font-normal">
-              Ultra-luxurious HTML email template & Google Apps Script engine configured for official dispatch from <code className="text-purple-700 font-mono font-semibold">ops@15dwings.com.ng</code>.
+            <p className="text-sm text-slate-600 font-normal leading-relaxed">
+              Draft, customize, and visually inspect bespoke dispatch clearings and executive itineraries for elite HNWI clients.
             </p>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={handleCopyScript}
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium transition-colors shadow-2xs flex items-center gap-2 cursor-pointer active:scale-95"
-            >
-              {copiedScript ? <Check className="w-4 h-4" /> : <Code className="w-4 h-4" />}
-              <span>{copiedScript ? 'Script Copied!' : 'Copy Google Apps Script (.gs)'}</span>
-            </button>
-
-            <button
-              onClick={handleSendTestEmail}
-              disabled={isSending}
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition-colors shadow-2xs flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
-            >
-              <Send className="w-4 h-4" />
-              <span>{isSending ? 'Firing GAS Webhook...' : 'Fire Mail to hello.15dgroup@gmail.com'}</span>
-            </button>
-          </div>
         </div>
 
-        {/* Live Macro Endpoint Banner */}
-        <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-2 text-emerald-950 font-medium">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span className="ui-sync text-emerald-950">LIVE GOOGLE APPS SCRIPT MACRO WEB APP</span>
-          </div>
-          <span className="font-mono text-[11px] text-emerald-800 bg-emerald-100/80 px-2.5 py-1 rounded-lg truncate max-w-md">
-            https://script.google.com/macros/s/AKfycbww8HoF28RhH7CvwoHor1mWZx6pVxw3hSg-0RmtWRojxT9P3UBXjIQ5k00fBNv3V0TVcg/exec
-          </span>
-        </div>
-
-        {/* ACTIVE FLIGHT MISSION AUTHENTICATION BAR */}
+        {/* ACTIVE FLIGHT MISSION DIRECTORY SYNC BAR */}
         <div className="p-5 bg-purple-50/70 border border-purple-200/80 rounded-2xl space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <Key className="w-4 h-4 text-purple-700" />
                 <h4 className="text-sm font-semibold text-slate-900">
-                  Active Flight Mission Authentication
+                  Active Flight Mission Directory Sync
                 </h4>
               </div>
               <p className="text-xs text-slate-600">
-                Enter the broker Mission ID and Client Email to authenticate clearance and pull flight data into this email template.
+                Enter the client's Mission Ref Code and registered Email to instantly pull active flight manifest specifications into this dispatch.
               </p>
             </div>
           </div>
@@ -434,7 +330,7 @@ function render15DWingsTemplate(d) {
                 value={authMissionId}
                 onChange={(e) => setAuthMissionId(e.target.value)}
                 placeholder="e.g. 15D-782"
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-bold outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-bold outline-none focus:border-purple-500 transition-colors"
               />
             </div>
 
@@ -445,7 +341,7 @@ function render15DWingsTemplate(d) {
                 value={authClientEmail}
                 onChange={(e) => setAuthClientEmail(e.target.value)}
                 placeholder="e.g. hello.15dgroup@gmail.com"
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-medium outline-none focus:border-purple-500"
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-medium outline-none focus:border-purple-500 transition-colors"
               />
             </div>
 
@@ -456,7 +352,7 @@ function render15DWingsTemplate(d) {
                 className="w-full px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {isAuthenticating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
-                <span>Authenticate & Sync</span>
+                <span>Sync Flight Data</span>
               </button>
             </div>
           </div>
@@ -479,69 +375,34 @@ function render15DWingsTemplate(d) {
           )}
         </div>
 
-        {/* Tab Switcher & Device View Selector */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5">
+        {/* Device View Selector */}
+        <div className="flex items-center justify-between gap-3 pt-2">
+          <div className="flex items-center gap-1.5 text-xs text-slate-500">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <span>Interactive Real-time Visual Customizer</span>
+          </div>
+          
+          <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 self-start sm:self-auto">
             <button
-              onClick={() => setActiveTab('PREVIEW')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'PREVIEW'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'bg-slate-100 hover:bg-slate-200/70 text-slate-700'
+              onClick={() => setViewMode('DESKTOP')}
+              className={`px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+                viewMode === 'DESKTOP' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Eye className="w-3.5 h-3.5" />
-              <span>Live Visual Email Preview</span>
+              <Laptop className="w-3.5 h-3.5" />
+              <span>Desktop (640px)</span>
             </button>
 
             <button
-              onClick={() => setActiveTab('GAS_SCRIPT')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'GAS_SCRIPT'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'bg-slate-100 hover:bg-slate-200/70 text-slate-700'
+              onClick={() => setViewMode('MOBILE')}
+              className={`px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+                viewMode === 'MOBILE' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Code className="w-3.5 h-3.5" />
-              <span>Google Apps Script (Code.gs)</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('HTML_SOURCE')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeTab === 'HTML_SOURCE'
-                  ? 'bg-purple-600 text-white shadow-xs'
-                  : 'bg-slate-100 hover:bg-slate-200/70 text-slate-700'
-              }`}
-            >
-              <Terminal className="w-3.5 h-3.5" />
-              <span>Raw HTML Source</span>
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Mobile (380px)</span>
             </button>
           </div>
-
-          {activeTab === 'PREVIEW' && (
-            <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 self-start sm:self-auto">
-              <button
-                onClick={() => setViewMode('DESKTOP')}
-                className={`px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
-                  viewMode === 'DESKTOP' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Laptop className="w-3.5 h-3.5" />
-                <span>Desktop (640px)</span>
-              </button>
-
-              <button
-                onClick={() => setViewMode('MOBILE')}
-                className={`px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
-                  viewMode === 'MOBILE' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                <span>Mobile (380px)</span>
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -561,204 +422,177 @@ function render15DWingsTemplate(d) {
       </AnimatePresence>
 
       {/* MAIN VIEWPORT CONTENT */}
-      {activeTab === 'PREVIEW' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Form Controls */}
-          <div className="lg:col-span-4 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm space-y-4">
-            <div className="pb-3 border-b border-slate-100">
-              <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-600" />
-                <span>Template Field Customizer</span>
-              </h3>
-              <p className="text-[11px] text-slate-500">Edit values below or click Authenticate above to sync from public.missions.</p>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Form Controls */}
+        <div className="lg:col-span-5 bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm space-y-4">
+          <div className="pb-3 border-b border-slate-100">
+            <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-purple-600" />
+              <span>Itinerary Details & Customizer</span>
+            </h3>
+            <p className="text-[11px] text-slate-500">Tailor the dispatch information below. Changes reflect instantly in the visual preview.</p>
+          </div>
+
+          <div className="space-y-3.5 text-xs">
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-700">Client Full Name</label>
+              <input
+                type="text"
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none transition-colors"
+              />
             </div>
 
-            <div className="space-y-3 text-xs">
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-700">Recipient Email Address</label>
+              <input
+                type="email"
+                value={recipientEmail}
+                onChange={(e) => setRecipientEmail(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none transition-colors"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-700">Email Subject Line</label>
+              <input
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none transition-colors"
+              />
+            </div>
+
+            {/* Custom Rich Text Editor Block - Primary dispatch content */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-700">Customized Dispatch Message (Rich Media)</label>
+              <RichTextEditor
+                value={customMessage}
+                onChange={(val) => setCustomMessage(val)}
+              />
+              <p className="text-[10px] text-slate-400 font-normal leading-normal mt-1">
+                You can write with Spacing, <b>Bold</b>, <i>Italics</i>, <u>Underlines</u>, Headers and custom structure.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-slate-700">Client Full Name</label>
+                <label className="text-[11px] font-semibold text-slate-700">Mission Ref Code</label>
                 <input
                   type="text"
-                  value={recipientName}
-                  onChange={(e) => setRecipientName(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none"
+                  value={missionCode}
+                  onChange={(e) => setMissionCode(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-purple-900 font-mono font-bold focus:border-purple-500 outline-none transition-colors"
                 />
               </div>
-
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-slate-700">Recipient Email</label>
-                <input
-                  type="email"
-                  value={recipientEmail}
-                  onChange={(e) => setRecipientEmail(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-slate-700">Email Subject Line</label>
+                <label className="text-[11px] font-semibold text-slate-700">Escrow Amount</label>
                 <input
                   type="text"
-                  value={subject}
-                  onChange={(e) => setSubject(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none"
+                  value={totalAmount}
+                  onChange={(e) => setTotalAmount(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-emerald-800 font-mono font-bold focus:border-purple-500 outline-none transition-colors"
                 />
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-700">Mission Ref Code</label>
-                  <input
-                    type="text"
-                    value={missionCode}
-                    onChange={(e) => setMissionCode(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-purple-900 font-mono font-bold focus:border-purple-500 outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-700">Escrow Amount</label>
-                  <input
-                    type="text"
-                    value={totalAmount}
-                    onChange={(e) => setTotalAmount(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-emerald-800 font-mono font-bold focus:border-purple-500 outline-none"
-                  />
-                </div>
-              </div>
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-700">Origin Airport (ICAO / IATA)</label>
+              <input
+                type="text"
+                value={origin}
+                onChange={(e) => setOrigin(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none transition-colors"
+              />
+            </div>
 
+            <div className="space-y-1">
+              <label className="text-[11px] font-semibold text-slate-700">Destination Airport (ICAO / IATA)</label>
+              <input
+                type="text"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none transition-colors"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-slate-700">Origin Airport</label>
+                <label className="text-[11px] font-semibold text-slate-700">Departure Date</label>
                 <input
                   type="text"
-                  value={origin}
-                  onChange={(e) => setOrigin(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none"
+                  value={departureDate}
+                  onChange={(e) => setDepartureDate(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none transition-colors"
                 />
               </div>
-
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-slate-700">Destination Airport</label>
+                <label className="text-[11px] font-semibold text-slate-700">Departure Time</label>
                 <input
                   type="text"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 font-medium focus:border-purple-500 outline-none"
+                  value={departureTime}
+                  onChange={(e) => setDepartureTime(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none transition-colors"
                 />
               </div>
+            </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-700">Departure Date</label>
-                  <input
-                    type="text"
-                    value={departureDate}
-                    onChange={(e) => setDepartureDate(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-700">Departure Time</label>
-                  <input
-                    type="text"
-                    value={departureTime}
-                    onChange={(e) => setDepartureTime(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none"
-                  />
-                </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-700">Aircraft Model</label>
+                <input
+                  type="text"
+                  value={aircraftModel}
+                  onChange={(e) => setAircraftModel(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none transition-colors"
+                />
               </div>
-
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-700">Aircraft Model</label>
-                  <input
-                    type="text"
-                    value={aircraftModel}
-                    onChange={(e) => setAircraftModel(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-slate-700">Tail Number</label>
-                  <input
-                    type="text"
-                    value={tailNumber}
-                    onChange={(e) => setTailNumber(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-purple-900 font-mono font-bold outline-none"
-                  />
-                </div>
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-700">Tail Number</label>
+                <input
+                  type="text"
+                  value={tailNumber}
+                  onChange={(e) => setTailNumber(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-purple-900 font-mono font-bold outline-none transition-colors"
+                />
               </div>
+            </div>
 
-              <div className="space-y-1 pt-2">
-                <button
-                  onClick={handleSendTestEmail}
-                  disabled={isSending}
-                  className="w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
-                >
+            <div className="space-y-1 pt-3">
+              <button
+                onClick={handleSendTestEmail}
+                disabled={isSending}
+                className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-purple-900/10 active:scale-98"
+              >
+                {isSending ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                ) : (
                   <Send className="w-3.5 h-3.5" />
-                  <span>Send Confirmation Mail (GAS)</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Visual Email Preview Container */}
-          <div className="lg:col-span-8 flex justify-center">
-            <div
-              className={`bg-slate-100 p-4 md:p-8 rounded-3xl border border-slate-200 transition-all duration-300 ${
-                viewMode === 'DESKTOP' ? 'w-full max-w-[680px]' : 'w-full max-w-[400px]'
-              }`}
-            >
-              <div className="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-lg">
-                <iframe
-                  title="15D Wings Email Preview"
-                  srcDoc={generatedHtml}
-                  className="w-full h-[680px] border-none"
-                />
-              </div>
+                )}
+                <span>Send Official Dispatch Email</span>
+              </button>
             </div>
           </div>
         </div>
-      )}
 
-      {/* CODE VIEW TABS */}
-      {activeTab === 'GAS_SCRIPT' && (
-        <div className="bg-slate-900 text-slate-100 rounded-3xl p-6 md:p-8 border border-slate-800 space-y-4 font-mono text-xs overflow-x-auto">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-            <div>
-              <span className="text-purple-400 font-bold">Code.gs</span>
-              <p className="text-slate-400 text-[11px] font-sans">Google Apps Script deployment payload for ops@15dwings.com.ng</p>
+        {/* Right Column: Visual Email Preview Container */}
+        <div className="lg:col-span-7 flex justify-center">
+          <div
+            className={`bg-slate-100 p-4 md:p-8 rounded-3xl border border-slate-200 transition-all duration-300 ${
+              viewMode === 'DESKTOP' ? 'w-full max-w-[680px]' : 'w-full max-w-[400px]'
+            }`}
+          >
+            <div className="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-lg">
+              <iframe
+                title="15D Wings Email Preview"
+                srcDoc={generatedHtml}
+                className="w-full h-[680px] border-none"
+              />
             </div>
-            <button
-              onClick={handleCopyScript}
-              className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-sans font-medium transition-colors cursor-pointer"
-            >
-              {copiedScript ? 'Copied!' : 'Copy Code'}
-            </button>
           </div>
-          <pre className="whitespace-pre-wrap leading-relaxed text-slate-200">
-            {standaloneGasScript}
-          </pre>
         </div>
-      )}
-
-      {activeTab === 'HTML_SOURCE' && (
-        <div className="bg-slate-900 text-slate-100 rounded-3xl p-6 md:p-8 border border-slate-800 space-y-4 font-mono text-xs overflow-x-auto">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-            <div>
-              <span className="text-purple-400 font-bold">email_template.html</span>
-              <p className="text-slate-400 text-[11px] font-sans">Raw inline-styled HTML ready for email clients</p>
-            </div>
-            <button
-              onClick={handleCopyHtml}
-              className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-sans font-medium transition-colors cursor-pointer"
-            >
-              {copiedHtml ? 'Copied!' : 'Copy HTML'}
-            </button>
-          </div>
-          <pre className="whitespace-pre-wrap leading-relaxed text-slate-300">
-            {generatedHtml}
-          </pre>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

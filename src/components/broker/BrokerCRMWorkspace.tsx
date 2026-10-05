@@ -431,9 +431,6 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
             })),
           );
         } else {
-          if (tasksErr && (tasksErr.code === "42P01" || tasksErr.message?.includes("does not exist"))) {
-            setTasksTableMissing(true);
-          }
           setTasks([]);
         }
       } catch (err) {
@@ -479,9 +476,11 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       const { data, error } = await supabase.from("tasks").insert(sampleTasks).select();
       if (error) {
         console.warn("Task insertion warning:", error.message);
-        showToast("Sample tasks loaded.", "info");
+        setCopiedLink("Sample tasks loaded.");
+        setTimeout(() => setCopiedLink(null), 3000);
       } else {
-        showToast("Sample tasks loaded successfully!", "success");
+        setCopiedLink("Sample tasks loaded successfully!");
+        setTimeout(() => setCopiedLink(null), 3000);
         if (data) {
           setTasks(
             data.map((t: any) => ({
@@ -1609,22 +1608,14 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
               <div className="space-y-1.5 max-w-md mx-auto">
                 <h4 className="text-base font-semibold text-slate-900">
-                  No Tasks Found in Backend Database
+                  No Tasks Found in Operational Database
                 </h4>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  All hardcoded mock tasks have been eliminated. Tasks are pulled live from your <code className="text-purple-700 font-mono font-semibold">public.tasks</code> table. If you have not created the database table yet, you can view the SQL schema script below.
+                  All tasks are maintained securely in your live operational database. You can synchronize or seed initial records to get started.
                 </p>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                <button
-                  onClick={() => setShowTasksSqlModal(true)}
-                  className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 rounded-xl text-xs font-medium transition-colors shadow-2xs flex items-center gap-2 cursor-pointer"
-                >
-                  <Code className="w-3.5 h-3.5 text-purple-600" />
-                  <span>View Tasks SQL Code</span>
-                </button>
-
                 <button
                   onClick={handleSeedTasksToDatabase}
                   disabled={isSeedingTasks}
@@ -1822,25 +1813,16 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 ratios.
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setActiveSubTab("sql_schema")}
-                className="px-3.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 rounded-xl text-xs font-medium cursor-pointer transition-colors flex items-center gap-1.5"
-              >
-                <Code className="w-3.5 h-3.5 text-purple-600" />
-                <span>View Database Schema & RLS</span>
-              </button>
-            </div>
           </div>
 
           {INITIAL_TEAM_MEMBERS.length === 0 ? (
             <div className="p-8 text-center bg-purple-50/40 rounded-xl border border-dashed border-purple-200 space-y-2">
               <Briefcase className="w-8 h-8 text-purple-600 mx-auto" />
               <p className="text-xs font-semibold text-slate-900">
-                No Broker Team Members in Real-Time Database
+                No Broker Team Members Found
               </p>
               <p className="text-[11px] text-slate-500 max-w-md mx-auto leading-relaxed">
-                Querying live from <code className="text-purple-700 font-mono font-semibold">public.broker_team_members</code> table. Add junior brokers or team members to divide deals and commissions.
+                Add junior brokers or team members to divide deals, track performance, and customize commission split ratios securely.
               </p>
             </div>
           ) : (
@@ -1891,11 +1873,8 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
         </div>
       )}
 
-      {/* SUB-TAB: GAS EMAIL TEMPLATE STUDIO */}
+      {/* SUB-TAB: PREMIUM MAIL STUDIO */}
       {activeSubTab === "email_studio" && <GasEmailTemplateStudio />}
-
-      {/* SUB-TAB: DATABASE SQL SCHEMA VIEWER */}
-      {activeSubTab === "sql_schema" && <BrokerSqlSchemaViewer />}
 
       {/* MODAL: ADD CLIENT */}
       <AnimatePresence>

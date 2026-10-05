@@ -356,7 +356,7 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
                     className="p-3 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-left transition-colors cursor-pointer"
                   >
                     <Mail className="w-4 h-4 text-purple-600 mb-1.5" />
-                    <span className="text-xs font-medium text-purple-950">GAS Email Studio</span>
+                    <span className="text-xs font-medium text-purple-950">Premium Mail Studio</span>
                   </button>
 
                 </div>

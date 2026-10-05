@@ -16,6 +16,7 @@ export interface GasEmailTemplateData {
   aocNumber?: string;
   totalAmount?: string;
   portalUrl?: string;
+  customMessage?: string;
 }
 
 interface GasMailPayload {
@@ -49,6 +50,7 @@ export function generate15DWingsHtmlEmail(d: GasEmailTemplateData): string {
   const aocNumber = d.aocNumber || "AOC/NG/044";
   const totalAmount = d.totalAmount || "$65,000 USD";
   const portalUrl = d.portalUrl || `https://vip.15dwings.com.ng/verify/${missionCode}`;
+  const customMessage = d.customMessage || "Your private aviation itinerary has been validated against our licensed carrier network. Flight crews, landing slots, and ground handling services are locked for execution.";
 
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -107,9 +109,9 @@ export function generate15DWingsHtmlEmail(d: GasEmailTemplateData): string {
                     <h1 style="font-size: 22px; font-weight: 700; color: #0f172a; margin: 12px 0 6px 0; letter-spacing: -0.5px;">
                       Charter Mission Confirmed, ${clientName}
                     </h1>
-                    <p style="font-size: 14px; color: #475569; margin: 0; line-height: 1.6;">
-                      Your private aviation itinerary has been validated against our licensed carrier network. Flight crews, landing slots, and ground handling services are locked for execution.
-                    </p>
+                    <div style="font-size: 14px; color: #475569; margin: 0; line-height: 1.6;">
+                      ${customMessage}
+                    </div>
                   </td>
                 </tr>
               </table>

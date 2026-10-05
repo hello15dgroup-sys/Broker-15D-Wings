@@ -4,8 +4,7 @@ compatibility_date = "2024-03-20"
 
 assets = { directory = "./dist" }
 
-# Note: You will need to securely provide the Supabase secrets
-# using wrangler secret put
+# Note: Securely provide the Supabase secrets using wrangler secret put
 # > npx wrangler secret put SUPABASE_URL
 # > npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 
@@ -18,47 +17,12 @@ binding = "MISSION_DOCS"
 bucket_name = "15dwings-mission-docs"
 
 [[durable_objects.bindings]]
-name = "MISSION_DO"
-class_name = "MissionPortalDO"
-
-[[durable_objects.bindings]]
-name = "OPERATOR_DO"
-class_name = "OperatorPortalDO"
-
-[[durable_objects.bindings]]
-name = "ICC_DO"
-class_name = "ICCPortalDO"
-
-[[durable_objects.bindings]]
-name = "DOCUMENT_DO"
-class_name = "DocumentProcessorDO"
-
-[[durable_objects.bindings]]
-name = "CLOCK_DO"
-class_name = "MissionClockDO"
-
-[[durable_objects.bindings]]
-name = "PRICE_DO"
-class_name = "PricingEngineDO"
+name = "CHAT_DO"
+class_name = "ChatDO"
 
 [ai]
 binding = "AI"
 
 [[migrations]]
 tag = "v1"
-
-new_sqlite_classes = [
-  "MissionPortalDO",
-  "OperatorPortalDO",
-  "ICCPortalDO",
-  "DocumentProcessorDO",
-  "MissionClockDO"
-]
-
-[[migrations]]
-tag = "v2"
-
-new_sqlite_classes = [
-  "PricingEngineDO"
-]
-
+new_sqlite_classes = ["ChatDO"]
