@@ -360,8 +360,8 @@ export const GasEmailTemplateStudio: React.FC<GasEmailTemplateStudioProps> = ({
                 BROKER SUITE • OFFICIAL VIP CORRESPONDENCE
               </span>
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <span>15D Wings for Private Flight Brokers</span>
+            <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
+              15D Wings for Private Flight Brokers
             </h2>
             <p className="text-sm text-slate-600 font-normal leading-relaxed">
               Draft, customize, and visually inspect bespoke dispatch clearings and executive itineraries for elite HNWI clients.
