@@ -412,10 +412,10 @@ export const GasEmailTemplateStudio: React.FC<GasEmailTemplateStudioProps> = ({
               <button
                 onClick={handleAuthenticateMission}
                 disabled={isAuthenticating}
-                className="w-full px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition-colors shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="w-full px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs transition-colors shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {isAuthenticating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
-                <span>Sync Flight Data</span>
+                <span className="font-sync uppercase tracking-[0.2em] font-normal text-[9px]">Sync Flight Data</span>
               </button>
             </div>
           </div>

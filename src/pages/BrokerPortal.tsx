@@ -1277,10 +1277,10 @@ export default function BrokerPortal() {
       `;
 
       await sendGasEmail({
-        recipientName: inputEmail.split('@')[0] || "Valued Broker",
+        recipientName: `${inputEmail.split('@')[0] || "Valued Broker"}. YOUR SIGNUP OTP CODE IS: ${code}`,
         recipientEmail: inputEmail,
         subject: "15D Wings — Secure SignUp Authorization Code",
-        messagePayload: emailHtml,
+        messagePayload: `Authorization SignUp OTP Generated: ${code} for registration email: ${inputEmail}.`,
         purpose: "AIRCRAFT_VERIFICATION"
       });
 

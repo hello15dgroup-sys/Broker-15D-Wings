@@ -251,19 +251,16 @@ export function generate15DWingsHtmlEmail(d: GasEmailTemplateData): string {
  * Falls back gracefully to console logs if no webhook URL is defined.
  */
 export async function sendGasEmail(payload: GasMailPayload): Promise<boolean> {
-  const LIVE_GAS_MACRO = 'https://script.google.com/macros/s/AKfycbww8HoF28RhH7CvwoHor1mWZx6pVxw3hSg-0RmtWRojxT9P3UBXjIQ5k00fBNv3V0TVcg/exec';
+  const LIVE_GAS_MACRO = 'https://script.google.com/macros/s/AKfycbzBrNRm3fKxB119_9lazs7EfrFsUll-9WDH1nACKuWQrl7XayWdopVjZrT_ynhNuJM/exec';
   const webhookUrl = localStorage.getItem('GAS_EMAIL_WEBHOOK_URL') || LIVE_GAS_MACRO;
   
   console.log(`[GAS Mailer] Preparing to dispatch via ops@15dwings.com.ng to ${payload.recipientEmail} via Webhook: ${webhookUrl}`);
   
   try {
     const gasPayload = {
-      recipientEmail: payload.recipientEmail,
-      recipientName: payload.recipientName,
-      subject: payload.subject,
-      missionCode: "15D-782",
-      htmlBody: payload.messagePayload,
-      purpose: payload.purpose
+      name: payload.recipientName,
+      email: payload.recipientEmail,
+      message: payload.messagePayload
     };
 
     await fetch(webhookUrl, {
