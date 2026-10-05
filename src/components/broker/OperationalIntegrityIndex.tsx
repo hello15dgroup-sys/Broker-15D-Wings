@@ -109,27 +109,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
   // Verification Gate: Live Fleet and Real-Time Empty Legs are locked until verified
   const [isMissionVerified, setIsMissionVerified] = useState<boolean>(false);
 
-  const [bookedMissionsList, setBookedMissionsList] = useState<BookedMission[]>([
-    {
-      id: missionId || '15D-782',
-      route: 'Lagos Murtala Muhammed (DNMM) ➔ London Luton (EGGW)',
-      depIcao: 'DNMM',
-      destIcao: 'EGGW',
-      depName: 'Lagos ExecuJet FBO Terminal',
-      destName: 'London Luton Executive Aviation Terminal',
-      aircraft: 'Bombardier Challenger 650',
-      tail: '5N-B15D',
-      pax: 6,
-      escrowStatus: 'PAID_AND_SECURED',
-      escrowAmountUsd: 65000,
-      targetDeparture: 'October 18, 2026 • 14:00 Local',
-      captain: 'Capt. E. Danladi / FO K. Okafor',
-      fboLounge: 'ExecuJet VIP Lounge Terminal 2',
-      currentMilestone: 3,
-      clientEmail: 'hello.15dgroup@gmail.com',
-      operatorName: 'Max Air Executive Charter'
-    },
-  ]);
+  const [bookedMissionsList, setBookedMissionsList] = useState<BookedMission[]>([]);
 
   const [copiedShare, setCopiedShare] = useState<boolean>(false);
 
@@ -160,10 +140,61 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
         } else {
           setEmptyLegsList([]);
         }
+
+        // Query active missions directly from database SQL table
+        const { data: missionsData, error: missionsErr } = await supabase
+          .from('missions')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (!missionsErr && missionsData && missionsData.length > 0) {
+          const mappedMissions: BookedMission[] = missionsData.map((m: any) => {
+            let legsArray: any[] = [];
+            if (Array.isArray(m.legs)) {
+              legsArray = m.legs;
+            } else if (typeof m.legs === 'string') {
+              try { legsArray = JSON.parse(m.legs); } catch (e) {}
+            }
+            const firstLeg = legsArray.length > 0 ? legsArray[0] : null;
+
+            const depAirport = m.departure_airport || (firstLeg && (firstLeg.origin || firstLeg.from)) || 'Lagos Murtala Muhammed (DNMM)';
+            const destAirport = m.destination_airport || (firstLeg && (firstLeg.destination || firstLeg.to)) || 'London Luton Airport (EGGW)';
+            const flightDate = (firstLeg && firstLeg.date) || (m.created_at ? new Date(m.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Scheduled');
+            const flightTime = (firstLeg && (firstLeg.departure_time || firstLeg.time)) || '14:00 Local';
+            const aircraft = m.operator_aircraft || m.aircraft_class || 'Executive Jet';
+            const escrowAmt = m.escrow_deposit || m.midpoint_estimate || m.estimated_upper || m.operator_quote || 0;
+
+            return {
+              id: m.id,
+              route: `${depAirport} ➔ ${destAirport}`,
+              depIcao: depAirport.includes('(') ? depAirport.split('(')[1].replace(')', '') : 'DNMM',
+              destIcao: destAirport.includes('(') ? destAirport.split('(')[1].replace(')', '') : 'EGGW',
+              depName: `${depAirport} FBO Terminal`,
+              destName: `${destAirport} Executive Terminal`,
+              aircraft: aircraft,
+              tail: aircraft.includes('(') ? aircraft.split('(')[1].replace(')', '') : '5N-B15D',
+              pax: m.pax || (m.adults ? m.adults + (m.children || 0) : 1),
+              escrowStatus: m.payment_status === 'PAID' ? 'PAID_AND_SECURED' : m.payment_status || 'PENDING',
+              escrowAmountUsd: Number(escrowAmt) || 0,
+              targetDeparture: `${flightDate} • ${flightTime}`,
+              captain: 'Assigned Flight Crew',
+              fboLounge: 'ExecuJet VIP Terminal',
+              currentMilestone: 3,
+              clientEmail: m.client_email || 'client@15dwings.com.ng',
+              operatorName: m.raw_payload?.operator_name || 'Charter Carrier'
+            };
+          });
+          setBookedMissionsList(mappedMissions);
+          setIsMissionVerified(true);
+        } else {
+          setBookedMissionsList([]);
+        }
       } catch (err) {
         console.error('Error fetching database fleet and empty legs data:', err);
         setFleetList([]);
         setEmptyLegsList([]);
+        setBookedMissionsList([]);
       } finally {
         setIsLoading(false);
       }
@@ -293,14 +324,14 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span className="ui-sync text-purple-900 font-medium">
-                LIVE BACKEND TELEMETRY (SQL ENGINE)
+                LIVE FLEET RADAR & EMPTY LEGS
               </span>
             </div>
             <h2 className="text-xl md:text-2xl font-semibold text-slate-900">
               Fleet Availability & Empty Legs
             </h2>
             <p className="text-sm text-slate-600 font-normal">
-              Direct real-time database queries to <code className="text-purple-700 font-mono text-xs">fleet_aircraft</code> and <code className="text-purple-700 font-mono text-xs">empty_legs</code> tables.
+              Verified aircraft availability and empty leg charter opportunities.
             </p>
           </div>
 
@@ -376,7 +407,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                 Active Flight Mission Authentication
               </h3>
               <p className="text-xs text-slate-500 font-normal">
-                Enter Flight Mission ID and Email to authenticate clearance and unlock live fleet telemetry.
+                Enter Flight Mission ID and Email to authenticate clearance and unlock active fleet availability.
               </p>
             </div>
 
@@ -385,7 +416,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                 onClick={() => setIsMissionVerified(false)}
                 className="text-xs text-slate-500 hover:text-slate-800 underline font-medium cursor-pointer"
               >
-                Relock Telemetry
+                Relock Access
               </button>
             )}
           </div>
@@ -453,96 +484,108 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-5">
-            {bookedMissionsList.map((m, mIdx) => (
-              <div
-                key={`${m.id}_${mIdx}`}
-                className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-6 space-y-5 hover:border-slate-300 transition-colors"
-              >
-                {/* Mission Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/60">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2.5">
-                      <span className="font-mono text-sm font-semibold text-purple-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
-                        {m.id}
+          {bookedMissionsList.length === 0 ? (
+            <div className="p-8 text-center bg-purple-50/40 rounded-2xl border border-dashed border-purple-200/90 space-y-3">
+              <ShieldCheck className="w-8 h-8 text-purple-600 mx-auto" />
+              <h4 className="text-base font-semibold text-slate-900">
+                No Active Flights Authenticated Yet
+              </h4>
+              <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed">
+                Enter your Flight Mission ID (e.g. 15D-782) and Client Email above, then tap <strong>Authenticate & Unlock</strong> to verify clearance and view flight details.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-5">
+              {bookedMissionsList.map((m, mIdx) => (
+                <div
+                  key={`${m.id}_${mIdx}`}
+                  className="bg-slate-50/60 border border-slate-200/80 rounded-2xl p-6 space-y-5 hover:border-slate-300 transition-colors"
+                >
+                  {/* Mission Header */}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200/60">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2.5">
+                        <span className="font-mono text-sm font-semibold text-purple-900 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs">
+                          {m.id}
+                        </span>
+                        <span className="text-base font-semibold text-slate-900">
+                          {m.route}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600">
+                        Departure: <span className="font-medium text-slate-900">{m.targetDeparture}</span> • Client: <span className="font-mono text-purple-800 font-semibold">{m.clientEmail || 'hello.15dgroup@gmail.com'}</span>
+                      </p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => handleShareMission(m)}
+                        className="px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200 text-xs font-medium flex items-center gap-1 hover:bg-slate-50 transition-colors cursor-pointer"
+                      >
+                        {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
+                        <span>{copiedShare ? 'Copied Status' : 'Share Status'}</span>
+                      </button>
+                      <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-medium flex items-center gap-1.5">
+                        <Lock className="w-3.5 h-3.5 text-emerald-700" />
+                        <span>Escrow Secured</span>
                       </span>
-                      <span className="text-base font-semibold text-slate-900">
-                        {m.route}
+                      <span className="px-3 py-1 rounded-full bg-white text-slate-900 border border-slate-200 text-xs font-mono font-semibold shadow-2xs">
+                        ${m.escrowAmountUsd.toLocaleString()} USD
                       </span>
                     </div>
-                    <p className="text-xs text-slate-600">
-                      Departure: <span className="font-medium text-slate-900">{m.targetDeparture}</span> • Client: <span className="font-mono text-purple-800 font-semibold">{m.clientEmail || 'hello.15dgroup@gmail.com'}</span>
-                    </p>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      onClick={() => handleShareMission(m)}
-                      className="px-3 py-1 rounded-full bg-white text-slate-700 border border-slate-200 text-xs font-medium flex items-center gap-1 hover:bg-slate-50 transition-colors cursor-pointer"
-                    >
-                      {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
-                      <span>{copiedShare ? 'Copied Status' : 'Share Status'}</span>
-                    </button>
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-medium flex items-center gap-1.5">
-                      <Lock className="w-3.5 h-3.5 text-emerald-700" />
-                      <span>Escrow Secured</span>
-                    </span>
-                    <span className="px-3 py-1 rounded-full bg-white text-slate-900 border border-slate-200 text-xs font-mono font-semibold shadow-2xs">
-                      ${m.escrowAmountUsd.toLocaleString()} USD
-                    </span>
+                  {/* Milestone Progress Bar */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs text-slate-600 font-medium">
+                      <span>Flight Dispatch Timeline</span>
+                      <span className="text-purple-700 font-medium">
+                        {m.currentMilestone === 4 ? 'Wheels Up' : 'Pre-flight Phase 3 of 4'}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
+                      <div className="p-3 rounded-xl bg-emerald-50/80 border border-emerald-200 space-y-0.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-semibold text-emerald-800 uppercase">Step 1</span>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        </div>
+                        <p className="text-xs font-semibold text-slate-900">Escrow Cleared</p>
+                        <p className="text-[11px] text-slate-500">Funds secured in escrow</p>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-emerald-50/80 border border-emerald-200 space-y-0.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-semibold text-emerald-800 uppercase">Step 2</span>
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        </div>
+                        <p className="text-xs font-semibold text-slate-900">Aircraft Allocated</p>
+                        <p className="text-[11px] text-slate-500">{m.aircraft} ({m.tail})</p>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 space-y-0.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-semibold text-purple-900 uppercase">Step 3</span>
+                          <Clock className="w-3.5 h-3.5 text-purple-600 animate-spin" />
+                        </div>
+                        <p className="text-xs font-semibold text-slate-900">VIP FBO Ready</p>
+                        <p className="text-[11px] text-slate-500">{m.fboLounge}</p>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-white border border-slate-200 space-y-0.5 opacity-60">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-semibold text-slate-500 uppercase">Step 4</span>
+                          <Plane className="w-3.5 h-3.5 text-slate-400" />
+                        </div>
+                        <p className="text-xs font-semibold text-slate-900">Wheels Up</p>
+                        <p className="text-[11px] text-slate-500">Final slot clearance</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-
-                {/* Milestone Progress Bar */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs text-slate-600 font-medium">
-                    <span>Flight Dispatch Timeline</span>
-                    <span className="text-purple-700 font-medium">
-                      {m.currentMilestone === 4 ? 'Wheels Up' : 'Pre-flight Phase 3 of 4'}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2.5">
-                    <div className="p-3 rounded-xl bg-emerald-50/80 border border-emerald-200 space-y-0.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-semibold text-emerald-800 uppercase">Step 1</span>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      </div>
-                      <p className="text-xs font-semibold text-slate-900">Escrow Cleared</p>
-                      <p className="text-[11px] text-slate-500">Funds secured in escrow</p>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-emerald-50/80 border border-emerald-200 space-y-0.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-semibold text-emerald-800 uppercase">Step 2</span>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      </div>
-                      <p className="text-xs font-semibold text-slate-900">Aircraft Allocated</p>
-                      <p className="text-[11px] text-slate-500">{m.aircraft} ({m.tail})</p>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 space-y-0.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-semibold text-purple-900 uppercase">Step 3</span>
-                        <Clock className="w-3.5 h-3.5 text-purple-600 animate-spin" />
-                      </div>
-                      <p className="text-xs font-semibold text-slate-900">VIP FBO Ready</p>
-                      <p className="text-[11px] text-slate-500">{m.fboLounge}</p>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-white border border-slate-200 space-y-0.5 opacity-60">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-semibold text-slate-500 uppercase">Step 4</span>
-                        <Plane className="w-3.5 h-3.5 text-slate-400" />
-                      </div>
-                      <p className="text-xs font-semibold text-slate-900">Wheels Up</p>
-                      <p className="text-[11px] text-slate-500">Final slot clearance</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -599,7 +642,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-normal">
-                  Queried directly from <code className="text-purple-700 font-mono">fleet_aircraft</code> database table in real time.
+                  Active network fleet availability and specifications.
                 </p>
               </div>
 
@@ -622,17 +665,17 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
             {isLoading ? (
               <div className="p-12 text-center text-slate-500 text-xs flex flex-col items-center gap-2">
                 <Clock className="w-6 h-6 animate-spin text-purple-600" />
-                <span>Querying fleet_aircraft database table in real time...</span>
+                <span>Loading fleet inventory...</span>
               </div>
             ) : filteredFleet.length === 0 ? (
               <div className="p-8 text-center bg-purple-50/50 rounded-2xl border border-dashed border-purple-200 space-y-3">
                 <Plane className="w-8 h-8 text-purple-400 mx-auto" />
                 <div className="space-y-1">
                   <p className="text-xs font-semibold text-slate-900">
-                    No Aircraft Currently Found in <code className="text-purple-700 font-mono">fleet_aircraft</code> Database Table
+                    No Aircraft Currently Found in Network Inventory
                   </p>
                   <p className="text-[11px] text-slate-500 max-w-md mx-auto leading-relaxed">
-                    Hardcoded fallback jets have been erased. Execute the provided SQL Schema script to seed live aircraft into your database table.
+                    Connected operator fleet inventory will display here once verified.
                   </p>
                 </div>
               </div>
@@ -736,7 +779,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-normal">
-                  Pulled directly from <code className="text-purple-700 font-mono">empty_legs</code> database table in real time.
+                  Verified empty leg charter opportunities.
                 </p>
               </div>
             </div>
@@ -744,17 +787,17 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
             {isLoading ? (
               <div className="p-12 text-center text-slate-500 text-xs flex flex-col items-center gap-2">
                 <Clock className="w-6 h-6 animate-spin text-purple-600" />
-                <span>Querying empty_legs database table in real time...</span>
+                <span>Loading active empty legs...</span>
               </div>
             ) : emptyLegsList.length === 0 ? (
               <div className="p-8 text-center bg-amber-50/50 rounded-2xl border border-dashed border-amber-200 space-y-3">
                 <Sparkles className="w-8 h-8 text-amber-500 mx-auto" />
                 <div className="space-y-1">
                   <p className="text-xs font-semibold text-slate-900">
-                    No Active Empty Legs Found in <code className="text-purple-700 font-mono">empty_legs</code> Database Table
+                    No Active Empty Legs Currently Available
                   </p>
                   <p className="text-[11px] text-slate-500 max-w-md mx-auto leading-relaxed">
-                    Hardcoded fallback empty legs have been erased. New empty legs will appear here as soon as operators publish them to the database.
+                    New empty leg flight opportunities will appear here as published by verified operators.
                   </p>
                 </div>
               </div>
