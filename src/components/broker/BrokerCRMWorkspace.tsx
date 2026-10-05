@@ -1874,7 +1874,12 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       )}
 
       {/* SUB-TAB: PREMIUM MAIL STUDIO */}
-      {activeSubTab === "email_studio" && <GasEmailTemplateStudio />}
+      {activeSubTab === "email_studio" && (
+        <GasEmailTemplateStudio
+          hasVerifiedOperator={hasVerifiedOperator}
+          onRequireOperator={onRequireOperator}
+        />
+      )}
 
       {/* MODAL: ADD CLIENT */}
       <AnimatePresence>

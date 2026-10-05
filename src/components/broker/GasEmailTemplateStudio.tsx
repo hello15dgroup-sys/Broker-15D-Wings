@@ -13,7 +13,8 @@ import {
   AlertCircle,
   Key,
   Search,
-  Check
+  Check,
+  Lock
 } from 'lucide-react';
 import { sendGasEmail, generate15DWingsHtmlEmail } from '../../lib/gasMailer';
 import { supabase } from '../../lib/supabase';
@@ -111,8 +112,33 @@ const RichTextEditor: React.FC<{ value: string; onChange: (val: string) => void 
   );
 };
 
-export const GasEmailTemplateStudio: React.FC = () => {
+export interface GasEmailTemplateStudioProps {
+  hasVerifiedOperator?: boolean;
+  onRequireOperator?: () => void;
+}
+
+export const GasEmailTemplateStudio: React.FC<GasEmailTemplateStudioProps> = ({
+  hasVerifiedOperator = false,
+  onRequireOperator
+}) => {
   const [viewMode, setViewMode] = useState<'DESKTOP' | 'MOBILE'>('DESKTOP');
+
+  // Track the number of emails sent by the user to enforce trial limitation
+  const [sentCount, setSentCount] = useState<number>(() => {
+    try {
+      return Number(localStorage.getItem('15d_premium_mail_sent_count') || '0');
+    } catch {
+      return 0;
+    }
+  });
+
+  const incrementSentCount = () => {
+    const nextCount = sentCount + 1;
+    setSentCount(nextCount);
+    try {
+      localStorage.setItem('15d_premium_mail_sent_count', nextCount.toString());
+    } catch {}
+  };
 
   // Active Flight Mission Lookup / Authentication State
   const [authMissionId, setAuthMissionId] = useState('15D-782');
@@ -259,10 +285,15 @@ export const GasEmailTemplateStudio: React.FC = () => {
   };
 
   const handleSendTestEmail = async () => {
+    // Strict Charlatan Verification Check (Locked if sent twice unverified)
+    if (sentCount >= 2 && !hasVerifiedOperator) {
+      if (onRequireOperator) onRequireOperator();
+      return;
+    }
+
     setIsSending(true);
     setSendSuccess(null);
     try {
-      // Fire background email dispatch using the secure utility
       await sendGasEmail({
         recipientName,
         recipientEmail,
@@ -274,14 +305,46 @@ export const GasEmailTemplateStudio: React.FC = () => {
           clearanceStatus: 'DISPATCH_CLEARED'
         }
       });
+      incrementSentCount();
       setSendSuccess(`Official Flight Dispatch itinerary has been securely sent to ${recipientEmail}.`);
     } catch (e: any) {
+      incrementSentCount();
       setSendSuccess(`Flight Dispatch triggered successfully for ${recipientEmail}.`);
     } finally {
       setIsSending(false);
       setTimeout(() => setSendSuccess(null), 5000);
     }
   };
+
+  // Enforce Trial Locking View (Strict verification exactly as requested)
+  if (sentCount >= 2 && !hasVerifiedOperator) {
+    return (
+      <div className="w-full max-w-2xl mx-auto text-center p-8 md:p-12 bg-white rounded-3xl border border-amber-200/80 space-y-6 shadow-sm">
+        <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-700 shadow-xs">
+          <Lock className="w-8 h-8" />
+        </div>
+
+        <div className="space-y-2 max-w-md mx-auto">
+          <h3 className="text-lg font-bold text-slate-900 tracking-tight flex items-center justify-center gap-2">
+            <span>Charlatan Protection Active</span>
+          </h3>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Your free trial limit for Premium Mail Studio has been reached. Please verify your operator Air Carrier certificate & registered broker credentials to unlock unlimited dispatch capabilities.
+          </p>
+        </div>
+
+        <div className="pt-2">
+          <button
+            onClick={onRequireOperator}
+            className="px-6 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-semibold tracking-wide transition-all shadow-md active:scale-95 flex items-center gap-2 mx-auto cursor-pointer"
+          >
+            <Lock className="w-4 h-4" />
+            <span>Verify Operator to Unlock Premium Mailer</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full text-left font-sans space-y-6">
@@ -297,8 +360,8 @@ export const GasEmailTemplateStudio: React.FC = () => {
                 BROKER SUITE • OFFICIAL VIP CORRESPONDENCE
               </span>
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
-              flight dispatcher suite ✨
+            <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <span>15D Wings for Private Flight Brokers</span>
             </h2>
             <p className="text-sm text-slate-600 font-normal leading-relaxed">
               Draft, customize, and visually inspect bespoke dispatch clearings and executive itineraries for elite HNWI clients.
@@ -379,20 +442,10 @@ export const GasEmailTemplateStudio: React.FC = () => {
         <div className="flex items-center justify-between gap-3 pt-2">
           <div className="flex items-center gap-1.5 text-xs text-slate-500">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Interactive Real-time Visual Customizer</span>
+            <span>Interactive Real-time Visual Customizer (Trial Sent: {sentCount}/2)</span>
           </div>
           
           <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 self-start sm:self-auto">
-            <button
-              onClick={() => setViewMode('DESKTOP')}
-              className={`px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
-                viewMode === 'DESKTOP' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Laptop className="w-3.5 h-3.5" />
-              <span>Desktop (640px)</span>
-            </button>
-
             <button
               onClick={() => setViewMode('MOBILE')}
               className={`px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${

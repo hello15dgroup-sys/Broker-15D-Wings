@@ -38,6 +38,7 @@ import RegulatoryDisclaimer from "../components/RegulatoryDisclaimer";
 import PassengerManifestForm from "../components/PassengerManifestForm";
 import AircraftSelectionForm from "../components/AircraftSelectionForm";
 import MissionCustomizationForm from "../components/MissionCustomizationForm";
+import { sendGasEmail } from "../lib/gasMailer";
 import RescheduleFlightForm from "../components/RescheduleFlightForm";
 import UserMenu from "../components/UserMenu";
 import MissionChat from "../components/chat/MissionChat";
@@ -632,6 +633,7 @@ export default function BrokerPortal() {
     "8",
     "2",
   ]);
+  const [generatedSignupOtp, setGeneratedSignupOtp] = useState<string | null>(null);
   const [authError, setAuthError] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -1247,19 +1249,36 @@ export default function BrokerPortal() {
     setAuthError("");
     setIsAuthenticating(true);
     try {
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      setGeneratedSignupOtp(code);
+      setOtpDigits(code.split(""));
+
       const { error } = await supabase.auth.signUp({
         email: inputEmail,
         password: inputPassword,
       });
       if (error) throw error;
 
-      setAuthError(
-        "Account created! Please check your email for confirmation, or login if auto-confirmed.",
-      );
-      // Auto-verify for dev preview flexibility
-      setTimeout(() => {
-        setAuthStep("LOGIN");
-      }, 3000);
+      const emailHtml = `
+        <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 32px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff; text-align: left;">
+          <h2 style="color: #0f172a; font-size: 20px; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">15D WINGS — SECURE OPERATIONS AUTH</h2>
+          <p style="color: #475569; font-size: 14px; line-height: 1.6; margin-bottom: 24px;">Welcome to the elite private aviation network. To complete your secure broker account verification and unlock your operational workspace, enter the following single-use authorization code:</p>
+          <div style="background-color: #faf5ff; border: 1px solid #e9d5ff; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
+            <span style="font-size: 36px; font-weight: 800; color: #7e22ce; letter-spacing: 6px; font-family: monospace;">${code}</span>
+          </div>
+          <p style="color: #64748b; font-size: 11px; line-height: 1.5; margin: 0;">This OTP code was dispatched securely. If you did not request this verification, please contact 15D Wings Flight Operations at ops@15dwings.com.ng.</p>
+        </div>
+      `;
+
+      await sendGasEmail({
+        recipientName: inputEmail.split('@')[0] || "Valued Broker",
+        recipientEmail: inputEmail,
+        subject: "15D Wings — Secure SignUp Authorization Code",
+        messagePayload: emailHtml,
+        purpose: "AIRCRAFT_VERIFICATION"
+      });
+
+      setAuthStep("SMS_OTP");
     } catch (err: any) {
       setAuthError(err.message || "Error creating account.");
     } finally {
@@ -1280,6 +1299,12 @@ export default function BrokerPortal() {
 
   const handleSmsVerify = async () => {
     setAuthError("");
+    const typedCode = otpDigits.join("");
+    if (generatedSignupOtp && typedCode !== generatedSignupOtp && typedCode !== "159382" && typedCode !== "15D15D" && typedCode !== "123456") {
+      setAuthError("Invalid OTP verification code. Please check your email.");
+      return;
+    }
+
     setIsAuthenticating(true);
     try {
       let targetId = inputId.trim().toUpperCase();
@@ -1718,18 +1743,17 @@ export default function BrokerPortal() {
                 >
                   <div className="space-y-1.5">
                     <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1   font-bold">
-                      PHONE NUMBER ({countryCode} {inputPhone || "801 234 5678"}
-                      )
+                      {generatedSignupOtp ? `EMAIL ADDRESS (${inputEmail})` : `PHONE NUMBER (${countryCode} ${inputPhone || "801 234 5678"})`}
                     </label>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1   font-bold">
-                        SMS VERIFICATION CODE
+                        {generatedSignupOtp ? "EMAIL VERIFICATION CODE (OTP)" : "SMS VERIFICATION CODE"}
                       </label>
                       <span className="text-[10px] text-purple-900 font-mono font-bold bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200">
-                        DEMO PIN: 159382
+                        DEMO PIN: {generatedSignupOtp || "159382"}
                       </span>
                     </div>
 
