@@ -50,7 +50,6 @@ import { OperatorOnboardingModal } from "../components/broker/OperatorOnboarding
 import { SystemizedCheckoutEngine } from "../components/broker/SystemizedCheckoutEngine";
 import { VipEscrowIframe } from "../components/broker/VipEscrowIframe";
 import { OperationalIntegrityIndex } from "../components/broker/OperationalIntegrityIndex";
-import { EyeOfGodTelemetry } from "../components/broker/EyeOfGodTelemetry";
 import { BrokerCRMWorkspace } from "../components/broker/BrokerCRMWorkspace";
 import { PremiumBookFlightPanel } from "../components/broker/PremiumBookFlightPanel";
 import {
@@ -742,7 +741,6 @@ export default function BrokerPortal() {
     | "proposal_builder"
     | "checkout_engine"
     | "operational_radar"
-    | "telemetry_vault"
     | "customization"
     | "manifest"
   >("crm_workspace");
@@ -2483,7 +2481,6 @@ export default function BrokerPortal() {
                   {activeTab === "proposal_builder" && "Proposal Builder"}
                   {activeTab === "checkout_engine" && "Payment Vault"}
                   {activeTab === "operational_radar" && "Fleet Radar"}
-                  {activeTab === "telemetry_vault" && "Flight Logs"}
                 </div>
               </div>
 
@@ -2545,17 +2542,6 @@ export default function BrokerPortal() {
                 >
                   <Radar className="w-3.5 h-3.5" />
                   <span>Fleet & Empty Legs</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("telemetry_vault")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
-                    activeTab === "telemetry_vault"
-                      ? "bg-purple-600 text-white shadow-xs"
-                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
-                  <Database className="w-3.5 h-3.5" />
-                  <span>Flight Logs</span>
                 </button>
 
                 <button
@@ -2689,18 +2675,6 @@ export default function BrokerPortal() {
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                 >
                   <OperationalIntegrityIndex missionId={mission.id} />
-                </motion.div>
-              )}
-
-              {activeTab === "telemetry_vault" && (
-                <motion.div
-                  key="broker-tab-telemetry_vault"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                >
-                  <EyeOfGodTelemetry />
                 </motion.div>
               )}
             </AnimatePresence>

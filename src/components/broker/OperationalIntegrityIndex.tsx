@@ -330,9 +330,6 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
             <h2 className="text-xl md:text-2xl font-semibold text-slate-900">
               Fleet Availability & Empty Legs
             </h2>
-            <p className="text-sm text-slate-600 font-normal">
-              Verified aircraft availability and empty leg charter opportunities.
-            </p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -599,13 +596,13 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
             <div className="space-y-2 max-w-lg mx-auto">
               <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-900 border border-purple-200 text-[10px] font-semibold tracking-wider uppercase inline-flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-purple-700" />
-                Restricted Access • Verification Required
+                Operational Database Status
               </span>
               <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
-                Network Available Fleet Locked
+                Operational Database
               </h3>
               <p className="text-xs md:text-sm text-slate-600 leading-relaxed">
-                Live aircraft fleet telemetry is locked to protect partner carrier schedules and prevent unauthorized intermediary brokering. Authenticate your active flight mission above to unlock real-time aircraft availability.
+                Carrier records, aircraft specs, and flight schedules are housed securely in the operational database. Please authenticate your active flight mission above to query real-time fleet logs and availability.
               </p>
             </div>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -617,14 +614,14 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                 className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer flex items-center gap-2"
               >
                 <Key className="w-4 h-4" />
-                <span>Enter Flight Mission Credentials</span>
+                <span>Enter Query Credentials</span>
               </button>
               <button
                 onClick={() => handleAuthenticateMission('15D-782', 'hello.15dgroup@gmail.com')}
                 className="px-5 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 text-xs font-semibold transition-all cursor-pointer flex items-center gap-2"
               >
                 <Unlock className="w-4 h-4 text-purple-700" />
-                <span>Verify Active Mission (15D-782)</span>
+                <span>Query Operational Database</span>
               </button>
             </div>
           </div>
@@ -641,9 +638,6 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                     <span>Unlocked</span>
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-normal">
-                  Active network fleet availability and specifications.
-                </p>
               </div>
 
               {/* Airport Filter */}
@@ -736,13 +730,13 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
             <div className="space-y-2 max-w-lg mx-auto">
               <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 text-[10px] font-semibold tracking-wider uppercase inline-flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-amber-700" />
-                Charter Desk Verification Required
+                Operational Database Status
               </span>
               <h3 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
-                Real-Time Empty Legs Locked
+                Operational Database
               </h3>
               <p className="text-xs md:text-sm text-slate-600 leading-relaxed">
-                Wholesale empty leg routes and heavily discounted repositioning sectors are strictly reserved for verified flight missions. Please authenticate your active flight mission to view live empty leg availability.
+                Wholesale empty leg routes and heavily discounted repositioning sectors are strictly reserved for verified flight missions in the operational database. Please authenticate your active flight mission to view live empty leg availability.
               </p>
             </div>
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -754,14 +748,14 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                 className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-sm transition-all cursor-pointer flex items-center gap-2"
               >
                 <Key className="w-4 h-4" />
-                <span>Enter Flight Mission Credentials</span>
+                <span>Enter Query Credentials</span>
               </button>
               <button
                 onClick={() => handleAuthenticateMission('15D-782', 'hello.15dgroup@gmail.com')}
                 className="px-5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-semibold transition-all cursor-pointer flex items-center gap-2"
               >
                 <Unlock className="w-4 h-4 text-amber-700" />
-                <span>Verify Active Mission (15D-782)</span>
+                <span>Query Operational Database</span>
               </button>
             </div>
           </div>
@@ -778,9 +772,6 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                     <span>Unlocked</span>
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-normal">
-                  Verified empty leg charter opportunities.
-                </p>
               </div>
             </div>
 

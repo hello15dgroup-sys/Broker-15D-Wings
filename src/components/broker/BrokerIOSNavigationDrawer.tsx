@@ -30,8 +30,7 @@ export type BrokerTabType =
   | 'proposal_builder' 
   | 'checkout_engine' 
   | 'operational_radar' 
-  | 'telemetry_vault'
-  | 'customization'
+  | 'customization' 
   | 'manifest';
 
 export type CrmSubTabType = 
@@ -296,22 +295,6 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
                       <div>
                         <span className="text-xs font-medium">Live Fleet & Empty Legs</span>
                         <p className="text-[11px] text-slate-500">Active flights, fleet network & deals</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-slate-400" />
-                  </button>
-
-                  <button
-                    onClick={() => handleTabClick('telemetry_vault')}
-                    className={`w-full p-3.5 flex items-center justify-between text-left transition-colors cursor-pointer ${
-                      activeTab === 'telemetry_vault' ? 'bg-purple-50/80 text-purple-900 font-medium' : 'hover:bg-white text-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Database className="w-4 h-4 text-slate-600" />
-                      <div>
-                        <span className="text-xs font-medium">Flight Archives & Logs</span>
-                        <p className="text-[11px] text-slate-500">Historical manifests and records</p>
                       </div>
                     </div>
                     <ChevronRight className="w-4 h-4 text-slate-400" />
