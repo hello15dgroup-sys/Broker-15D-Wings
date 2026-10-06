@@ -1813,6 +1813,14 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 ratios.
               </p>
             </div>
+            <div className="flex items-center gap-2">
+              <button
+                className="px-4 py-2 bg-purple-600 text-white rounded-xl text-xs transition-colors shadow-2xs flex items-center gap-2 cursor-pointer hover:bg-purple-700"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span className="font-sync uppercase tracking-[0.2em] font-normal text-[9px]">Add Team Member</span>
+              </button>
+            </div>
           </div>
 
           {INITIAL_TEAM_MEMBERS.length === 0 ? (
