@@ -3,6 +3,14 @@ import { handleCommsAPI } from './CommsAPI';
 
 export { ChatDO };
 
+// Dummy classes for migration history compatibility (v1, v2, v3 deleted classes)
+export class MissionPortalDO {}
+export class OperatorPortalDO {}
+export class ICCPortalDO {}
+export class DocumentProcessorDO {}
+export class MissionClockDO {}
+export class PricingEngineDO {}
+
 export interface Env {
   ASSETS: any;
   SUPABASE_URL: string;
@@ -35,7 +43,7 @@ export default {
       return stub.fetch(request);
     }
 
-    // Comms API (e.g. Gas Mailer)
+    // Comms API (Premium Mail Studio)
     if (url.pathname === "/api/comms/send" && request.method === "POST") {
       return handleCommsAPI(request, env);
     }
