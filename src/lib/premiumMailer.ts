@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 
-export interface GasEmailTemplateData {
+export interface PremiumEmailTemplateData {
   recipientName: string;
   recipientEmail: string;
   subject?: string;
@@ -19,7 +19,7 @@ export interface GasEmailTemplateData {
   customMessage?: string;
 }
 
-interface GasMailPayload {
+interface PremiumMailPayload {
   recipientName: string;
   recipientEmail: string;
   subject: string;
@@ -34,9 +34,9 @@ interface GasMailPayload {
 
 /**
  * Generates an ultra-luxurious, bulletproof HTML email template for 15D Wings.
- * Configured for dispatch from ops@15dwings.com.ng via Google Apps Script.
+ * Configured for dispatch from ops@15dwings.com.ng via Premium Mail Studio.
  */
-export function generate15DWingsHtmlEmail(d: GasEmailTemplateData): string {
+export function generate15DWingsHtmlEmail(d: PremiumEmailTemplateData): string {
   const missionCode = d.missionCode || "15D-001";
   const clientName = d.recipientName || "Valued Client";
   const origin = d.origin || "Lagos Murtala Muhammed (DNMM / LOS)";
@@ -246,18 +246,14 @@ export function generate15DWingsHtmlEmail(d: GasEmailTemplateData): string {
 </html>`;
 }
 
-/**
- * Sends a communication payload to the Google Apps Script Webhook.
- * Falls back gracefully to console logs if no webhook URL is defined.
- */
-export async function sendGasEmail(payload: GasMailPayload): Promise<boolean> {
-  const LIVE_GAS_MACRO = 'https://script.google.com/macros/s/AKfycbww8HoF28RhH7CvwoHor1mWZx6pVxw3hSg-0RmtWRojxT9P3UBXjIQ5k00fBNv3V0TVcg/exec';
-  const webhookUrl = localStorage.getItem('GAS_EMAIL_WEBHOOK_URL') || LIVE_GAS_MACRO;
+export async function sendPremiumEmail(payload: PremiumMailPayload): Promise<boolean> {
+  const LIVE_MACRO = 'https://script.google.com/macros/s/AKfycbww8HoF28RhH7CvwoHor1mWZx6pVxw3hSg-0RmtWRojxT9P3UBXjIQ5k00fBNv3V0TVcg/exec';
+  const webhookUrl = localStorage.getItem('PREMIUM_MAIL_WEBHOOK_URL') || LIVE_MACRO;
   
-  console.log(`[GAS Mailer] Preparing to dispatch via ops@15dwings.com.ng to ${payload.recipientEmail} via Webhook: ${webhookUrl}`);
+  console.log(`[Premium Mail Studio] Preparing to dispatch via ops@15dwings.com.ng to ${payload.recipientEmail} via Webhook: ${webhookUrl}`);
   
   try {
-    const gasPayload = {
+    const mailPayload = {
       recipientEmail: payload.recipientEmail,
       recipientName: payload.recipientName,
       subject: payload.subject,
@@ -272,13 +268,16 @@ export async function sendGasEmail(payload: GasMailPayload): Promise<boolean> {
       headers: {
         'Content-Type': 'text/plain;charset=utf-8'
       },
-      body: JSON.stringify(gasPayload)
+      body: JSON.stringify(mailPayload)
     });
     
-    console.log("[GAS Mailer] Payload dispatched to live Google Apps Script endpoint successfully.");
+    console.log("[Premium Mail Studio] Payload dispatched successfully.");
     return true;
   } catch (error) {
-    console.error("[GAS Mailer] Failed to dispatch payload to GAS Webhook:", error);
+    console.error("[Premium Mail Studio] Failed to dispatch payload:", error);
     return false;
   }
 }
+
+// Alias for backwards compatibility
+export const sendGasEmail = sendPremiumEmail;

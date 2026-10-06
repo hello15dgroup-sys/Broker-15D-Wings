@@ -4,7 +4,7 @@ import {
   Plus, Trash2, Check, Sparkles
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { sendGasEmail } from '../lib/gasMailer';
+import { sendPremiumEmail as sendGasEmail } from '../lib/premiumMailer';
 import { db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 

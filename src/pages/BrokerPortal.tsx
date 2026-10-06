@@ -38,7 +38,7 @@ import RegulatoryDisclaimer from "../components/RegulatoryDisclaimer";
 import PassengerManifestForm from "../components/PassengerManifestForm";
 import AircraftSelectionForm from "../components/AircraftSelectionForm";
 import MissionCustomizationForm from "../components/MissionCustomizationForm";
-import { sendGasEmail } from "../lib/gasMailer";
+import { sendPremiumEmail as sendGasEmail } from "../lib/premiumMailer";
 import RescheduleFlightForm from "../components/RescheduleFlightForm";
 import UserMenu from "../components/UserMenu";
 import MissionChat from "../components/chat/MissionChat";

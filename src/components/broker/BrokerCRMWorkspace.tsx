@@ -56,7 +56,7 @@ import {
 import { supabase } from "../../lib/supabase";
 import { WhiteLabelProposalBuilder } from "./WhiteLabelProposalBuilder";
 import { FeatureTourModal } from "./FeatureTourModal";
-import { GasEmailTemplateStudio } from "./GasEmailTemplateStudio";
+import { PremiumMailStudio } from "./PremiumMailStudio";
 
 /* Types for CRM Core */
 export interface ClientProfile {
@@ -1883,7 +1883,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB: PREMIUM MAIL STUDIO */}
       {activeSubTab === "email_studio" && (
-        <GasEmailTemplateStudio
+        <PremiumMailStudio
           hasVerifiedOperator={hasVerifiedOperator}
           onRequireOperator={onRequireOperator}
         />
