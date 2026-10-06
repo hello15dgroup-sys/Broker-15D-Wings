@@ -2,10 +2,12 @@ name = "broker-15d-wings"
 main = "src/edge/index.ts"
 compatibility_date = "2024-03-20"
 
-# Distributed Static Assets Directory
 assets = { directory = "./dist" }
 
-# R2 Buckets for Operator & Mission Documentation
+# Note: Securely provide the Supabase secrets using wrangler secret put
+# > npx wrangler secret put SUPABASE_URL
+# > npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+
 [[r2_buckets]]
 binding = "OPERATOR_DOCS"
 bucket_name = "15dwings-operator-docs"
@@ -14,7 +16,6 @@ bucket_name = "15dwings-operator-docs"
 binding = "MISSION_DOCS"
 bucket_name = "15dwings-mission-docs"
 
-# Active Durable Objects for Real-Time Broker Workstreams
 [[durable_objects.bindings]]
 name = "CHAT_DO"
 class_name = "ChatDO"
@@ -22,24 +23,6 @@ class_name = "ChatDO"
 [ai]
 binding = "AI"
 
-# Migrations (Purged legacy non-broker DO classes: ICC, Operators, Client portals)
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = []
-
-[[migrations]]
-tag = "v2"
-new_sqlite_classes = []
-
-[[migrations]]
-tag = "v3"
 new_sqlite_classes = ["ChatDO"]
-deleted_classes = [
-  "MissionPortalDO",
-  "OperatorPortalDO",
-  "ICCPortalDO",
-  "DocumentProcessorDO",
-  "MissionClockDO",
-  "PricingEngineDO"
-]
-
