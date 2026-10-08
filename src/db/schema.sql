@@ -415,5 +415,27 @@ CREATE INDEX IF NOT EXISTS idx_notifications_recipient ON notifications(recipien
 CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(recipient_email, read);
 
 -- ==============================================================================
+-- 16. IDEMPOTENT BROKER PROFILE TAILORING & 18+ STATE MIGRATION
+-- ==============================================================================
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='brokers' and column_name='legal_first_name') THEN
+        ALTER TABLE brokers ADD COLUMN legal_first_name VARCHAR(100);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='brokers' and column_name='legal_last_name') THEN
+        ALTER TABLE brokers ADD COLUMN legal_last_name VARCHAR(100);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='brokers' and column_name='organization') THEN
+        ALTER TABLE brokers ADD COLUMN organization VARCHAR(255);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='brokers' and column_name='date_of_birth') THEN
+        ALTER TABLE brokers ADD COLUMN date_of_birth DATE;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='brokers' and column_name='theme_preference') THEN
+        ALTER TABLE brokers ADD COLUMN theme_preference VARCHAR(50) DEFAULT 'EXECUTIVE_DARK';
+    END IF;
+END $$;
+
+-- ==============================================================================
 -- SCHEMA CREATION COMPLETE (IDEMPOTENT & PRODUCTION READY)
 -- ==============================================================================

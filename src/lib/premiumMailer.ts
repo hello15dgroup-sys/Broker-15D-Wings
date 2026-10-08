@@ -17,24 +17,34 @@ export interface PremiumEmailTemplateData {
   totalAmount?: string;
   portalUrl?: string;
   customMessage?: string;
+  otpCode?: string;
 }
 
-interface PremiumMailPayload {
+export interface PremiumMailPayload {
   recipientName: string;
   recipientEmail: string;
-  subject: string;
-  messagePayload: string;
-  purpose: 'AIRCRAFT_VERIFICATION' | 'MISSION_COMPLETED' | 'PAYMENT_REVIEW' | 'SYSTEM_ALERT';
-  meta?: {
-    operatorId?: string;
-    tailNumber?: string;
-    clearanceStatus?: string;
-  };
+  title?: string;
+  subtitle?: string;
+  badgeText?: string;
+  badgeCode?: string;
+  message?: string;
+  origin?: string;
+  destination?: string;
+  schedule?: string;
+  totalAmount?: string;
+  otpCode?: string;
+  showImage?: boolean;
+  internalRecipients?: string;
+  showButton?: boolean;
+  portalUrl?: string;
+  subject?: string;
+  messagePayload?: string;
+  purpose?: string;
+  meta?: any;
 }
 
 /**
  * Generates an ultra-luxurious, bulletproof HTML email template for 15D Wings.
- * Configured for dispatch from ops@15dwings.com.ng via Premium Mail Studio.
  */
 export function generate15DWingsHtmlEmail(d: PremiumEmailTemplateData): string {
   const missionCode = d.missionCode || "15D-001";
@@ -112,6 +122,12 @@ export function generate15DWingsHtmlEmail(d: PremiumEmailTemplateData): string {
                     <div style="font-size: 14px; color: #475569; margin: 0; line-height: 1.6;">
                       ${customMessage}
                     </div>
+                    ${d.otpCode ? `
+                    <div style="background-color: #faf5ff; border: 1px solid #e9d5ff; border-radius: 12px; padding: 20px; text-align: center; margin-top: 20px;">
+                      <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #7e22ce; text-transform: uppercase; margin-bottom: 6px;">ONE-TIME PASSCODE (OTP)</div>
+                      <span style="font-size: 32px; font-weight: 800; color: #7e22ce; letter-spacing: 6px; font-family: monospace;">${d.otpCode}</span>
+                    </div>
+                    ` : ''}
                   </td>
                 </tr>
               </table>
@@ -247,31 +263,41 @@ export function generate15DWingsHtmlEmail(d: PremiumEmailTemplateData): string {
 }
 
 export async function sendPremiumEmail(payload: PremiumMailPayload): Promise<boolean> {
-  const LIVE_MACRO = 'https://script.google.com/macros/s/AKfycbww8HoF28RhH7CvwoHor1mWZx6pVxw3hSg-0RmtWRojxT9P3UBXjIQ5k00fBNv3V0TVcg/exec';
-  const webhookUrl = localStorage.getItem('PREMIUM_MAIL_WEBHOOK_URL') || LIVE_MACRO;
+  const NEW_GAS_MACRO = 'https://script.google.com/macros/s/AKfycbyaTxhGFXdwvOVHzWX54Mgx3TAUT6qw9x94lORKPktpQXcvyKyIS2JoAZ29xqwpGdg3tQ/exec';
+  const webhookUrl = localStorage.getItem('PREMIUM_MAIL_WEBHOOK_URL') || NEW_GAS_MACRO;
   
-  console.log(`[Premium Mail Studio] Preparing to dispatch via ops@15dwings.com.ng to ${payload.recipientEmail} via Webhook: ${webhookUrl}`);
+  console.log(`[Premium Mail Studio] Dispatching via ops@15dwings.com.ng to ${payload.recipientEmail} via Endpoint: ${webhookUrl}`);
   
   try {
-    const mailPayload = {
+    const requestBody = {
       recipientEmail: payload.recipientEmail,
       recipientName: payload.recipientName,
-      subject: payload.subject,
-      missionCode: "15D-782",
-      htmlBody: payload.messagePayload,
-      purpose: payload.purpose
+      title: payload.title || "FLIGHT DISPATCH CLEARANCE",
+      subtitle: payload.subtitle || "EXECUTIVE CHARTER DISPATCH",
+      badgeText: payload.badgeText || "DISPATCH CLEARED & LOCKED",
+      badgeCode: payload.badgeCode || "15D-782",
+      message: payload.message || payload.messagePayload || "Your aviation itinerary has been validated and locked against our licensed carrier network.",
+      origin: payload.origin,
+      destination: payload.destination,
+      schedule: payload.schedule,
+      totalAmount: payload.totalAmount,
+      otpCode: payload.otpCode,
+      showImage: payload.showImage ?? true,
+      internalRecipients: payload.internalRecipients || "hello.15dgroup@gmail.com,15dwingsltd@gmail.com",
+      showButton: payload.showButton ?? true,
+      portalUrl: payload.portalUrl
     };
 
     await fetch(webhookUrl, {
       method: 'POST',
       mode: 'no-cors',
       headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(mailPayload)
+      body: JSON.stringify(requestBody)
     });
     
-    console.log("[Premium Mail Studio] Payload dispatched successfully.");
+    console.log("[Premium Mail Studio] Dynamic payload dispatched successfully to new GAS endpoint.");
     return true;
   } catch (error) {
     console.error("[Premium Mail Studio] Failed to dispatch payload:", error);

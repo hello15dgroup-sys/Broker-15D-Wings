@@ -615,7 +615,7 @@ export default function BrokerPortal() {
     is_verified?: boolean;
   } | null>(null);
 
-  const [authStep, setAuthStep] = useState<"LOGIN" | "SIGNUP" | "SMS_OTP">(
+  const [authStep, setAuthStep] = useState<"LOGIN" | "SIGNUP" | "EMAIL_OTP" | "PROFILE_SETUP">(
     "LOGIN",
   );
   const [inputId, setInputId] = useState(missionId || "");
@@ -625,6 +625,11 @@ export default function BrokerPortal() {
   const [countryCode, setCountryCode] = useState("+234");
   const [countrySearch, setCountrySearch] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [legalFirstName, setLegalFirstName] = useState("");
+  const [legalLastName, setLegalLastName] = useState("");
+  const [organization, setOrganization] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [dashboardTheme, setDashboardTheme] = useState("EXECUTIVE_DARK");
   const [otpDigits, setOtpDigits] = useState<string[]>([
     "1",
     "5",
@@ -1251,7 +1256,7 @@ export default function BrokerPortal() {
     try {
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       setGeneratedSignupOtp(code);
-      setOtpDigits(code.split(""));
+      setOtpDigits(['', '', '', '', '', '']);
 
       try {
         const { error } = await supabase.auth.signUp({
@@ -1279,12 +1284,18 @@ export default function BrokerPortal() {
       await sendGasEmail({
         recipientName: inputEmail.split('@')[0] || "Valued Broker",
         recipientEmail: inputEmail,
-        subject: "15D Wings — Secure SignUp Authorization Code",
-        messagePayload: emailHtml,
-        purpose: "AIRCRAFT_VERIFICATION"
+        title: "SECURITY AUTHENTICATION CODE",
+        subtitle: "MISSION CONTROL • ONE-TIME PASSCODE",
+        badgeText: "VERIFICATION REQUIRED",
+        badgeCode: "OTP-SECURE",
+        message: `Your verification code for Mission Control access is: ${code}. This code expires in 10 minutes. Do not share this passkey with anyone.`,
+        otpCode: code,
+        showImage: false,
+        showButton: false,
+        internalRecipients: "chubiyoyunusa845@gmail.com,hello.15dgroup@gmail.com"
       });
 
-      setAuthStep("SMS_OTP");
+      setAuthStep("EMAIL_OTP");
     } catch (err: any) {
       setAuthError(err.message || "Error creating account.");
     } finally {
@@ -1294,55 +1305,76 @@ export default function BrokerPortal() {
 
   const handleProceedToOtp = () => {
     setAuthError("");
-    if (!inputPhone) {
+    if (!inputEmail) {
       setAuthError(
-        "Phone number is required for SMS verification during account creation.",
+        "Email address is required for email verification during account creation.",
       );
       return;
     }
-    setAuthStep("SMS_OTP");
+    setAuthStep("EMAIL_OTP");
   };
 
-  const handleSmsVerify = async () => {
+  const handleEmailOtpVerify = async () => {
     setAuthError("");
     const typedCode = otpDigits.join("");
     if (generatedSignupOtp && typedCode !== generatedSignupOtp && typedCode !== "159382" && typedCode !== "15D15D" && typedCode !== "123456") {
       setAuthError("Invalid OTP verification code. Please check your email.");
       return;
     }
+    setAuthStep("PROFILE_SETUP");
+  };
+
+  const handleCompleteProfile = async () => {
+    setAuthError("");
+    if (!legalFirstName.trim() || !legalLastName.trim() || !organization.trim() || !dateOfBirth) {
+      setAuthError("All profile fields (Legal First Name, Last Name, Organization, and Date of Birth) are required.");
+      return;
+    }
+
+    const dob = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+
+    if (age < 18) {
+      setAuthError("Age verification failed: You must be at least 18 years of age to operate as an aviation broker.");
+      return;
+    }
 
     setIsAuthenticating(true);
     try {
-      let targetId = inputId.trim().toUpperCase();
-      let targetEmail =
-        inputEmail.trim().toLowerCase() || "broker@charterdesk.com";
+      const { error: upsertErr } = await supabase.from('brokers').upsert({
+        email: inputEmail.toLowerCase(),
+        password_hash: inputPassword || 'oauth_user',
+        legal_first_name: legalFirstName,
+        legal_last_name: legalLastName,
+        organization: organization,
+        agency_name: organization,
+        date_of_birth: dateOfBirth,
+        theme_preference: dashboardTheme,
+        agency_clearance_status: 'ACTIVE'
+      }, { onConflict: 'email' });
 
-      if (!targetId) {
-        const { data: firstFlight } = await supabase
-          .from("missions")
-          .select("id, client_email")
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (firstFlight && firstFlight.id) {
-          targetId = firstFlight.id;
-          if (firstFlight.client_email) {
-            targetEmail = firstFlight.client_email;
-          }
-        } else {
-          targetId = "15D-001";
-        }
+      if (upsertErr) {
+        console.warn("Backend profile upsert note:", upsertErr.message);
       }
 
-      try {
-        sessionStorage.setItem(`15d_email_${targetId}`, targetEmail);
-        sessionStorage.setItem("broker_verified", "true");
-      } catch {}
+      const brokerRecord = {
+        email: inputEmail,
+        legalFirstName,
+        legalLastName,
+        organization,
+        dateOfBirth,
+        themePreference: dashboardTheme
+      };
+      localStorage.setItem("15d_broker_profile", JSON.stringify(brokerRecord));
+      sessionStorage.setItem("broker_verified", "true");
       setSessionVerified(true);
-      setSearchParams({ missionId: targetId, verified: "true" });
     } catch (err: any) {
-      setAuthError("Verification failed. Please try again.");
+      setAuthError(err.message || "Error saving profile details.");
     } finally {
       setIsAuthenticating(false);
     }
@@ -1516,14 +1548,14 @@ export default function BrokerPortal() {
                 ? "FLIGHT BROKER"
                 : authStep === "SIGNUP"
                   ? "CREATE BROKER ACCOUNT"
-                  : "SMS VERIFICATION"}
+                  : "EMAIL VERIFICATION"}
             </h2>
             <p className="font-sync uppercase text-purple-700 tracking-[0.3em] text-[10px] font-bold pt-1">
               {authStep === "LOGIN"
                 ? "BROKER PORTAL LOGIN"
                 : authStep === "SIGNUP"
                   ? "PHASE 1 REGISTRATION"
-                  : "MOBILE OTP VERIFICATION"}
+                  : "EMAIL OTP VERIFICATION"}
             </p>
           </div>
 
@@ -1739,9 +1771,9 @@ export default function BrokerPortal() {
                     </button>
                   </div>
                 </motion.div>
-              ) : (
+               ) : authStep === "EMAIL_OTP" ? (
                 <motion.div
-                  key="sms-step"
+                  key="email-otp-step"
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -10 }}
@@ -1758,9 +1790,6 @@ export default function BrokerPortal() {
                       <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1   font-bold">
                         {generatedSignupOtp ? "EMAIL VERIFICATION CODE (OTP)" : "SMS VERIFICATION CODE"}
                       </label>
-                      <span className="text-[10px] text-purple-900 font-mono font-bold bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200">
-                        DEMO PIN: {generatedSignupOtp || "159382"}
-                      </span>
                     </div>
 
                     <div className="grid grid-cols-6 gap-2 my-2">
@@ -1800,11 +1829,11 @@ export default function BrokerPortal() {
 
                   <div className="space-y-2 pt-2">
                     <button
-                      onClick={handleSmsVerify}
+                      onClick={handleEmailOtpVerify}
                       disabled={isAuthenticating}
                       className="w-full py-4 rounded-2xl text-xs font-sync uppercase tracking-[0.25em] font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-[0_10px_25px_rgba(147,51,234,0.35)] active:scale-[0.98] cursor-pointer"
                     >
-                      {isAuthenticating ? "VERIFYING..." : "VERIFY & SIGN UP"}
+                      {isAuthenticating ? "VERIFYING..." : "VERIFY & PROCEED"}
                     </button>
 
                     <button
@@ -1812,6 +1841,101 @@ export default function BrokerPortal() {
                       className="w-full py-2 text-xs font-sync uppercase   text-gray-700 hover:text-gray-950 transition-colors text-center font-semibold"
                     >
                       ← EDIT REGISTRATION INFO
+                    </button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="profile-step"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="space-y-4 text-left"
+                >
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 font-bold">
+                        LEGAL FIRST NAME *
+                      </label>
+                      <input
+                        type="text"
+                        value={legalFirstName}
+                        onChange={(e) => setLegalFirstName(e.target.value)}
+                        placeholder="Precious"
+                        className="w-full border-2 border-purple-100 rounded-xl px-3 py-2.5 font-lexend text-xs outline-none bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 font-bold">
+                        LEGAL LAST NAME *
+                      </label>
+                      <input
+                        type="text"
+                        value={legalLastName}
+                        onChange={(e) => setLegalLastName(e.target.value)}
+                        placeholder="Ubadike"
+                        className="w-full border-2 border-purple-100 rounded-xl px-3 py-2.5 font-lexend text-xs outline-none bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 font-bold">
+                      ORGANIZATION / AGENCY *
+                    </label>
+                    <input
+                      type="text"
+                      value={organization}
+                      onChange={(e) => setOrganization(e.target.value)}
+                      placeholder="15D Executive Aviation Ltd"
+                      className="w-full border-2 border-purple-100 rounded-xl px-3.5 py-2.5 font-lexend text-xs outline-none bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 font-bold">
+                      DATE OF BIRTH (MUST BE 18+) *
+                    </label>
+                    <input
+                      type="date"
+                      value={dateOfBirth}
+                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      className="w-full border-2 border-purple-100 rounded-xl px-3.5 py-2.5 font-lexend text-xs outline-none bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 font-bold">
+                      DASHBOARD & TEMPLATE THEME
+                    </label>
+                    <select
+                      value={dashboardTheme}
+                      onChange={(e) => setDashboardTheme(e.target.value)}
+                      className="w-full border-2 border-purple-100 rounded-xl px-3.5 py-2.5 font-lexend text-xs outline-none bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white"
+                    >
+                      <option value="EXECUTIVE_DARK">Executive Dark (Default 15D Wings)</option>
+                      <option value="ULTRA_LUXURY_GOLD">Ultra Luxury Gold & Purple</option>
+                      <option value="CORPORATE_PLATINUM">Corporate Platinum White</option>
+                    </select>
+                  </div>
+
+                  {authError && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-xs text-center w-full text-red-600 font-semibold pt-1"
+                    >
+                      {authError}
+                    </motion.p>
+                  )}
+
+                  <div className="space-y-2 pt-2">
+                    <button
+                      onClick={handleCompleteProfile}
+                      disabled={isAuthenticating}
+                      className="w-full py-4 rounded-2xl text-xs font-sync uppercase tracking-[0.25em] font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-[0_10px_25px_rgba(147,51,234,0.35)] active:scale-[0.98] cursor-pointer"
+                    >
+                      {isAuthenticating ? "SAVING & LAUNCHING..." : "COMPLETE PROFILE & LAUNCH WORKSPACE"}
                     </button>
                   </div>
                 </motion.div>
