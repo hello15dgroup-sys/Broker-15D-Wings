@@ -3,9 +3,16 @@ import { motion, AnimatePresence } from 'motion/react';
 import { User, Settings, LogOut, BellRing, HelpCircle, Mail } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { UserProfileModal } from './UserProfileModal';
 
-export default function UserMenu() {
+interface UserMenuProps {
+  onOpenProfile?: () => void;
+  userEmail?: string;
+}
+
+export default function UserMenu({ onOpenProfile, userEmail }: UserMenuProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -109,7 +116,17 @@ export default function UserMenu() {
                <p className="text-[10px] font-sync font-bold tracking-widest text-purple-700 uppercase">SYSTEM ACCESS</p>
             </div>
             
-            <button className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-900 transition-colors cursor-pointer active:bg-purple-100">
+            <button 
+              onClick={() => {
+                setIsOpen(false);
+                if (onOpenProfile) {
+                  onOpenProfile();
+                } else {
+                  setShowProfileModal(true);
+                }
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-900 transition-colors cursor-pointer active:bg-purple-100"
+            >
               <Settings className="w-4 h-4 text-purple-600" /> Profile Settings
             </button>
             <button onClick={requestPushNotifications} className="w-full flex items-center gap-3 px-4 py-3.5 text-xs font-medium text-gray-700 hover:bg-purple-50 hover:text-purple-900 transition-colors cursor-pointer active:bg-purple-100">
@@ -132,6 +149,12 @@ export default function UserMenu() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <UserProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        userEmail={userEmail}
+      />
     </div>
   );
 }

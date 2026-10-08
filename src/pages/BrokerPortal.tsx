@@ -41,6 +41,7 @@ import MissionCustomizationForm from "../components/MissionCustomizationForm";
 import { sendPremiumEmail as sendGasEmail } from "../lib/premiumMailer";
 import RescheduleFlightForm from "../components/RescheduleFlightForm";
 import UserMenu from "../components/UserMenu";
+import { UserProfileModal } from "../components/UserProfileModal";
 import MissionChat from "../components/chat/MissionChat";
 import { MissionClockWidget } from "../components/MissionClockWidget";
 import { FlightTracker } from "../components/FlightTracker";
@@ -641,6 +642,7 @@ export default function BrokerPortal() {
   const [generatedSignupOtp, setGeneratedSignupOtp] = useState<string | null>(null);
   const [authError, setAuthError] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [showUserProfileModal, setShowUserProfileModal] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -649,6 +651,10 @@ export default function BrokerPortal() {
         try {
           sessionStorage.setItem("broker_verified", "true");
         } catch {}
+        const storedProfile = localStorage.getItem("15d_broker_profile");
+        if (!storedProfile) {
+          setShowUserProfileModal(true);
+        }
       }
     });
 
@@ -660,6 +666,10 @@ export default function BrokerPortal() {
         try {
           sessionStorage.setItem("broker_verified", "true");
         } catch {}
+        const storedProfile = localStorage.getItem("15d_broker_profile");
+        if (!storedProfile) {
+          setShowUserProfileModal(true);
+        }
       } else {
         setSessionVerified(false);
         try {
@@ -2413,16 +2423,25 @@ export default function BrokerPortal() {
           {}
           <div className="max-w-4xl mx-auto space-y-12">
             <header className="flex flex-col items-start justify-start gap-8 pt-4 w-full">
-              {/* iOS Hamburger Menu Trigger Button */}
-              <button
-                onClick={() => setShowIOSMenu(true)}
-                className="px-3.5 py-2.5 rounded-2xl bg-white border border-purple-200 hover:border-purple-400 hover:bg-purple-50 text-gray-900 text-xs font-sync uppercase   font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer active:scale-95 group shrink-0"
-                title="Open Complete Feature Menu"
-              >
-                <Menu className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
-                <span className="hidden sm:inline">ALL FEATURES</span>
-                <span className="sm:hidden">MENU</span>
-              </button>
+              {/* Top Navigation Row: Hamburger + Profile Menu */}
+              <div className="flex items-center justify-between w-full">
+                <button
+                  onClick={() => setShowIOSMenu(true)}
+                  className="px-3.5 py-2.5 rounded-2xl bg-white border border-purple-200 hover:border-purple-400 hover:bg-purple-50 text-gray-900 text-xs font-sync uppercase font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer active:scale-95 group shrink-0"
+                  title="Open Complete Feature Menu"
+                >
+                  <Menu className="w-4 h-4 text-purple-600 group-hover:scale-110 transition-transform" />
+                  <span className="hidden sm:inline">ALL FEATURES</span>
+                  <span className="sm:hidden">MENU</span>
+                </button>
+
+                <div className="flex items-center gap-3">
+                  <UserMenu
+                    userEmail={brokerDbRecord?.email || inputEmail || 'hello.15dgroup@gmail.com'}
+                    onOpenProfile={() => setShowUserProfileModal(true)}
+                  />
+                </div>
+              </div>
 
               <div className="space-y-1 text-left flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4">
                 <h1 className=" text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight text-gray-900  flex items-center gap-2 sm:gap-4">
@@ -2925,6 +2944,7 @@ export default function BrokerPortal() {
           onOpenBookFlight={() => setShowBookFlightIframe(true)}
           onOpenReschedule={() => setShowRescheduleIframe(true)}
           onOpenExperiences={() => setShowExperienceIframe(true)}
+          onOpenProfile={() => setShowUserProfileModal(true)}
           onSignOut={async () => {
             await supabase.auth.signOut();
             sessionStorage.removeItem("broker_verified");
@@ -2940,6 +2960,18 @@ export default function BrokerPortal() {
           brokerEmail={
             brokerDbRecord?.email || inputEmail || "broker@15dwings.com.ng"
           }
+        />
+
+        <UserProfileModal
+          isOpen={showUserProfileModal}
+          onClose={() => setShowUserProfileModal(false)}
+          userEmail={brokerDbRecord?.email || inputEmail || 'hello.15dgroup@gmail.com'}
+          onProfileUpdated={(p) => {
+            setLegalFirstName(p.legalFirstName);
+            setLegalLastName(p.legalLastName);
+            setOrganization(p.organization);
+            showToast("Profile credentials synchronized.", "success");
+          }}
         />
       </div>
     </div>

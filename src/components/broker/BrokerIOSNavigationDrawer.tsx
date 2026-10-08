@@ -60,6 +60,7 @@ interface BrokerIOSNavigationDrawerProps {
   onOpenOperatorVerification: () => void;
   onOpenReschedule?: () => void;
   onOpenExperiences?: () => void;
+  onOpenProfile?: () => void;
   onSignOut: () => void;
 }
 
@@ -79,6 +80,7 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
   onOpenOperatorVerification,
   onOpenReschedule,
   onOpenExperiences,
+  onOpenProfile,
   onSignOut
 }) => {
   useEffect(() => {
@@ -366,14 +368,24 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
 
             {/* Footer Profile & Sign Out */}
             <div className="p-4 bg-slate-50 border-t border-slate-200/80 shrink-0 flex items-center justify-between">
-              <div className="space-y-0.5 max-w-[200px]">
-                <p className="text-xs font-semibold text-slate-900 truncate">
+              <button
+                type="button"
+                onClick={() => {
+                  if (onOpenProfile) {
+                    onClose();
+                    onOpenProfile();
+                  }
+                }}
+                className="space-y-0.5 max-w-[200px] text-left hover:opacity-80 transition-opacity cursor-pointer group"
+                title="Click to view or edit broker legal credentials"
+              >
+                <p className="text-xs font-semibold text-slate-900 truncate group-hover:text-purple-700">
                   {brokerCompanyName}
                 </p>
                 <p className="text-[11px] text-slate-500 truncate">
                   {brokerEmail || 'Authenticated Broker'}
                 </p>
-              </div>
+              </button>
               <button
                 onClick={onSignOut}
                 className="px-3 py-1.5 rounded-xl bg-white hover:bg-red-50 text-red-600 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200 hover:border-red-200"
