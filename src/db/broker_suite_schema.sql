@@ -229,20 +229,39 @@ CREATE POLICY "Brokers can manage own tasks"
 -- =====================================================================
 -- AUTOMATIC BROKER REGISTRATION TRIGGER
 -- Auto-creates broker record when a user signs up via email/password or Google
+-- Wrapped in an exception handler so it never blocks auth.users creation
 -- =====================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_broker()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.brokers (id, email, full_name, company_name, referral_code, aoc_verified)
-    VALUES (
-        NEW.id,
-        NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', SPLIT_PART(NEW.email, '@', 1)),
-        COALESCE(NEW.raw_user_meta_data->>'company_name', '15D Executive Aviation Brokerage'),
-        'BRK-' || UPPER(SUBSTRING(MD5(NEW.id::text) FROM 1 FOR 6)),
-        FALSE
-    )
-    ON CONFLICT (id) DO NOTHING;
+    BEGIN
+        INSERT INTO public.brokers (
+            auth_user_id,
+            email,
+            full_name,
+            company_name,
+            agency_name,
+            organization,
+            legal_first_name,
+            is_verified
+        )
+        VALUES (
+            NEW.id,
+            NEW.email,
+            COALESCE(NEW.raw_user_meta_data->>'full_name', SPLIT_PART(NEW.email, '@', 1)),
+            '15D Wings for Brokers',
+            '15D Wings for Brokers',
+            '15D Wings for Brokers',
+            COALESCE(NEW.raw_user_meta_data->>'legal_first_name', SPLIT_PART(NEW.email, '@', 1)),
+            FALSE
+        )
+        ON CONFLICT (email) DO UPDATE SET
+            auth_user_id = COALESCE(public.brokers.auth_user_id, EXCLUDED.auth_user_id),
+            updated_at = CURRENT_TIMESTAMP;
+    EXCEPTION WHEN OTHERS THEN
+        -- Never abort auth.users transaction if brokers table sync fails
+        RAISE WARNING 'handle_new_broker non-fatal notice: %', SQLERRM;
+    END;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

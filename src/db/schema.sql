@@ -501,5 +501,47 @@ BEGIN
 END $$;
 
 -- ==============================================================================
+-- 17. AUTOMATIC BROKER REGISTRATION TRIGGER (FAIL-SAFE)
+-- ==============================================================================
+CREATE OR REPLACE FUNCTION public.handle_new_broker()
+RETURNS TRIGGER AS $$
+BEGIN
+    BEGIN
+        INSERT INTO public.brokers (
+            auth_user_id,
+            email,
+            full_name,
+            company_name,
+            agency_name,
+            organization,
+            legal_first_name,
+            is_verified
+        )
+        VALUES (
+            NEW.id,
+            NEW.email,
+            COALESCE(NEW.raw_user_meta_data->>'full_name', SPLIT_PART(NEW.email, '@', 1)),
+            '15D Wings for Brokers',
+            '15D Wings for Brokers',
+            '15D Wings for Brokers',
+            COALESCE(NEW.raw_user_meta_data->>'legal_first_name', SPLIT_PART(NEW.email, '@', 1)),
+            FALSE
+        )
+        ON CONFLICT (email) DO UPDATE SET
+            auth_user_id = COALESCE(public.brokers.auth_user_id, EXCLUDED.auth_user_id),
+            updated_at = CURRENT_TIMESTAMP;
+    EXCEPTION WHEN OTHERS THEN
+        RAISE WARNING 'handle_new_broker non-fatal notice: %', SQLERRM;
+    END;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE FUNCTION public.handle_new_broker();
+
+-- ==============================================================================
 -- SCHEMA CREATION COMPLETE (IDEMPOTENT & PRODUCTION READY)
 -- ==============================================================================
