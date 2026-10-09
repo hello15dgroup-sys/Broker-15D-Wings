@@ -626,9 +626,36 @@ export default function BrokerPortal() {
   const [countryCode, setCountryCode] = useState("+234");
   const [countrySearch, setCountrySearch] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [legalFirstName, setLegalFirstName] = useState("");
-  const [legalLastName, setLegalLastName] = useState("");
-  const [organization, setOrganization] = useState("");
+  const [legalFirstName, setLegalFirstName] = useState<string>(() => {
+    try {
+      const stored = localStorage.getItem("15d_broker_profile");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.legalFirstName || parsed.first_name || "";
+      }
+    } catch {}
+    return "";
+  });
+  const [legalLastName, setLegalLastName] = useState<string>(() => {
+    try {
+      const stored = localStorage.getItem("15d_broker_profile");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.legalLastName || parsed.last_name || "";
+      }
+    } catch {}
+    return "";
+  });
+  const [organization, setOrganization] = useState<string>(() => {
+    try {
+      const stored = localStorage.getItem("15d_broker_profile");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.organization || parsed.company_name || parsed.agency_name || "";
+      }
+    } catch {}
+    return "15D Wings for Brokers";
+  });
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [dashboardTheme, setDashboardTheme] = useState("EXECUTIVE_DARK");
   const [otpDigits, setOtpDigits] = useState<string[]>([
@@ -652,7 +679,14 @@ export default function BrokerPortal() {
           sessionStorage.setItem("broker_verified", "true");
         } catch {}
         const storedProfile = localStorage.getItem("15d_broker_profile");
-        if (!storedProfile) {
+        if (storedProfile) {
+          try {
+            const parsed = JSON.parse(storedProfile);
+            if (parsed.legalFirstName) setLegalFirstName(parsed.legalFirstName);
+            if (parsed.legalLastName) setLegalLastName(parsed.legalLastName);
+            if (parsed.organization) setOrganization(parsed.organization);
+          } catch {}
+        } else {
           setShowUserProfileModal(true);
         }
       }
@@ -667,7 +701,14 @@ export default function BrokerPortal() {
           sessionStorage.setItem("broker_verified", "true");
         } catch {}
         const storedProfile = localStorage.getItem("15d_broker_profile");
-        if (!storedProfile) {
+        if (storedProfile) {
+          try {
+            const parsed = JSON.parse(storedProfile);
+            if (parsed.legalFirstName) setLegalFirstName(parsed.legalFirstName);
+            if (parsed.legalLastName) setLegalLastName(parsed.legalLastName);
+            if (parsed.organization) setOrganization(parsed.organization);
+          } catch {}
+        } else {
           setShowUserProfileModal(true);
         }
       } else {
@@ -689,19 +730,66 @@ export default function BrokerPortal() {
       }
       try {
         const { data: user } = await supabase.auth.getUser();
-        if (!user.user) {
-          setHasVerifiedOperator(false);
-          return;
+        const activeEmail = user.user?.email || inputEmail || "hello.15dgroup@gmail.com";
+
+        // 1. Fetch from Supabase with resilient lookup by auth_user_id OR email
+        let broker: any = null;
+        if (user.user?.id) {
+          const { data: bById } = await supabase
+            .from("brokers")
+            .select("id, referral_code, company_name, agency_name, organization, email, is_verified, legal_first_name, legal_last_name, full_name, date_of_birth")
+            .eq("auth_user_id", user.user.id)
+            .maybeSingle();
+          broker = bById;
         }
 
-        const { data: broker } = await supabase
-          .from("brokers")
-          .select("id, referral_code, company_name, email, is_verified")
-          .eq("auth_user_id", user.user.id)
-          .maybeSingle();
+        if (!broker && activeEmail) {
+          const { data: bByEmail } = await supabase
+            .from("brokers")
+            .select("id, referral_code, company_name, agency_name, organization, email, is_verified, legal_first_name, legal_last_name, full_name, date_of_birth")
+            .eq("email", activeEmail.toLowerCase().trim())
+            .maybeSingle();
+          broker = bByEmail;
+        }
+
+        // 2. Fetch from backend API endpoint for low latency and state assurance
+        try {
+          const beRes = await fetch(`/api/auth/profile?email=${encodeURIComponent(activeEmail)}`);
+          if (beRes.ok) {
+            const beData = await beRes.json();
+            if (beData?.profile?.legalFirstName) {
+              setLegalFirstName(beData.profile.legalFirstName);
+              if (beData.profile.legalLastName) setLegalLastName(beData.profile.legalLastName);
+              if (beData.profile.organization) setOrganization(beData.profile.organization);
+            }
+          }
+        } catch (beErr) {
+          console.warn("Backend profile query notice:", beErr);
+        }
 
         if (broker) {
           setBrokerDbRecord(broker);
+          const fname = broker.legal_first_name || (broker.full_name ? broker.full_name.split(' ')[0] : '');
+          if (fname) {
+            setLegalFirstName(fname);
+          }
+          if (broker.legal_last_name) setLegalLastName(broker.legal_last_name);
+          if (broker.organization || broker.company_name || broker.agency_name) {
+            setOrganization(broker.organization || broker.company_name || broker.agency_name);
+          }
+
+          try {
+            const stored = localStorage.getItem("15d_broker_profile");
+            const existing = stored ? JSON.parse(stored) : {};
+            localStorage.setItem("15d_broker_profile", JSON.stringify({
+              ...existing,
+              legalFirstName: fname || existing.legalFirstName || '',
+              legalLastName: broker.legal_last_name || existing.legalLastName || '',
+              organization: broker.organization || broker.company_name || existing.organization || '15D Wings for Brokers',
+              email: broker.email || activeEmail,
+              isVerified: Boolean(broker.is_verified)
+            }));
+          } catch {}
         }
 
         if (broker?.is_verified) {
@@ -732,7 +820,7 @@ export default function BrokerPortal() {
       }
     }
     checkOperator();
-  }, [sessionVerified]);
+  }, [sessionVerified, inputEmail]);
 
   /* First-Time Broker Onboarding State */
   const [isBrokerOnboarded, setIsBrokerOnboarded] = useState<boolean>(() => {
@@ -1430,8 +1518,12 @@ export default function BrokerPortal() {
       }
 
       // 2. Upsert to Supabase
+      const { data: sessionData } = await supabase.auth.getSession();
+      const currentAuthId = sessionData?.session?.user?.id;
+
       const { error: upsertErr } = await supabase.from('brokers').upsert({
         email: inputEmail.toLowerCase(),
+        ...(currentAuthId ? { auth_user_id: currentAuthId } : {}),
         password_hash: inputPassword || 'oauth_user',
         legal_first_name: legalFirstName,
         legal_last_name: legalLastName,
@@ -2547,11 +2639,13 @@ export default function BrokerPortal() {
                 className="p-8 md:p-12 flex-1 flex flex-col justify-center z-10 bg-white"
                 style={{ backgroundColor: "#ffffff" }}
               >
-                <h2 className=" text-3xl font-bold text-gray-900 tracking-tight  mb-4">
-                  welcome back to your luxury command center.
+                <h2 className="text-3xl font-bold text-gray-900 tracking-tight mb-4">
+                  {legalFirstName
+                    ? `Welcome back, ${legalFirstName}, to your luxury command center.`
+                    : "Welcome back to your luxury command center."}
                 </h2>
-                <p className=" text-gray-600 text-lg leading-relaxed max-w-lg ">
-                  everything you need to orchestrate seamless, world-class
+                <p className="text-gray-600 text-lg leading-relaxed max-w-lg">
+                  Everything you need to orchestrate seamless, world-class
                   aviation experiences for your clients in one vibrant place.
                 </p>
               </div>
@@ -2823,7 +2917,7 @@ export default function BrokerPortal() {
                   <BrokerCRMWorkspace
                     missionId={mission.id}
                     brokerCompanyName={
-                      brokerCompany || "15D Executive Aviation Brokerage"
+                      brokerCompany || "15D Wings for Brokers"
                     }
                     hasVerifiedOperator={hasVerifiedOperator}
                     onRequireOperator={() => setShowAOCModal(true)}
@@ -3028,11 +3122,12 @@ export default function BrokerPortal() {
               "info",
             );
           }}
+          brokerName={legalFirstName}
           brokerCompanyName={
-            brokerCompany || "15D Executive Aviation Brokerage"
+            brokerCompany || "15D Wings for Brokers"
           }
           brokerEmail={
-            brokerDbRecord?.email || inputEmail || "broker@15dwings.com.ng"
+            brokerDbRecord?.email || inputEmail || "hello.15dgroup@gmail.com"
           }
         />
 

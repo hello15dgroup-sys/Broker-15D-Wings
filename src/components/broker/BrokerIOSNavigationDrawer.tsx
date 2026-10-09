@@ -54,6 +54,7 @@ interface BrokerIOSNavigationDrawerProps {
   hasVerifiedOperator: boolean;
   brokerCompanyName?: string;
   brokerEmail?: string;
+  brokerName?: string;
   pendingTasksCount?: number;
   activeDealsCount?: number;
   onOpenBookFlight: () => void;
@@ -72,8 +73,9 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
   activeCrmSubTab,
   onSelectCrmSubTab,
   hasVerifiedOperator,
-  brokerCompanyName = '15D Executive Aviation Brokerage',
+  brokerCompanyName = '15D Wings for Brokers',
   brokerEmail,
+  brokerName,
   pendingTasksCount = 2,
   activeDealsCount = 3,
   onOpenBookFlight,
@@ -380,7 +382,7 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
                 title="Click to view or edit broker legal credentials"
               >
                 <p className="text-xs font-semibold text-slate-900 truncate group-hover:text-purple-700">
-                  {brokerCompanyName}
+                  {brokerName ? `${brokerName} • ${brokerCompanyName}` : brokerCompanyName}
                 </p>
                 <p className="text-[11px] text-slate-500 truncate">
                   {brokerEmail || 'Authenticated Broker'}

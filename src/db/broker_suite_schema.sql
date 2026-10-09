@@ -29,11 +29,21 @@ CREATE TABLE IF NOT EXISTS public.brokers (
 );
 
 -- Idempotent column migrations for existing public.brokers
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS auth_user_id UUID;
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS password_hash TEXT DEFAULT 'secured';
 ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS legal_first_name TEXT;
 ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS legal_last_name TEXT;
-ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS organization TEXT DEFAULT '15D Executive Aviation Brokerage';
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS organization TEXT DEFAULT '15D Wings for Brokers';
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS company_name TEXT DEFAULT '15D Wings for Brokers';
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS agency_name TEXT DEFAULT '15D Wings for Brokers';
 ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS date_of_birth DATE;
 ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS theme_preference TEXT DEFAULT 'apple_dark';
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE;
+
+DO $$ BEGIN
+    ALTER TABLE public.brokers ALTER COLUMN auth_user_id DROP NOT NULL;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
 
 CREATE UNIQUE INDEX IF NOT EXISTS brokers_email_unique_idx ON public.brokers (email);
 

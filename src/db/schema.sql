@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS brokers (
     password_hash VARCHAR(255) NOT NULL,
     legal_first_name VARCHAR(255),
     legal_last_name VARCHAR(255),
-    organization VARCHAR(255) DEFAULT '15D Executive Aviation Brokerage',
-    agency_name VARCHAR(255) DEFAULT '15D Executive Aviation Brokerage',
+    organization VARCHAR(255) DEFAULT '15D Wings for Brokers',
+    agency_name VARCHAR(255) DEFAULT '15D Wings for Brokers',
     date_of_birth DATE,
     theme_preference VARCHAR(50) DEFAULT 'apple_dark',
     phone VARCHAR(50),
@@ -45,12 +45,30 @@ CREATE TABLE IF NOT EXISTS brokers (
 );
 
 -- Idempotent column migrations for existing tables
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS auth_user_id UUID;
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255) DEFAULT 'secured';
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS full_name VARCHAR(255) DEFAULT '15D Executive Broker';
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS company_name VARCHAR(255) DEFAULT '15D Wings for Brokers';
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS agency_name VARCHAR(255) DEFAULT '15D Wings for Brokers';
 ALTER TABLE brokers ADD COLUMN IF NOT EXISTS legal_first_name VARCHAR(255);
 ALTER TABLE brokers ADD COLUMN IF NOT EXISTS legal_last_name VARCHAR(255);
-ALTER TABLE brokers ADD COLUMN IF NOT EXISTS organization VARCHAR(255) DEFAULT '15D Executive Aviation Brokerage';
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS organization VARCHAR(255) DEFAULT '15D Wings for Brokers';
 ALTER TABLE brokers ADD COLUMN IF NOT EXISTS date_of_birth DATE;
 ALTER TABLE brokers ADD COLUMN IF NOT EXISTS theme_preference VARCHAR(50) DEFAULT 'apple_dark';
 ALTER TABLE brokers ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE;
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS has_verified_operator BOOLEAN DEFAULT FALSE;
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS agency_clearance_status VARCHAR(50) DEFAULT 'ACTIVE';
+
+-- Safely allow NULL for legacy auth_user_id and full_name if existing table had NOT NULL
+DO $$ BEGIN
+    ALTER TABLE brokers ALTER COLUMN auth_user_id DROP NOT NULL;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE brokers ALTER COLUMN full_name DROP NOT NULL;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_brokers_email ON brokers(email);
 CREATE UNIQUE INDEX IF NOT EXISTS brokers_email_unique_idx ON brokers(email);

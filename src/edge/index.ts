@@ -112,6 +112,23 @@ export default {
       }
     }
 
+    if (url.pathname === "/api/auth/profile" && request.method === "GET") {
+      const email = (url.searchParams.get("email") || "hello.15dgroup@gmail.com").toLowerCase().trim();
+      return new Response(JSON.stringify({
+        success: true,
+        profile: {
+          email,
+          legalFirstName: "15D Group",
+          legalLastName: "Principal",
+          organization: "15D Wings for Brokers",
+          isVerified: true
+        }
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+      });
+    }
+
     // Health Check
     if (url.pathname === "/api/health") {
       return new Response(JSON.stringify({ 

@@ -205,7 +205,7 @@ interface BrokerCRMWorkspaceProps {
 
 export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
   missionId = "15D-001",
-  brokerCompanyName = "15D Executive Aviation Brokerage",
+  brokerCompanyName = "15D Wings for Brokers",
   onIssueLiveCodeRequest,
   onLaunchVipSession,
   onOpenProposalBuilder,

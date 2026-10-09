@@ -240,9 +240,13 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       }
 
       // 2. Upsert to Supabase brokers table
+      const { data: sessionData } = await supabase.auth.getSession();
+      const currentAuthId = sessionData?.session?.user?.id;
+
       const { error: upsertErr } = await supabase.from('brokers').upsert(
         {
           email: userEmail.toLowerCase(),
+          ...(currentAuthId ? { auth_user_id: currentAuthId } : {}),
           legal_first_name: updatedProfile.legalFirstName,
           legal_last_name: updatedProfile.legalLastName,
           organization: updatedProfile.organization,
