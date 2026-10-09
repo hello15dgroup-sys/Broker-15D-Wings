@@ -220,6 +220,26 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         email: userEmail
       };
 
+      // 1. Send profile to backend server endpoint
+      try {
+        await fetch('/api/auth/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: userEmail,
+            legalFirstName: updatedProfile.legalFirstName,
+            legalLastName: updatedProfile.legalLastName,
+            organization: updatedProfile.organization,
+            dateOfBirth: updatedProfile.dateOfBirth,
+            isVerified: updatedProfile.isVerified,
+            hasIdentityChanged
+          })
+        });
+      } catch (backendErr) {
+        console.warn('Backend profile relay notice:', backendErr);
+      }
+
+      // 2. Upsert to Supabase brokers table
       const { error: upsertErr } = await supabase.from('brokers').upsert(
         {
           email: userEmail.toLowerCase(),

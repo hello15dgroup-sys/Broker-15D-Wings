@@ -26,20 +26,50 @@ CREATE TABLE IF NOT EXISTS brokers (
     broker_uuid UUID DEFAULT gen_random_uuid() UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+    legal_first_name VARCHAR(255),
+    legal_last_name VARCHAR(255),
+    organization VARCHAR(255) DEFAULT '15D Executive Aviation Brokerage',
     agency_name VARCHAR(255) DEFAULT '15D Executive Aviation Brokerage',
+    date_of_birth DATE,
+    theme_preference VARCHAR(50) DEFAULT 'apple_dark',
     phone VARCHAR(50),
     device_fingerprint VARCHAR(255),
     agency_clearance_status VARCHAR(50) DEFAULT 'ACTIVE', -- ACTIVE, SUSPENDED_90_DAYS, DEACTIVATED
     is_soft_deleted BOOLEAN DEFAULT FALSE,
     has_verified_operator BOOLEAN DEFAULT FALSE,
+    is_verified BOOLEAN DEFAULT FALSE,
     last_client_onboarded_at TIMESTAMP WITH TIME ZONE,
     last_flight_booked_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Idempotent column migrations for existing tables
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS legal_first_name VARCHAR(255);
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS legal_last_name VARCHAR(255);
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS organization VARCHAR(255) DEFAULT '15D Executive Aviation Brokerage';
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS date_of_birth DATE;
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS theme_preference VARCHAR(50) DEFAULT 'apple_dark';
+ALTER TABLE brokers ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE;
+
 CREATE INDEX IF NOT EXISTS idx_brokers_email ON brokers(email);
+CREATE UNIQUE INDEX IF NOT EXISTS brokers_email_unique_idx ON brokers(email);
 CREATE INDEX IF NOT EXISTS idx_brokers_clearance ON brokers(agency_clearance_status);
+
+DO $$ BEGIN
+    -- Add unique constraint if not already registered
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conrelid = 'brokers'::regclass AND contype = 'u' AND conname = 'brokers_email_key'
+    ) THEN
+        BEGIN
+            ALTER TABLE brokers ADD CONSTRAINT brokers_email_key UNIQUE (email);
+        EXCEPTION
+            WHEN duplicate_table OR duplicate_object OR undefined_table THEN
+                NULL;
+        END;
+    END IF;
+END $$;
 
 DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_brokers_updated_at') THEN
@@ -47,6 +77,22 @@ DO $$ BEGIN
         FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
     END IF;
 END $$;
+
+-- 3B. IDENTITY AUDIT & FOUL PLAY INVESTIGATION LEDGER
+-- Triggered whenever verified accounts attempt credential alterations
+CREATE TABLE IF NOT EXISTS identity_audit_logs (
+    id SERIAL PRIMARY KEY,
+    log_uuid UUID DEFAULT gen_random_uuid() UNIQUE,
+    broker_email VARCHAR(255) NOT NULL,
+    event_type VARCHAR(100) DEFAULT 'IDENTITY_ALTERATION_ATTEMPT',
+    previous_identity JSONB,
+    new_identity JSONB,
+    admin_notified VARCHAR(255) DEFAULT '15dgroup.ng@gmail.com',
+    status VARCHAR(50) DEFAULT 'FLAGGED_INVESTIGATION',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_identity_audit_email ON identity_audit_logs(broker_email);
 
 -- ==============================================================================
 -- 4. OPERATORS & AOC REGISTRY

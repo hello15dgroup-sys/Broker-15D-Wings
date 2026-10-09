@@ -13,7 +13,12 @@ CREATE TABLE IF NOT EXISTS public.brokers (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT NOT NULL UNIQUE,
     full_name TEXT NOT NULL,
+    legal_first_name TEXT,
+    legal_last_name TEXT,
+    organization TEXT DEFAULT '15D Executive Aviation Brokerage',
     company_name TEXT NOT NULL DEFAULT '15D Executive Aviation Brokerage',
+    date_of_birth DATE,
+    theme_preference TEXT DEFAULT 'apple_dark',
     referral_code TEXT UNIQUE,
     commission_tier TEXT NOT NULL DEFAULT 'EXECUTIVE_PARTNER',
     aoc_verified BOOLEAN NOT NULL DEFAULT FALSE,
@@ -22,6 +27,15 @@ CREATE TABLE IF NOT EXISTS public.brokers (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Idempotent column migrations for existing public.brokers
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS legal_first_name TEXT;
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS legal_last_name TEXT;
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS organization TEXT DEFAULT '15D Executive Aviation Brokerage';
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS date_of_birth DATE;
+ALTER TABLE public.brokers ADD COLUMN IF NOT EXISTS theme_preference TEXT DEFAULT 'apple_dark';
+
+CREATE UNIQUE INDEX IF NOT EXISTS brokers_email_unique_idx ON public.brokers (email);
 
 -- ---------------------------------------------------------------------
 -- 2. BROKERAGE TEAM SUB-ACCOUNTS (Team Members & Junior Brokers)
