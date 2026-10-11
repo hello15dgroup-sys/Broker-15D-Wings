@@ -112,26 +112,23 @@ async function startServer() {
       }
 
       const normalizedEmail = email.toLowerCase().trim();
-      let record = brokerStore.get(normalizedEmail);
+      const record = brokerStore.get(normalizedEmail);
 
-      const now = new Date().toISOString();
+      // SECURITY LOCK: Only allow pre-registered or verified executive brokers
+      // Unauthorized emails are rejected with a strict 403 Forbidden
       if (!record) {
-        // Idempotently create record for signed in broker
-        record = {
-          email: normalizedEmail,
-          password_hash: password ? `hash_${password.length}` : 'secured',
-          createdAt: now,
-          updatedAt: now,
-          lastSignInAt: now,
-          isVerified: false
-        };
-        brokerStore.set(normalizedEmail, record);
-      } else {
-        record.lastSignInAt = now;
-        brokerStore.set(normalizedEmail, record);
+        console.warn(`[Security Alert] 🚨 Unauthorized login attempt blocked for unverified email: ${normalizedEmail}`);
+        return res.status(403).json({
+          success: false,
+          error: 'Access Denied: 15D Wings for Brokers requires prior executive vetting and authorization. Unrecognized email credentials cannot access Mission Control.'
+        });
       }
 
-      console.log(`[Backend Auth] ✓ Sign-in validated for: ${normalizedEmail}`);
+      const now = new Date().toISOString();
+      record.lastSignInAt = now;
+      brokerStore.set(normalizedEmail, record);
+
+      console.log(`[Backend Auth] ✓ Authorized sign-in for executive broker: ${normalizedEmail}`);
 
       return res.status(200).json({
         success: true,

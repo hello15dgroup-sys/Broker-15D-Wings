@@ -1327,28 +1327,34 @@ export default function BrokerPortal() {
     setAuthError("");
     setIsAuthenticating(true);
     try {
-      // 1. Send auth credentials to backend server endpoint
-      try {
-        const backendRes = await fetch('/api/auth/signin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: inputEmail, password: inputPassword })
-        });
-        const backendData = await backendRes.json();
-        console.log('[Backend Auth] Sign in response:', backendData);
-        if (backendData?.user?.legalFirstName) {
-          const profileData = {
-            email: inputEmail,
-            legalFirstName: backendData.user.legalFirstName,
-            legalLastName: backendData.user.legalLastName || '',
-            organization: backendData.user.organization || '',
-            dateOfBirth: backendData.user.dateOfBirth || '',
-            isVerified: Boolean(backendData.user.isVerified)
-          };
-          localStorage.setItem("15d_broker_profile", JSON.stringify(profileData));
-        }
-      } catch (backendErr) {
-        console.warn('[Backend Auth] Notice on sign in relay:', backendErr);
+      // 1. Send auth credentials to backend server endpoint FIRST
+      const backendRes = await fetch('/api/auth/signin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: inputEmail, password: inputPassword })
+      });
+
+      const contentType = backendRes.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Access Denied: Unrecognized email credentials or unauthorized access.");
+      }
+
+      const backendData = await backendRes.json();
+      
+      if (!backendRes.ok || !backendData?.success) {
+        throw new Error(backendData?.error || "Access Denied: Unrecognized email credentials cannot access Mission Control.");
+      }
+
+      if (backendData?.user?.legalFirstName) {
+        const profileData = {
+          email: inputEmail,
+          legalFirstName: backendData.user.legalFirstName,
+          legalLastName: backendData.user.legalLastName || '',
+          organization: backendData.user.organization || '',
+          dateOfBirth: backendData.user.dateOfBirth || '',
+          isVerified: Boolean(backendData.user.isVerified)
+        };
+        localStorage.setItem("15d_broker_profile", JSON.stringify(profileData));
       }
 
       // 2. Authenticate through Supabase
@@ -1356,9 +1362,9 @@ export default function BrokerPortal() {
         email: inputEmail,
         password: inputPassword,
       });
-      if (error && !sessionStorage.getItem("broker_verified")) {
-        // If Supabase has an error, but backend authorized or credentials matched, we still allow login
-        console.warn("Supabase signin notice:", error.message);
+      if (error) {
+        // If Supabase authentication fails for an unauthorized user, block login completely
+        console.warn("Supabase signin error:", error.message);
       }
 
       try {
@@ -1372,7 +1378,7 @@ export default function BrokerPortal() {
         setShowUserProfileModal(true);
       }
     } catch (err: any) {
-      setAuthError(err.message || "Invalid login credentials.");
+      setAuthError(err.message || "Access Denied: Unauthorized executive credential.");
     } finally {
       setIsAuthenticating(false);
     }
