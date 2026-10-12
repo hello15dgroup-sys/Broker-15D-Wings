@@ -76,6 +76,16 @@ async function startServer() {
       const normalizedEmail = email.toLowerCase().trim();
       const existing = brokerStore.get(normalizedEmail);
 
+      // SECURITY LOCK: Prevent random self-registration unless pre-authorized or matching executive domain
+      const isAuthorizedDomain = normalizedEmail.endsWith('@15dgroup.ng') || normalizedEmail.endsWith('@15dwings.com.ng') || normalizedEmail === 'hello.15dgroup@gmail.com';
+      if (!existing && !isAuthorizedDomain) {
+        console.warn(`[Security Alert] 🚨 Unauthorized self-signup attempt blocked for: ${normalizedEmail}`);
+        return res.status(403).json({
+          success: false,
+          error: 'Access Denied: Public registration is closed. 15D Wings for Brokers requires invitation or executive authorization.'
+        });
+      }
+
       const now = new Date().toISOString();
       const brokerRecord = {
         email: normalizedEmail,
@@ -83,7 +93,7 @@ async function startServer() {
         createdAt: existing?.createdAt || now,
         updatedAt: now,
         isVerified: existing?.isVerified || false,
-        organization: existing?.organization || '15D Executive Aviation Brokerage'
+        organization: existing?.organization || '15D Wings for Brokers'
       };
 
       brokerStore.set(normalizedEmail, { ...existing, ...brokerRecord });
