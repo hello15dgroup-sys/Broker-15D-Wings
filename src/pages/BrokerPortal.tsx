@@ -1357,14 +1357,14 @@ export default function BrokerPortal() {
         localStorage.setItem("15d_broker_profile", JSON.stringify(profileData));
       }
 
-      // 2. Authenticate through Supabase
+      // 2. Authenticate strictly through Supabase
       const { data: supaData, error } = await supabase.auth.signInWithPassword({
         email: inputEmail,
         password: inputPassword,
       });
-      if (error) {
-        // If Supabase authentication fails for an unauthorized user, block login completely
-        console.warn("Supabase signin error:", error.message);
+
+      if (error || !supaData?.session) {
+        throw new Error(error?.message || "Invalid Supabase authentication credentials.");
       }
 
       try {
