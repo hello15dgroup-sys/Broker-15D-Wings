@@ -1530,7 +1530,6 @@ export default function BrokerPortal() {
       const { error: upsertErr } = await supabase.from('brokers').upsert({
         email: inputEmail.toLowerCase(),
         ...(currentAuthId ? { auth_user_id: currentAuthId } : {}),
-        password_hash: inputPassword || 'oauth_user',
         legal_first_name: legalFirstName,
         legal_last_name: legalLastName,
         organization: organization,
@@ -1722,7 +1721,7 @@ export default function BrokerPortal() {
         >
           {/* Header branding above card */}
           <div className="text-center space-y-3 mb-8 md:mb-12">
-            <span className="font-sync uppercase text-[11px] text-purple-700 tracking-[0.35em] font-bold block">
+            <span className="hidden md:block font-sync uppercase text-[11px] text-purple-700 tracking-[0.35em] font-bold">
               15D WINGS
             </span>
             <h2 className="font-sync uppercase font-bold text-2xl md:text-3xl tracking-[0.22em] text-gray-950 pt-1">

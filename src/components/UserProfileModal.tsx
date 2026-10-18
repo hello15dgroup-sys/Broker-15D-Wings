@@ -180,7 +180,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       setShowFoulPlayAuditBanner(true);
       setIsConfirmingFoulPlayChange(true);
       setErrorMessage(
-        'LEGAL WARNING: Under 15D Wings Security Governance Law §4.9, this account is OPERATING UNDER VERIFIED STATUS. Changing your legal credentials triggers an immediate anti-fraud investigation relay to Mission Control Admin (15dgroup.ng@gmail.com). Click "Confirm & Dispatch Audit Relay" below to proceed.'
+        'LEGAL WARNING: Under 15D Wings Security Governance Law §4.9, this account is OPERATING UNDER VERIFIED STATUS. Changing your legal credentials triggers an immediate anti-fraud investigation relay to Mission Control Security. Click "Confirm & Dispatch Audit Relay" below to proceed.'
       );
       return;
     }
@@ -190,21 +190,21 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       // If verified account changed identity, trigger the mandatory foul play alert email to admin
       if (isVerified && hasIdentityChanged) {
         const foulPlayAuditPayload = {
-          recipientEmail: '15dgroup.ng@gmail.com',
+          recipientEmail: 'security@15dwings.internal',
           recipientName: '15D Wings Mission Control Security Desk',
           title: 'SECURITY AUDIT: FOUL PLAY DETECTED // IDENTITY ALTERATION',
           subtitle: 'GOVERNANCE LAW §4.9 • VERIFIED ACCOUNT BREACH NOTICE',
           badgeText: 'FOUL PLAY ALERT',
           badgeCode: 'AUDIT-SEC-409',
           message: `CRITICAL AUDIT: A verified broker account (${userEmail}) has initiated an unauthorized alteration of locked legal identity credentials.\n\nPREVIOUS VERIFIED IDENTITY:\n• Name: ${originalProfile?.legalFirstName} ${originalProfile?.legalLastName}\n• Organization: ${originalProfile?.organization}\n• Date of Birth: ${originalProfile?.dateOfBirth}\n\nATTEMPTED NEW IDENTITY:\n• Name: ${firstName.trim()} ${lastName.trim()}\n• Organization: ${organization.trim()}\n• Date of Birth: ${dateOfBirth}\n\nAudit timestamp: ${new Date().toISOString()}.\nIP/Session telemetry flagged for investigation.`,
-          internalRecipients: '15dgroup.ng@gmail.com,hello.15dgroup@gmail.com',
+          internalRecipients: 'security@15dwings.internal',
           showImage: false,
           showButton: false
         };
 
         try {
           await sendPremiumEmail(foulPlayAuditPayload);
-          console.warn('[Security Audit] Foul play alert dispatched to 15dgroup.ng@gmail.com.');
+          console.warn('[Security Audit] Foul play alert dispatched to Mission Control Security.');
         } catch (mailErr) {
           console.error('[Security Audit] Mail dispatch warning:', mailErr);
         }
@@ -272,7 +272,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
       if (isVerified && hasIdentityChanged) {
         setSuccessMessage(
-          'Profile updated. In accordance with Governance Law §4.9, a security audit notification was dispatched to 15dgroup.ng@gmail.com.'
+          'Profile updated. In accordance with Governance Law §4.9, a security audit notification was dispatched to Mission Control Security.'
         );
       } else {
         setSuccessMessage('Profile credentials verified and secured successfully.');
@@ -377,7 +377,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 <span>Identity Governance Law §4.9</span>
               </div>
               <p className="leading-relaxed text-purple-900/90 font-normal">
-                To prevent fraud and preserve passenger safety protocols, verified broker identities cannot be altered without triggering a priority alert to Mission Control Admin (<span className="font-mono font-bold">15dgroup.ng@gmail.com</span>) for foul play investigation.
+                To prevent fraud and preserve passenger safety protocols, verified broker identities cannot be altered without triggering a priority alert to Mission Control Security for foul play investigation.
               </p>
             </div>
 
@@ -472,7 +472,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                   <span>IDENTITY MODIFICATION DETECTED</span>
                 </div>
                 <p className="text-[11px] leading-relaxed text-red-800">
-                  You are editing legal credentials on a verified account. Saving will fire an immediate security audit dispatch to <span className="font-mono font-bold">15dgroup.ng@gmail.com</span> warning of potential foul play.
+                  You are editing legal credentials on a verified account. Saving will fire an immediate security audit dispatch to Mission Control Security warning of potential foul play.
                 </p>
               </motion.div>
             )}
