@@ -147,26 +147,6 @@ CREATE TABLE IF NOT EXISTS public.broker_deals (
 );
 
 -- ---------------------------------------------------------------------
--- 7. BROKER ACTIONABLE TASKS & ALERTS
--- ---------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.tasks (
-    id SERIAL PRIMARY KEY,
-    task_uuid UUID DEFAULT gen_random_uuid() UNIQUE,
-    broker_id UUID REFERENCES public.brokers(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    client_name VARCHAR(255),
-    type VARCHAR(50) DEFAULT 'Task',
-    category VARCHAR(100) DEFAULT 'Follow Up',
-    priority VARCHAR(50) DEFAULT 'High',
-    status VARCHAR(50) DEFAULT 'pending',
-    due_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE INDEX IF NOT EXISTS idx_tasks_broker ON public.tasks(broker_id);
-CREATE INDEX IF NOT EXISTS idx_tasks_status ON public.tasks(status);
-
 -- =====================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- =====================================================================
@@ -178,7 +158,6 @@ ALTER TABLE public.fleet_aircraft ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.empty_legs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.broker_clients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.broker_deals ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.broker_tasks ENABLE ROW LEVEL SECURITY;
 
 -- 2. Brokers Profile Policies
 DROP POLICY IF EXISTS "Brokers can view own profile" ON public.brokers;
@@ -225,12 +204,6 @@ CREATE POLICY "Brokers can manage own clients"
 DROP POLICY IF EXISTS "Brokers can manage own deals" ON public.broker_deals;
 CREATE POLICY "Brokers can manage own deals"
     ON public.broker_deals FOR ALL
-    USING (broker_id = auth.uid());
-
--- 7. Tasks Policies
-DROP POLICY IF EXISTS "Brokers can manage own tasks" ON public.broker_tasks;
-CREATE POLICY "Brokers can manage own tasks"
-    ON public.broker_tasks FOR ALL
     USING (broker_id = auth.uid());
 
 -- =====================================================================
