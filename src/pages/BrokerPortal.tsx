@@ -65,6 +65,7 @@ import vljImg from "../assets/images/vlj_phenom_100_1780611441744.png";
 import lightJetImg from "../assets/images/light_citation_cj4_1780611454957.png";
 import midsizeImg from "../assets/images/midsize_hawker_900_1780611469263.png";
 import ultraImg from "../assets/images/ultra_g650er_1780611495733.png";
+import jetIllustration from "../assets/images/jet_illustration_friendly_1787553630770.jpg";
 
 const AIRPORT_MAP: Record<string, { name: string; lat: number; lon: number }> =
   {
@@ -679,6 +680,7 @@ export default function BrokerPortal() {
           sessionStorage.setItem("broker_verified", "true");
         } catch {}
         const storedProfile = localStorage.getItem("15d_broker_profile");
+        const profileCompleted = localStorage.getItem("15d_profile_completed");
         if (storedProfile) {
           try {
             const parsed = JSON.parse(storedProfile);
@@ -686,7 +688,7 @@ export default function BrokerPortal() {
             if (parsed.legalLastName) setLegalLastName(parsed.legalLastName);
             if (parsed.organization) setOrganization(parsed.organization);
           } catch {}
-        } else {
+        } else if (!profileCompleted) {
           setShowUserProfileModal(true);
         }
       }
@@ -701,6 +703,7 @@ export default function BrokerPortal() {
           sessionStorage.setItem("broker_verified", "true");
         } catch {}
         const storedProfile = localStorage.getItem("15d_broker_profile");
+        const profileCompleted = localStorage.getItem("15d_profile_completed");
         if (storedProfile) {
           try {
             const parsed = JSON.parse(storedProfile);
@@ -708,7 +711,7 @@ export default function BrokerPortal() {
             if (parsed.legalLastName) setLegalLastName(parsed.legalLastName);
             if (parsed.organization) setOrganization(parsed.organization);
           } catch {}
-        } else {
+        } else if (!profileCompleted) {
           setShowUserProfileModal(true);
         }
       } else {
@@ -2659,7 +2662,7 @@ export default function BrokerPortal() {
                 style={{ backgroundColor: "#ffffff" }}
               >
                 <img
-                  src="/src/assets/images/jet_illustration_friendly_1787553630770.jpg"
+                  src={jetIllustration}
                   alt="Luxury Jet Graphic"
                   className="absolute inset-0 w-full h-full object-cover object-center mix-blend-multiply"
                 />

@@ -290,6 +290,81 @@ async function startServer() {
     res.json({ success: true, processed: true });
   });
 
+  // ==========================================
+  // BROKER TASKS & ALERTS BACKEND API
+  // ==========================================
+  interface TaskRecord {
+    id: string;
+    title: string;
+    clientName?: string;
+    dueDate?: string;
+    priority?: string;
+    category?: string;
+    completed: boolean;
+    createdAt: string;
+  }
+
+  const taskStore = new Map<string, TaskRecord[]>();
+
+  app.get('/api/tasks', (req, res) => {
+    const email = (req.query.email as string) || 'hello.15dgroup@gmail.com';
+    const tasks = taskStore.get(email.toLowerCase()) || [
+      {
+        id: 'task-init-1',
+        title: 'Follow up with Chief Adeleke on London Challenger quote',
+        clientName: 'Chief Alani Adeleke',
+        dueDate: 'Today',
+        priority: 'High',
+        category: 'Follow Up',
+        completed: false,
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'task-init-2',
+        title: 'Verify landing permit & VIP lounge clearance for Geneva mission',
+        clientName: 'Zenith Executive Fleet',
+        dueDate: 'Tomorrow',
+        priority: 'High',
+        category: 'Charter Prep',
+        completed: false,
+        createdAt: new Date().toISOString()
+      }
+    ];
+    res.json({ success: true, tasks });
+  });
+
+  app.post('/api/tasks', (req, res) => {
+    const { email = 'hello.15dgroup@gmail.com', title, clientName, dueDate, priority, category } = req.body;
+    if (!title) {
+      return res.status(400).json({ success: false, error: 'Task title is required.' });
+    }
+    const normEmail = email.toLowerCase();
+    const existingTasks = taskStore.get(normEmail) || [];
+    const newTask: TaskRecord = {
+      id: `task-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      title,
+      clientName: clientName || '',
+      dueDate: dueDate || 'Today',
+      priority: priority || 'High',
+      category: category || 'Follow Up',
+      completed: false,
+      createdAt: new Date().toISOString()
+    };
+    existingTasks.unshift(newTask);
+    taskStore.set(normEmail, existingTasks);
+    res.json({ success: true, task: newTask });
+  });
+
+  app.patch('/api/tasks/:id', (req, res) => {
+    const { id } = req.params;
+    const { email = 'hello.15dgroup@gmail.com', completed } = req.body;
+    const normEmail = email.toLowerCase();
+    const tasks = taskStore.get(normEmail) || [];
+    const updated = tasks.map(t => t.id === id ? { ...t, completed: Boolean(completed) } : t);
+    taskStore.set(normEmail, updated);
+    res.json({ success: true, tasks: updated });
+  });
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
