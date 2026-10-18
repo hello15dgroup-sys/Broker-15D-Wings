@@ -679,18 +679,20 @@ export default function BrokerPortal() {
         try {
           sessionStorage.setItem("broker_verified", "true");
         } catch {}
-        const storedProfile = localStorage.getItem("15d_broker_profile");
-        const profileCompleted = localStorage.getItem("15d_profile_completed");
-        if (storedProfile) {
-          try {
-            const parsed = JSON.parse(storedProfile);
-            if (parsed.legalFirstName) setLegalFirstName(parsed.legalFirstName);
-            if (parsed.legalLastName) setLegalLastName(parsed.legalLastName);
-            if (parsed.organization) setOrganization(parsed.organization);
-          } catch {}
-        } else if (!profileCompleted) {
-          setShowUserProfileModal(true);
-        }
+        supabase
+          .from("brokers")
+          .select("*")
+          .eq("auth_user_id", session.user.id)
+          .single()
+          .then(({ data: broker, error }) => {
+            if (broker) {
+              setLegalFirstName(broker.legal_first_name);
+              setLegalLastName(broker.legal_last_name);
+              setOrganization(broker.organization);
+            } else if (!error) {
+              setShowUserProfileModal(true);
+            }
+          });
       }
     });
 
@@ -702,18 +704,20 @@ export default function BrokerPortal() {
         try {
           sessionStorage.setItem("broker_verified", "true");
         } catch {}
-        const storedProfile = localStorage.getItem("15d_broker_profile");
-        const profileCompleted = localStorage.getItem("15d_profile_completed");
-        if (storedProfile) {
-          try {
-            const parsed = JSON.parse(storedProfile);
-            if (parsed.legalFirstName) setLegalFirstName(parsed.legalFirstName);
-            if (parsed.legalLastName) setLegalLastName(parsed.legalLastName);
-            if (parsed.organization) setOrganization(parsed.organization);
-          } catch {}
-        } else if (!profileCompleted) {
-          setShowUserProfileModal(true);
-        }
+        supabase
+          .from("brokers")
+          .select("*")
+          .eq("auth_user_id", session.user.id)
+          .single()
+          .then(({ data: broker, error }) => {
+            if (broker) {
+              setLegalFirstName(broker.legal_first_name);
+              setLegalLastName(broker.legal_last_name);
+              setOrganization(broker.organization);
+            } else if (!error) {
+              setShowUserProfileModal(true);
+            }
+          });
       } else {
         setSessionVerified(false);
         try {

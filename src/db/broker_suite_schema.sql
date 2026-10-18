@@ -149,16 +149,23 @@ CREATE TABLE IF NOT EXISTS public.broker_deals (
 -- ---------------------------------------------------------------------
 -- 7. BROKER ACTIONABLE TASKS & ALERTS
 -- ---------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.broker_tasks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    broker_id UUID NOT NULL REFERENCES public.brokers(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS public.tasks (
+    id SERIAL PRIMARY KEY,
+    task_uuid UUID DEFAULT gen_random_uuid() UNIQUE,
+    broker_id UUID REFERENCES public.brokers(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
-    category TEXT NOT NULL DEFAULT 'GENERAL' CHECK (category IN ('SLOT_CLEARANCE', 'PAYMENT_ESCROW', 'MANIFEST_CHECK', 'GENERAL', 'CLIENT_FOLLOWUP')),
-    priority TEXT NOT NULL DEFAULT 'NORMAL' CHECK (priority IN ('HIGH', 'NORMAL', 'URGENT')),
-    due_date TIMESTAMPTZ,
-    is_completed BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    client_name VARCHAR(255),
+    type VARCHAR(50) DEFAULT 'Task',
+    category VARCHAR(100) DEFAULT 'Follow Up',
+    priority VARCHAR(50) DEFAULT 'High',
+    status VARCHAR(50) DEFAULT 'pending',
+    due_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_tasks_broker ON public.tasks(broker_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON public.tasks(status);
 
 -- =====================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES

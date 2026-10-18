@@ -261,10 +261,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         console.warn('Backend profile upsert note:', upsertErr.message);
       }
 
-      // Update local storage state
-      localStorage.setItem('15d_broker_profile', JSON.stringify(updatedProfile));
-      localStorage.setItem('15d_profile_completed', 'true');
-      localStorage.setItem('15d_broker_company', updatedProfile.organization);
       setOriginalProfile(updatedProfile);
 
       if (onProfileUpdated) {
