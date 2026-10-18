@@ -22,7 +22,8 @@ import {
   Compass,
   ArrowUpRight,
   Code,
-  Mail
+  Mail,
+  Calculator
 } from 'lucide-react';
 
 export type BrokerTabType = 
@@ -35,6 +36,7 @@ export type BrokerTabType =
 
 export type CrmSubTabType = 
   | 'tasks' 
+  | 'settlement'
   | 'pipeline' 
   | 'clients' 
   | 'proposals' 
@@ -318,12 +320,12 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
                     className="p-3 rounded-xl border border-slate-200 bg-white hover:bg-purple-50/50 text-left transition-colors cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <CheckSquare className="w-4 h-4 text-purple-600" />
-                      <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 font-medium">
-                        {pendingTasksCount}
+                      <Calculator className="w-4 h-4 text-purple-600" />
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-100 text-emerald-900 font-medium">
+                        Active
                       </span>
                     </div>
-                    <span className="text-xs font-medium text-slate-900">Tasks</span>
+                    <span className="text-xs font-medium text-slate-900">Escrow & Settle</span>
                   </button>
 
                   <button
