@@ -139,7 +139,8 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
     }
   };
 
-  const proposalLink = `https://vip.15dwings.com.ng/verify/${missionId}?concierge=${encodeURIComponent(agencyName)}`;
+  const baseOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  const proposalLink = `${baseOrigin}/verify/${missionId}?concierge=${encodeURIComponent(agencyName)}`;
 
   const handleCopyLink = async () => {
     await copyToClipboard(proposalLink);
@@ -469,7 +470,7 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
                 <div className="flex items-center gap-3 pt-2 text-[10px] text-gray-600 font-mono border-t border-purple-200">
                   <QrCode className="w-8 h-8 text-purple-600 shrink-0" />
                   <div>
-                    <p className="text-gray-200">Dynamic Security QR: vip.15dwings.com.ng/verify/{missionId}</p>
+                    <p className="text-gray-200">Dynamic Security QR: Secure Portal /verify/{missionId}</p>
                     <p className="text-gray-500">Verified Ground Escrow & Safe Payment Guarantee</p>
                   </div>
                 </div>
@@ -479,10 +480,11 @@ export const WhiteLabelProposalBuilder: React.FC<WhiteLabelProposalBuilderProps>
               <div className="flex gap-3">
                 <button
                   onClick={() => {
-                                        alert(`Proposal PDF for ${missionId} formatted in "${selectedFont}" generated successfully!
+                    const baseOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+                    alert(`Proposal PDF for ${missionId} formatted in "${selectedFont}" generated successfully!
 
 DYNAMIC VERIFICATION:
-A QR code has been embedded into this PDF pointing to: https://vip.15dwings.com.ng/verify/${missionId}`);
+A QR code has been embedded into this PDF pointing to: ${baseOrigin}/verify/${missionId}`);
                     setShowPreviewModal(false);
                   }}
                   className="flex-1 py-3.5 rounded-xl bg-purple-600 text-gray-900 font-space lowercase text-xs font-bold tracking-wider lowercase hover:bg-purple-600/90 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(24,119,242,0.4)]"

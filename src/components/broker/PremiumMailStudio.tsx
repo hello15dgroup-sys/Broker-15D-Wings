@@ -80,7 +80,7 @@ export const PremiumMailStudio: React.FC<PremiumMailStudioProps> = ({
   const [operatorName, setOperatorName] = useState('Max Air Executive Charter');
   const [aocNumber, setAocNumber] = useState('AOC/NG/044');
   const [totalAmount, setTotalAmount] = useState('$65,000 USD');
-  const [portalUrl, setPortalUrl] = useState('https://vip.15dwings.com.ng/verify/15D-782');
+  const [portalUrl, setPortalUrl] = useState(() => (typeof window !== 'undefined' ? window.location.origin : '') + '/verify/15D-782');
 
   // Rich text customized body message (the default acts as a professional guide)
   const [customMessage, setCustomMessage] = useState(
@@ -173,7 +173,8 @@ export const PremiumMailStudio: React.FC<PremiumMailStudioProps> = ({
         setOperatorName(m.operator_name || 'Max Air Executive Charter');
         setAocNumber(m.aoc_number || 'AOC/NG/044');
         setTotalAmount(typeof escrowAmt === 'number' ? `$${escrowAmt.toLocaleString()} USD` : escrowAmt);
-        setPortalUrl(`https://vip.15dwings.com.ng/verify/${m.id || cleanId}`);
+        const baseOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+        setPortalUrl(`${baseOrigin}/verify/${m.id || cleanId}`);
 
         setAuthStatus({
           success: true,

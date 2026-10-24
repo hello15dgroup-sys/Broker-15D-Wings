@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { copyToClipboard } from '../../lib/utils';
+import { BrokerVerificationWidget } from './BrokerVerificationWidget';
 
 export interface OperatorRecord {
   id: string;
@@ -58,6 +59,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
   const [operatorsList, setOperatorsList] = useState<OperatorRecord[]>([]);
   const [isLoadingOperators, setIsLoadingOperators] = useState(false);
   const [isSimulatingOnboard, setIsSimulatingOnboard] = useState(false);
+  const [activeModalTab, setActiveModalTab] = useState<'worker_clearance' | 'airline_link'>('worker_clearance');
 
   const refCode = brokerReferralCode || (brokerId ? brokerId.substring(0, 8).toUpperCase() : 'REF-15D');
   const inviteUrl = `https://airlines.15dwings.com.ng?broker_ref=${refCode}&broker_id=${brokerId || ''}`;
@@ -222,9 +224,45 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
             <p className="text-xs md:text-sm text-purple-200/90 font-lexend max-w-xl leading-relaxed mt-2">
               To prevent unauthorized pricing manifests in our ecosystem, brokers must link an Air Operator Certificate (AOC) holder. Send your custom onboarding link to your partner airline to register on <strong className="text-white underline">airlines.15dwings.com.ng</strong>.
             </p>
+
+            {/* Modal Subtabs */}
+            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => setActiveModalTab('worker_clearance')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  activeModalTab === 'worker_clearance'
+                    ? 'bg-white text-slate-900 shadow-sm font-bold'
+                    : 'bg-white/10 hover:bg-white/20 text-purple-200'
+                }`}
+              >
+                15D Worker Clearance Gateway
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveModalTab('airline_link')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                  activeModalTab === 'airline_link'
+                    ? 'bg-white text-slate-900 shadow-sm font-bold'
+                    : 'bg-white/10 hover:bg-white/20 text-purple-200'
+                }`}
+              >
+                Manual Airline Link & Invites
+              </button>
+            </div>
           </div>
 
           <div className="p-6 md:p-8 space-y-6 max-h-[75vh] overflow-y-auto">
+            {activeModalTab === 'worker_clearance' ? (
+              <BrokerVerificationWidget
+                initialBrokerId={brokerId || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'}
+                brokerEmail={brokerEmail || 'broker@15dwings.com.ng'}
+                onClearanceActive={() => {
+                  if (onVerificationSuccess) onVerificationSuccess();
+                }}
+              />
+            ) : (
+              <>
             {/* Live Verification Status Banner */}
             <div className={`p-4 rounded-2xl border flex items-center justify-between gap-4 ${
               isAnyVerified
@@ -479,6 +517,8 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
                 <span>Simulate Operator Handshake</span>
               </button>
             </div>
+            </>
+            )}
           </div>
         </motion.div>
       </div>

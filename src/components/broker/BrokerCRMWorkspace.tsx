@@ -946,10 +946,8 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                                   if (onLaunchVipSession) {
                                     onLaunchVipSession(deal.missionCode!);
                                   } else {
-                                    window.open(
-                                      `https://vip.15dwings.com.ng/verify/${deal.missionCode}`,
-                                      "_blank",
-                                    );
+                                    const baseOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+                                    window.open(`${baseOrigin}/verify/${deal.missionCode}`, "_self");
                                   }
                                 }}
                                 className="w-full py-1.5 rounded-lg bg-purple-100 hover:bg-white/20 text-gray-900 border border-purple-200 text-[9px] font-semibold flex items-center justify-center gap-1.5 cursor-pointer"

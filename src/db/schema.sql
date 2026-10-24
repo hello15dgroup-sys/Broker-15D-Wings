@@ -375,7 +375,7 @@ CREATE INDEX IF NOT EXISTS idx_contracts_code ON contracts(contract_code);
 
 -- ==============================================================================
 -- 12. PAYMENTS & ESCROW SETTLEMENTS
--- Direct connection to VIP.15DWINGS.COM.NG activation and principal payments
+-- Direct connection to Secure Escrow Vault activation and principal payments
 -- ==============================================================================
 CREATE TABLE IF NOT EXISTS payments (
     id SERIAL PRIMARY KEY,

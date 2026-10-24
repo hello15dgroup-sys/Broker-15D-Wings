@@ -34,7 +34,8 @@ export const BookingCodeGenerator: React.FC<BookingCodeGeneratorProps> = ({
   const [copiedIntake, setCopiedIntake] = useState<boolean>(false);
 
   const selectedOperator = SAMPLE_AOC_OPERATORS.find(op => op.id === selectedOperatorId) || SAMPLE_AOC_OPERATORS[0];
-  const vipIntakeUrl = `https://vip.15dwings.com.ng/portal?missionId=${missionCode}&verified=true`;
+  const baseOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  const vipIntakeUrl = `${baseOrigin}/portal?missionId=${missionCode}&verified=true`;
 
   const handleGenerateCode = () => {
     setIsGenerating(true);

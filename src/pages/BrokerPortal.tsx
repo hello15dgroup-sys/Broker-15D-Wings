@@ -2669,17 +2669,24 @@ export default function BrokerPortal() {
                 </h1>
                 {/* Visual verification status badge indicating when the fleet and empty legs data has been successfully verified */}
                 <div className="flex items-center">
-                  {hasVerifiedOperator ? (
-                    <span className="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium flex items-center gap-1.5 shadow-xs">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span>Fleet & Empty Legs Verified</span>
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium flex items-center gap-1.5 shadow-xs">
-                      <ShieldAlert className="w-4 h-4 text-amber-600" />
-                      <span>Pending Fleet Verification</span>
-                    </span>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setShowAOCModal(true)}
+                    className="cursor-pointer hover:opacity-90 transition-all active:scale-95"
+                    title="Click to view broker clearance and operator verification"
+                  >
+                    {hasVerifiedOperator ? (
+                      <span className="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-medium flex items-center gap-1.5 shadow-xs">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>Fleet & Empty Legs Verified</span>
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-medium flex items-center gap-1.5 shadow-xs">
+                        <ShieldAlert className="w-4 h-4 text-amber-600" />
+                        <span>Pending Fleet Verification • Check Status</span>
+                      </span>
+                    )}
+                  </button>
                 </div>
               </div>
             </header>

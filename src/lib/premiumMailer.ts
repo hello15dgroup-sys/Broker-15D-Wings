@@ -59,7 +59,8 @@ export function generate15DWingsHtmlEmail(d: PremiumEmailTemplateData): string {
   const operatorName = d.operatorName || "Max Air Executive Charter";
   const aocNumber = d.aocNumber || "AOC/NG/044";
   const totalAmount = d.totalAmount || "$65,000 USD";
-  const portalUrl = d.portalUrl || `https://vip.15dwings.com.ng/verify/${missionCode}`;
+  const baseOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://ais-dev-be6f5lzsgrwxmbt67lbtzx-246653384841.europe-west2.run.app';
+  const portalUrl = d.portalUrl || `${baseOrigin}/verify/${missionCode}`;
   const customMessage = d.customMessage || "Your private aviation itinerary has been validated against our licensed carrier network. Flight crews, landing slots, and ground handling services are locked for execution.";
 
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
