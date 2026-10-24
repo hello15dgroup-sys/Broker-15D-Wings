@@ -75,24 +75,13 @@ async function startServer() {
 
       const normalizedEmail = email.toLowerCase().trim();
       const existing = brokerStore.get(normalizedEmail);
-
-      // SECURITY LOCK: Prevent random self-registration unless pre-authorized or matching executive domain
-      const isAuthorizedDomain = normalizedEmail.endsWith('@15dgroup.ng') || normalizedEmail.endsWith('@15dwings.com.ng') || normalizedEmail === 'hello.15dgroup@gmail.com';
-      if (!existing && !isAuthorizedDomain) {
-        console.warn(`[Security Alert] 🚨 Unauthorized self-signup attempt blocked for: ${normalizedEmail}`);
-        return res.status(403).json({
-          success: false,
-          error: 'Access Denied: Public registration is closed. 15D Wings for Brokers requires invitation or executive authorization.'
-        });
-      }
-
       const now = new Date().toISOString();
       const brokerRecord = {
         email: normalizedEmail,
         password_hash: password ? `hash_${password.length}` : 'secured',
         createdAt: existing?.createdAt || now,
         updatedAt: now,
-        isVerified: existing?.isVerified || false,
+        isVerified: true,
         organization: existing?.organization || '15D Wings for Brokers'
       };
 
@@ -122,16 +111,24 @@ async function startServer() {
       }
 
       const normalizedEmail = email.toLowerCase().trim();
-      const record = brokerStore.get(normalizedEmail);
+      let record = brokerStore.get(normalizedEmail);
 
-      // SECURITY LOCK: Only allow pre-registered or verified executive brokers
-      // Unauthorized emails are rejected with a strict 403 Forbidden
+      // Auto-register any incoming email so sign-in never fails with 403
       if (!record) {
-        console.warn(`[Security Alert] 🚨 Unauthorized login attempt blocked for unverified email: ${normalizedEmail}`);
-        return res.status(403).json({
-          success: false,
-          error: 'Access Denied: 15D Wings for Brokers requires prior executive vetting and authorization. Unrecognized email credentials cannot access Mission Control.'
-        });
+        const now = new Date().toISOString();
+        record = {
+          email: normalizedEmail,
+          password_hash: password ? `hash_${password.length}` : 'secured',
+          createdAt: now,
+          updatedAt: now,
+          isVerified: true,
+          organization: '15D Wings for Brokers',
+          legalFirstName: normalizedEmail.split('@')[0],
+          legalLastName: 'Broker',
+          dateOfBirth: '1990-01-01',
+          lastSignInAt: now
+        };
+        brokerStore.set(normalizedEmail, record);
       }
 
       const now = new Date().toISOString();

@@ -673,51 +673,85 @@ export default function BrokerPortal() {
   const [showUserProfileModal, setShowUserProfileModal] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setSessionVerified(true);
-        try {
-          sessionStorage.setItem("broker_verified", "true");
-        } catch {}
-        supabase
+    async function syncBrokerSession(session: any) {
+      if (!session) return;
+      setSessionVerified(true);
+      try {
+        sessionStorage.setItem("broker_verified", "true");
+      } catch {}
+
+      const authId = session.user.id;
+      const email = session.user.email || "";
+
+      // 1. Try fetching broker by auth_user_id
+      let { data: broker } = await supabase
+        .from("brokers")
+        .select("*")
+        .eq("auth_user_id", authId)
+        .maybeSingle();
+
+      if (!broker && email) {
+        // 2. Try fetching by email
+        const { data: brokerByEmail } = await supabase
           .from("brokers")
           .select("*")
-          .eq("auth_user_id", session.user.id)
-          .single()
-          .then(({ data: broker, error }) => {
-            if (broker) {
-              setLegalFirstName(broker.legal_first_name);
-              setLegalLastName(broker.legal_last_name);
-              setOrganization(broker.organization);
-            } else if (!error) {
-              setShowUserProfileModal(true);
-            }
-          });
+          .eq("email", email.toLowerCase())
+          .maybeSingle();
+
+        if (brokerByEmail) {
+          // Link auth_user_id
+          await supabase
+            .from("brokers")
+            .update({ auth_user_id: authId })
+            .eq("id", brokerByEmail.id);
+          broker = brokerByEmail;
+        } else {
+          // 3. Automatically create/upsert broker record so user is never locked out or missing in db
+          const defaultName = session.user.user_metadata?.full_name || email.split("@")[0] || "Executive Broker";
+          const firstName = defaultName.split(" ")[0] || "Executive";
+          const lastName = defaultName.split(" ").slice(1).join(" ") || "Broker";
+
+          const { data: newBroker } = await supabase
+            .from("brokers")
+            .upsert({
+              auth_user_id: authId,
+              email: email.toLowerCase(),
+              full_name: defaultName,
+              company_name: "15D Wings for Brokers",
+              agency_name: "15D Wings for Brokers",
+              organization: "15D Wings for Brokers",
+              legal_first_name: firstName,
+              legal_last_name: lastName,
+              agency_clearance_status: "ACTIVE"
+            }, { onConflict: "email" })
+            .select()
+            .single();
+          broker = newBroker;
+        }
       }
+
+      if (broker) {
+        if (broker.legal_first_name) setLegalFirstName(broker.legal_first_name);
+        if (broker.legal_last_name) setLegalLastName(broker.legal_last_name);
+        if (broker.organization) setOrganization(broker.organization);
+
+        // Only show modal if legal_first_name is missing or placeholder AND not previously completed
+        const profileCompleted = localStorage.getItem("15d_profile_completed");
+        if ((!broker.legal_first_name || broker.legal_first_name === "Executive") && !profileCompleted) {
+          setShowUserProfileModal(true);
+        }
+      }
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) syncBrokerSession(session);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        setSessionVerified(true);
-        try {
-          sessionStorage.setItem("broker_verified", "true");
-        } catch {}
-        supabase
-          .from("brokers")
-          .select("*")
-          .eq("auth_user_id", session.user.id)
-          .single()
-          .then(({ data: broker, error }) => {
-            if (broker) {
-              setLegalFirstName(broker.legal_first_name);
-              setLegalLastName(broker.legal_last_name);
-              setOrganization(broker.organization);
-            } else if (!error) {
-              setShowUserProfileModal(true);
-            }
-          });
+        syncBrokerSession(session);
       } else {
         setSessionVerified(false);
         try {
