@@ -184,6 +184,8 @@ export type CrmWorkspaceSubTab =
 
 interface BrokerCRMWorkspaceProps {
   missionId?: string;
+  brokerId?: string;
+  brokerEmail?: string;
   brokerCompanyName?: string;
   onIssueLiveCodeRequest?: (missionCode: string) => void;
   onLaunchVipSession?: (missionCode: string) => void;
@@ -197,7 +199,9 @@ interface BrokerCRMWorkspaceProps {
 }
 
 export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
-  missionId = "15D-001",
+  missionId,
+  brokerId,
+  brokerEmail,
   brokerCompanyName = "15D Wings for Brokers",
   onIssueLiveCodeRequest,
   onLaunchVipSession,
@@ -315,9 +319,14 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           );
         }
 
-        const { data: clientsData, error: clientsErr } = await supabase
-          .from("clients")
-          .select("*");
+        // Fetch clients strictly scoped to this broker
+        let clientsQuery = supabase.from("clients").select("*");
+        if (brokerId) {
+          clientsQuery = clientsQuery.eq("broker_id", brokerId);
+        } else if (brokerEmail) {
+          clientsQuery = clientsQuery.eq("broker_email", brokerEmail.toLowerCase());
+        }
+        const { data: clientsData, error: clientsErr } = await clientsQuery;
         if (!clientsErr && clientsData) {
           setClients(
             clientsData.map((c) => ({
@@ -343,9 +352,14 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           );
         }
 
-        const { data: proposalsData, error: propsErr } = await supabase
-          .from("proposals")
-          .select("*");
+        // Fetch proposals strictly scoped to this broker
+        let propsQuery = supabase.from("proposals").select("*");
+        if (brokerId) {
+          propsQuery = propsQuery.eq("broker_id", brokerId);
+        } else if (brokerEmail) {
+          propsQuery = propsQuery.eq("broker_email", brokerEmail.toLowerCase());
+        }
+        const { data: proposalsData, error: propsErr } = await propsQuery;
         if (!propsErr && proposalsData) {
           setDeals(
             proposalsData.map((p) => ({
@@ -376,9 +390,14 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
           );
         }
 
-        const { data: historyData, error: histErr } = await supabase
-          .from("flight_history")
-          .select("*");
+        // Fetch flight history strictly scoped to this broker
+        let histQuery = supabase.from("flight_history").select("*");
+        if (brokerId) {
+          histQuery = histQuery.eq("broker_id", brokerId);
+        } else if (brokerEmail) {
+          histQuery = histQuery.eq("broker_email", brokerEmail.toLowerCase());
+        }
+        const { data: historyData, error: histErr } = await histQuery;
         if (!histErr && historyData) {
           setHistory(
             historyData.map((h) => ({
@@ -405,7 +424,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       }
     }
     fetchCRMData();
-  }, []);
+  }, [brokerId, brokerEmail]);
 
   /* State for Messages */
   const [chatMessages, setChatMessages] = useState([
@@ -1315,7 +1334,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
                 No Historical Flight Logs Found in Database
               </p>
               <p className="text-[11px] text-slate-500 max-w-md mx-auto leading-relaxed">
-                Querying live from <code className="text-purple-700 font-mono font-semibold">public.flight_history</code> table. Completed client flights will be automatically recorded here.
+                Charter flights completed under your broker account will be automatically recorded here. No unassociated records are displayed to protect privacy.
               </p>
             </div>
           ) : (
@@ -1440,14 +1459,17 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
       {/* SUB-TAB 7: MISSION SETTLEMENT ENGINE */}
       {activeSubTab === "tasks" && (
-        <MissionSettlementPanel />
+        <MissionSettlementPanel
+          brokerEmail={brokerEmail}
+          brokerId={brokerId}
+        />
       )}
 
       {/* SUB-TAB: BROKER KYC CLEARANCE HUB */}
       {activeSubTab === "kyc" && (
         <BrokerKycHub
-          brokerId={missionId || "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"}
-          brokerEmail="broker@15dwings.com.ng"
+          brokerId={brokerId || missionId || "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"}
+          brokerEmail={brokerEmail || "broker@15dwings.com.ng"}
           brokerName={brokerCompanyName || "Precious Ubadike"}
         />
       )}

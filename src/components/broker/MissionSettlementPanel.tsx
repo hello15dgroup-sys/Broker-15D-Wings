@@ -33,9 +33,17 @@ interface MissionSettlementData {
   escrow_deposit?: number;
 }
 
-export const MissionSettlementPanel: React.FC = () => {
-  const [missionIdInput, setMissionIdInput] = useState("15D-001");
-  const [brokerEmailInput, setBrokerEmailInput] = useState("");
+interface MissionSettlementPanelProps {
+  brokerEmail?: string;
+  brokerId?: string;
+}
+
+export const MissionSettlementPanel: React.FC<MissionSettlementPanelProps> = ({
+  brokerEmail,
+  brokerId,
+}) => {
+  const [missionIdInput, setMissionIdInput] = useState("");
+  const [brokerEmailInput, setBrokerEmailInput] = useState(brokerEmail || "");
   const [isLoading, setIsLoading] = useState(false);
   const [missionData, setMissionData] = useState<MissionSettlementData | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -48,15 +56,17 @@ export const MissionSettlementPanel: React.FC = () => {
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
+    if (brokerEmail) {
+      setBrokerEmailInput(brokerEmail);
+      return;
+    }
     // Attempt to pre-fill broker email from session or local profile
     supabase.auth.getUser().then(({ data }) => {
       if (data?.user?.email) {
         setBrokerEmailInput(data.user.email);
-      } else {
-        setBrokerEmailInput("hello.15dgroup@gmail.com");
       }
     });
-  }, []);
+  }, [brokerEmail]);
 
   const handleFetchMission = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -79,7 +89,21 @@ export const MissionSettlementPanel: React.FC = () => {
         .maybeSingle();
 
       if (!error && data) {
-        const wholesale = Number(data.gross_operator_quote) || Number(data.total_estimate) || 75000;
+        const cleanEmail = (brokerEmailInput || brokerEmail || "").toLowerCase().trim();
+        const isAuthorized =
+          (data.client_email && data.client_email.toLowerCase() === cleanEmail) ||
+          (data.broker_email && data.broker_email.toLowerCase() === cleanEmail) ||
+          (brokerId && data.broker_id === brokerId);
+
+        if (!isAuthorized) {
+          setSearchError(
+            `Access Restricted: Flight mission ${cleanId} is not associated with ${brokerEmailInput || "your verified broker credentials"}. Flight manifests belonging to other accounts cannot be accessed.`
+          );
+          setMissionData(null);
+          return;
+        }
+
+        const wholesale = Number(data.gross_operator_quote) || Number(data.total_estimate) || 0;
         const existingMarkup = Number(data.broker_markup) || 0;
         setMissionData({
           ...data,
@@ -93,26 +117,15 @@ export const MissionSettlementPanel: React.FC = () => {
           setFixedMarginUsd(existingMarkup);
         }
       } else {
-        // Fallback demo/interactive mission data so broker can immediately test the settlement engine
-        setMissionData({
-          id: cleanId,
-          client_name: "Chief Alani Adeleke (Family Office)",
-          client_email: brokerEmailInput || "chief.adeleke@privateoffice.ng",
-          departure_airport: "LOS (Lagos Murtala Muhammed)",
-          arrival_airport: "EGGW (London Luton VIP Terminal)",
-          departure_date: new Date(Date.now() + 86400000 * 2).toLocaleDateString(),
-          aircraft_type: "Bombardier Challenger 650 (5N-B15D)",
-          passengers: 8,
-          status: "CONFIRMED_IN_ESCROW",
-          payment_status: "ESCROW_VAULT_FUNDED",
-          gross_operator_quote: 82500,
-          broker_markup: 12375,
-          escrow_deposit: 94875,
-        });
+        setSearchError(
+          `No flight mission found for ID: "${cleanId}". Please verify the mission code on your booking confirmation.`
+        );
+        setMissionData(null);
       }
     } catch (err: any) {
       console.warn("Settlement query note:", err.message);
       setSearchError("Unable to load mission records. Please verify the ID or check connection.");
+      setMissionData(null);
     } finally {
       setIsLoading(false);
     }
@@ -446,6 +459,20 @@ export const MissionSettlementPanel: React.FC = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+      {/* Empty State Prompt */}
+      {!missionData && !isLoading && (
+        <div className="p-8 md:p-12 rounded-2xl bg-white border border-purple-100 shadow-sm text-center space-y-4">
+          <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200 flex items-center justify-center mx-auto text-purple-700">
+            <Plane className="w-6 h-6" />
+          </div>
+          <div className="max-w-md mx-auto space-y-1.5">
+            <h4 className="text-sm font-bold text-gray-900">Search Your Charter Mission</h4>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Enter a Mission ID code registered to your broker account above to inspect verified operator wholesale rates, configure markups, and calculate client escrow totals.
+            </p>
           </div>
         </div>
       )}

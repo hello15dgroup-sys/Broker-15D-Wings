@@ -1019,37 +1019,22 @@ export default function BrokerPortal() {
     refetchInterval: 5000,
   });
 
-  const defaultMission = {
-    id: missionId || "15D-001",
-    status: localStatus || "ACCEPTED",
-    payment_status: localPaymentStatus || "PAID",
-    departure_airport: "DNMM",
-    arrival_airport: "EGLL",
-    departure_city: "Lagos",
-    arrival_city: "London",
-    departure_date: new Date().toISOString(),
-    aircraft_type: "Challenger 605",
-    operator_aircraft: "Bombardier Challenger 605",
-    gross_operator_quote: 65000,
-    upfront_deposit: 15000,
-    outstanding_balance: 50000,
-    passenger_count: 6,
-    mission_aircraft: dbFlightAircraft || {
-      aircraft_name: "Bombardier Challenger 605",
-      tail_number: "5N-B15D",
-      model: "Challenger 605",
-      category: "Heavy Jet",
-    },
-  };
+  const activeEmailForFilter = brokerDbRecord?.email || inputEmail || sessionStorage.getItem(`15d_email_${missionId}`) || "";
+  const isAuthorizedMission = rawFlight && (
+    !activeEmailForFilter ||
+    (rawFlight.client_email && rawFlight.client_email.toLowerCase() === activeEmailForFilter.toLowerCase()) ||
+    (rawFlight.broker_email && rawFlight.broker_email.toLowerCase() === activeEmailForFilter.toLowerCase()) ||
+    (brokerDbRecord?.id && rawFlight.broker_id === brokerDbRecord.id)
+  );
 
-  const mission = rawFlight
+  const mission = isAuthorizedMission
     ? {
         ...rawFlight,
         status: localStatus || rawFlight.status,
         payment_status: localPaymentStatus || rawFlight.payment_status,
         mission_aircraft: dbFlightAircraft || rawFlight.mission_aircraft,
       }
-    : defaultMission;
+    : null;
 
   // Fetch global fleet inventory for specifications parsing
   const { data: dbAircrafts } = useQuery({
@@ -2186,10 +2171,10 @@ export default function BrokerPortal() {
     );
   }
 
-  const { dep, dest } = parseLegs(mission);
-  const statusText = translateStatus(mission.status);
+  const { dep, dest } = parseLegs(mission || {});
+  const statusText = translateStatus(mission?.status);
   const isSetupPhase = ["ACCEPTED", "INTAKE_SUBMITTED"].includes(
-    mission.status,
+    mission?.status || "",
   );
 
   const handleManifestUpload = () => {
@@ -2197,25 +2182,25 @@ export default function BrokerPortal() {
     setShowManifestIframe(true);
   };
 
-  const dynamicDeposit = mission.upfront_deposit
+  const dynamicDeposit = mission?.upfront_deposit
     ? Number(mission.upfront_deposit)
-    : mission.commitment_activation_fee
+    : mission?.commitment_activation_fee
       ? Number(mission.commitment_activation_fee)
       : 0;
   const remainingBalance =
-    mission.outstanding_balance !== undefined &&
-    mission.outstanding_balance !== null
+    mission?.outstanding_balance !== undefined &&
+    mission?.outstanding_balance !== null
       ? Number(mission.outstanding_balance)
-      : mission.gross_operator_quote
+      : mission?.gross_operator_quote
         ? Number(mission.gross_operator_quote) - dynamicDeposit
         : 0;
 
-  const totalVerifiedCost = mission.gross_operator_quote
+  const totalVerifiedCost = mission?.gross_operator_quote
     ? Number(mission.gross_operator_quote)
     : remainingBalance + dynamicDeposit;
 
   let isWithin72Hours = false;
-  const depDateStr = parseDate(mission);
+  const depDateStr = parseDate(mission || {});
   if (
     depDateStr !== "Flexible Sequence" &&
     depDateStr !== "Timeline Establishing"
@@ -2227,7 +2212,7 @@ export default function BrokerPortal() {
     }
   }
 
-  if (mission.status === "COMPLETED") {
+  if (mission?.status === "COMPLETED") {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-gray-900 font-lexend flex flex-col items-center justify-center p-6 text-center">
         <div className="w-16 h-16 bg-purple-600/20 rounded-full flex items-center justify-center mb-6">
@@ -2774,7 +2759,7 @@ export default function BrokerPortal() {
                               }));
                               setNotifications(updated);
                               localStorage.setItem(
-                                `notifications_${mission.id}`,
+                                `notifications_${mission?.id || missionId || 'general'}`,
                                 JSON.stringify(updated),
                               );
                             }}
@@ -2853,24 +2838,54 @@ export default function BrokerPortal() {
               )}
             </AnimatePresence>
 
-            {mission.status === "ROTATING" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-6 rounded-2xl border transition-all bg-amber-500/10 border-amber-500/20 mb-8"
-              >
-                <h4 className="text-amber-500 text-sm mb-2">
-                  Operational refinement in progress.
-                </h4>
-                <p className="text-gray-600 text-xs font-light leading-relaxed">
-                  Execution pathway being adjusted to preserve integrity.
-                  Buffers exist to protect execution against airspace and crew
-                  volatility. No action required on your part.
-                </p>
-              </motion.div>
-            )}
+            {!mission ? (
+              <div className="p-8 md:p-12 rounded-3xl bg-white border border-purple-100 shadow-xl text-center space-y-5 my-6">
+                <div className="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-200 flex items-center justify-center mx-auto text-purple-700">
+                  <Plane className="w-7 h-7" />
+                </div>
+                <div className="max-w-md mx-auto space-y-2">
+                  <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-800 border border-purple-200 text-xs font-mono font-bold inline-flex items-center gap-1.5">
+                    <Lock className="w-3 h-3 text-purple-600" /> Confidential Broker Ledger
+                  </span>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    No Active Flight Missions Registered
+                  </h3>
+                  <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
+                    Flight charters and live escrow manifests registered to your verified broker credentials will appear here securely. No unassociated missions are displayed to protect client privacy.
+                  </p>
+                </div>
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <button
+                    onClick={() => setShowBookFlightIframe(true)}
+                    className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-medium shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                  >
+                    <Plane className="w-4 h-4" />
+                    <span>Book a Flight Charter</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {mission.status === "ROTATING" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-6 rounded-2xl border transition-all bg-amber-500/10 border-amber-500/20 mb-8"
+                  >
+                    <h4 className="text-amber-500 text-sm mb-2">
+                      Operational refinement in progress.
+                    </h4>
+                    <p className="text-gray-600 text-xs font-light leading-relaxed">
+                      Execution pathway being adjusted to preserve integrity.
+                      Buffers exist to protect execution against airspace and crew
+                      volatility. No action required on your part.
+                    </p>
+                  </motion.div>
+                )}
 
-            <MissionClockWidget mission={mission} />
+                <MissionClockWidget mission={mission} />
+              </>
+            )}
 
             {/* BROKER COMMAND NAVIGATION - CLEAN EXECUTIVE DESK SWITCHER */}
             <div className="bg-white rounded-2xl p-2.5 md:p-3 border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
@@ -2984,7 +2999,7 @@ export default function BrokerPortal() {
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                 >
                   <BrokerCRMWorkspace
-                    missionId={mission.id}
+                    missionId={mission?.id || missionId || "15D-001"}
                     brokerCompanyName={
                       brokerCompany || "15D Wings for Brokers"
                     }
@@ -3016,12 +3031,12 @@ export default function BrokerPortal() {
                 >
                   {hasVerifiedOperator ? (
                     <WhiteLabelProposalBuilder
-                      missionId={mission.id}
+                      missionId={mission?.id || missionId || "15D-001"}
                       originCode={dep.substring(0, 3)}
                       destCode={dest.substring(0, 3)}
                       aircraftName={
-                        mission.operator_aircraft ||
-                        mission.aircraft_class ||
+                        mission?.operator_aircraft ||
+                        mission?.aircraft_class ||
                         "Midsize Jet (Hawker 900XP)"
                       }
                       baselineWholesaleCostUsd={totalVerifiedCost || 16250}
@@ -3086,11 +3101,11 @@ export default function BrokerPortal() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                 >
-                  <OperationalIntegrityIndex missionId={mission.id} />
+                  <OperationalIntegrityIndex missionId={mission?.id || missionId || "15D-001"} />
                 </motion.div>
               )}
             </AnimatePresence>
-            {[
+            {mission && [
               "ACTIVATED",
               "EXECUTING",
               "DEPARTED",
@@ -3108,7 +3123,7 @@ export default function BrokerPortal() {
 
         {}
         <AnimatePresence>
-          {showCustomizationModal && (
+          {showCustomizationModal && mission && (
             <motion.div
               key="modal-customization-backdrop"
               initial={{ opacity: 0 }}

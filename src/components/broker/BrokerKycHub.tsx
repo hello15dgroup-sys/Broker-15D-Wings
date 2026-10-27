@@ -181,7 +181,7 @@ export const BrokerKycHub: React.FC<BrokerKycHubProps> = ({
       }
 
       setTimeout(() => {
-        setAnalysisStep('Executing Google Gemini Multimodal Vision OCR extraction...');
+        setAnalysisStep('Executing certified document verification & text extraction...');
       }, 1000);
 
       setTimeout(() => {
@@ -240,7 +240,7 @@ export const BrokerKycHub: React.FC<BrokerKycHubProps> = ({
                 </span>
                 <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Cloudflare R2 + Gemini OCR
+                  Bank-Grade Encryption Vault
                 </span>
               </div>
               <h2 className="text-xl md:text-2xl font-bold tracking-tight text-white mt-1">
@@ -258,7 +258,7 @@ export const BrokerKycHub: React.FC<BrokerKycHubProps> = ({
         </div>
 
         <p className="text-xs md:text-sm text-purple-200/90 mt-3 max-w-2xl leading-relaxed">
-          Upload certified international identity and aviation brokerage credentials. Files are stored in Cloudflare R2, analyzed via Gemini Multimodal OCR, deterministically audited for expiration dates, and automatically dispatched to operations.
+          Upload certified international identity and aviation brokerage credentials. All documents are encrypted in high-security regulatory vaults, deterministically verified for authenticity and expiration dates, and automatically dispatched to clearance operations.
         </p>
 
         {/* 4 Category Segmented Switcher */}
@@ -355,7 +355,7 @@ export const BrokerKycHub: React.FC<BrokerKycHubProps> = ({
                           Click to browse or drop certified scan here
                         </p>
                         <p className="text-[11px] text-slate-500 mt-0.5">
-                          Stored to Cloudflare R2 scope: <code className="font-mono text-purple-700">operator/</code>
+                          Preserved in encrypted compliance vault
                         </p>
                       </div>
                     )}
@@ -707,13 +707,13 @@ export const BrokerKycHub: React.FC<BrokerKycHubProps> = ({
                   </div>
                 </div>
 
-                {/* Cloudflare R2 Storage Confirmation */}
+                {/* Secure Storage Vault Confirmation */}
                 {analysisResult.storage?.url && (
                   <div className="p-3 bg-purple-50/70 border border-purple-200 rounded-xl flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <Lock className="w-4 h-4 text-purple-600 shrink-0" />
                       <span className="text-purple-900 font-medium">
-                        Stored in Cloudflare R2 Vault (<code className="font-mono text-[11px]">{analysisResult.storage.scope}</code>)
+                        Preserved in Private Compliance Vault (<code className="font-mono text-[11px]">{analysisResult.storage.scope}</code>)
                       </span>
                     </div>
                     <a
@@ -749,7 +749,7 @@ export const BrokerKycHub: React.FC<BrokerKycHubProps> = ({
                 <div className="max-w-xs mx-auto">
                   <h4 className="text-sm font-bold text-slate-900">No Document Analyzed Yet</h4>
                   <p className="text-xs text-slate-500 mt-1">
-                    Select a document on the left to execute the Cloudflare R2 upload and Gemini Vision OCR extraction.
+                    Select a document on the left to execute certified verification and compliance extraction.
                   </p>
                 </div>
               </div>

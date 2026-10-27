@@ -214,7 +214,7 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
               </span>
             </h3>
             <p className="text-xs text-slate-300">
-              Live Cloudflare Worker connection & operator accreditation clearinghouse
+              Live 15D clearance network & operator accreditation clearinghouse
             </p>
           </div>
         </div>
@@ -380,7 +380,7 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
             <div>
               <h4 className="text-sm font-bold text-slate-900">Validating broker clearance...</h4>
               <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                Connecting to 15D Wings Cloudflare Worker clearinghouse and evaluating operator accreditation records.
+                Connecting to 15D Wings verification clearinghouse and evaluating operator accreditation records.
               </p>
             </div>
             <div className="flex justify-center gap-2 pt-1">
