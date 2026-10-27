@@ -47,6 +47,7 @@ async function startServer() {
     dateOfBirth?: string;
     themePreference?: string;
     isVerified?: boolean;
+    kyc_verified?: boolean;
     lastSignInAt?: string;
     createdAt?: string;
     updatedAt?: string;
@@ -111,9 +112,10 @@ async function startServer() {
             agency_clearance_status: 'ACTIVE',
             referral_code: refCode,
             is_verified: true,
+            kyc_verified: false,
             updated_at: now
           }, { onConflict: 'email' })
-          .select('id, referral_code, company_name, email')
+          .select('id, referral_code, company_name, email, kyc_verified')
           .maybeSingle();
 
         if (dbData?.id) {
@@ -135,6 +137,7 @@ async function startServer() {
         email: normalizedEmail,
         brokerId: assignedBrokerId,
         referralCode: assignedRefCode,
+        kycVerified: dbData?.kyc_verified || false,
         requiresOtp: true,
         sessionToken: `15d_tok_${Buffer.from(normalizedEmail).toString('base64')}_${Date.now()}`
       });

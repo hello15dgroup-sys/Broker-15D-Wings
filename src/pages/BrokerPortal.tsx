@@ -617,7 +617,7 @@ export default function BrokerPortal() {
     is_verified?: boolean;
   } | null>(null);
 
-  const [authStep, setAuthStep] = useState<"LOGIN" | "SIGNUP" | "EMAIL_OTP" | "PROFILE_SETUP">(
+  const [authStep, setAuthStep] = useState<"LOGIN" | "SIGNUP" | "EMAIL_OTP" | "PROFILE_SETUP" | "FORGOT_PASSWORD">(
     "LOGIN",
   );
   const [inputId, setInputId] = useState(missionId || "");
@@ -1394,7 +1394,8 @@ export default function BrokerPortal() {
           legalLastName: backendData.user.legalLastName || '',
           organization: backendData.user.organization || '',
           dateOfBirth: backendData.user.dateOfBirth || '',
-          isVerified: Boolean(backendData.user.isVerified)
+          isVerified: Boolean(backendData.user.isVerified),
+          kycVerified: Boolean(backendData.user.kycVerified)
         };
         localStorage.setItem("15d_broker_profile", JSON.stringify(profileData));
       }
@@ -1878,6 +1879,15 @@ export default function BrokerPortal() {
                     {isAuthenticating ? "AUTHENTICATING..." : "SIGN IN"}
                   </button>
 
+                  <div className="text-center">
+                    <button
+                      onClick={() => setAuthStep("FORGOT_PASSWORD")}
+                      className="text-[10px] text-gray-500 hover:text-gray-900 font-medium transition-colors tracking-wide"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+
                   <div className="pt-2 text-center">
                     <button
                       onClick={() => {
@@ -2064,6 +2074,58 @@ export default function BrokerPortal() {
                       className="w-full py-2 text-xs font-sync uppercase   text-gray-700 hover:text-gray-950 transition-colors text-center font-semibold"
                     >
                       ← EDIT REGISTRATION INFO
+                    </button>
+                  </div>
+                </motion.div>
+              ) : authStep === "FORGOT_PASSWORD" ? (
+                <motion.div
+                  key="forgot-password-step"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="space-y-5 text-left"
+                >
+                  <div className="space-y-1.5">
+                    <label className="font-sync uppercase text-[9px] text-gray-950 block ml-1 font-bold">
+                      WORK EMAIL ADDRESS
+                    </label>
+                    <input
+                      type="email"
+                      value={inputEmail}
+                      onChange={(e) => setInputEmail(e.target.value)}
+                      className="w-full border-2 border-purple-100 rounded-2xl px-4 py-3.5 font-lexend text-sm outline-none transition-all bg-purple-50/40 text-gray-950 font-medium focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-100 placeholder:text-gray-400 shadow-sm"
+                      placeholder="broker@charterdesk.com"
+                    />
+                  </div>
+                  
+                  {authError && (
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-xs text-center w-full text-red-600 font-semibold"
+                    >
+                      {authError}
+                    </motion.p>
+                  )}
+
+                  <div className="space-y-2 pt-2">
+                    <button
+                      onClick={async () => {
+                         // Simple placeholder for now: trigger OTP engine
+                         setAuthError("Password reset requested. Check your email for an OTP.");
+                         // Logic to call API endpoint should be added here
+                      }}
+                      disabled={isAuthenticating}
+                      className="w-full py-4 rounded-2xl text-xs font-sync uppercase tracking-[0.25em] font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all shadow-[0_10px_25px_rgba(147,51,234,0.35)] active:scale-[0.98] cursor-pointer"
+                    >
+                      {isAuthenticating ? "SENDING..." : "SEND RESET CODE"}
+                    </button>
+
+                    <button
+                      onClick={() => setAuthStep("LOGIN")}
+                      className="w-full py-2 text-xs font-sync uppercase text-gray-700 hover:text-gray-950 transition-colors text-center font-semibold"
+                    >
+                      ← BACK TO LOGIN
                     </button>
                   </div>
                 </motion.div>

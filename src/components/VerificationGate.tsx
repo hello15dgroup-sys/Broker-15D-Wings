@@ -61,7 +61,7 @@ export default function VerificationGate({ missionId, operatorId, docType, onVer
     setStep('PROCESSING');
 
     try {
-      // 1. Convert to base64 for Gemini processing in server
+      // 1. Convert to base64 for processing in server
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = async () => {

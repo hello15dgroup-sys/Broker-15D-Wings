@@ -140,7 +140,7 @@ export const BrokerKycHub: React.FC<BrokerKycHubProps> = ({
 
     setIsAnalyzing(true);
     setErrorMessage(null);
-    setAnalysisStep('Encrypting & uploading to Cloudflare R2 storage...');
+    setAnalysisStep('Encrypting & uploading document to secure storage...');
 
     try {
       // Build tailored entered_details for deterministic validation based on category

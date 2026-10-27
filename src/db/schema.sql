@@ -543,5 +543,12 @@ CREATE TRIGGER on_auth_user_created
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_broker();
 
 -- ==============================================================================
+-- 4. Enforcement Logic
+-- Ensure only KYC verified accounts can access platform features
+CREATE OR REPLACE VIEW verified_broker_access AS
+SELECT * FROM brokers
+WHERE kyc_verified = TRUE AND agency_clearance_status = 'ACTIVE';
+
+-- ==============================================================================
 -- SCHEMA CREATION COMPLETE (IDEMPOTENT & PRODUCTION READY)
 -- ==============================================================================

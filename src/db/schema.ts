@@ -10,6 +10,7 @@ export const brokers = pgTable("brokers", {
   device_fingerprint: varchar("device_fingerprint", { length: 255 }),
   agency_clearance_status: varchar("agency_clearance_status", { length: 50 }).default('ACTIVE'), // ACTIVE, SUSPENDED_90_DAYS, DEACTIVATED
   is_soft_deleted: boolean("is_soft_deleted").default(false),
+  kyc_verified: boolean("kyc_verified").default(false),
   has_verified_operator: boolean("has_verified_operator").default(false),
   last_client_onboarded_at: timestamp("last_client_onboarded_at"),
   last_flight_booked_at: timestamp("last_flight_booked_at"),
@@ -313,6 +314,7 @@ CREATE TABLE IF NOT EXISTS brokers (
     device_fingerprint VARCHAR(255),
     agency_clearance_status VARCHAR(50) DEFAULT 'ACTIVE',
     is_soft_deleted BOOLEAN DEFAULT FALSE,
+    kyc_verified BOOLEAN DEFAULT FALSE,
     has_verified_operator BOOLEAN DEFAULT FALSE,
     last_client_onboarded_at TIMESTAMP WITH TIME ZONE,
     last_flight_booked_at TIMESTAMP WITH TIME ZONE,
