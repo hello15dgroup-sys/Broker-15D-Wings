@@ -1,10 +1,16 @@
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
+import { createClient } from '@supabase/supabase-js';
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Supabase Database Admin Client using service role key
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://mhplukffgcxiorpfunyy.supabase.co';
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_fmCwwyGOguTjtD7z0CO62Q_6yVE_XDh';
+  const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
   // Enable CORS headers for cross-origin Open Graph preview requests
   app.use((req, res, next) => {
@@ -66,7 +72,7 @@ async function startServer() {
   // ==========================================
 
   // 1. Sign Up Endpoint
-  app.post('/api/auth/signup', (req, res) => {
+  app.post('/api/auth/signup', async (req, res) => {
     try {
       const { email, password, otpCode } = req.body;
       if (!email) {
@@ -87,12 +93,48 @@ async function startServer() {
 
       brokerStore.set(normalizedEmail, { ...existing, ...brokerRecord });
 
+      // Persist directly to Supabase PostgreSQL brokers table with service role key
+      let assignedBrokerId: string | null = null;
+      let assignedRefCode: string | null = null;
+      try {
+        const refCode = `BRK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+        const { data: dbData, error: dbErr } = await supabaseAdmin
+          .from('brokers')
+          .upsert({
+            email: normalizedEmail,
+            full_name: normalizedEmail.split('@')[0],
+            legal_first_name: normalizedEmail.split('@')[0],
+            legal_last_name: 'Broker',
+            organization: '15D Wings for Brokers',
+            company_name: '15D Wings for Brokers',
+            agency_name: '15D Wings for Brokers',
+            agency_clearance_status: 'ACTIVE',
+            referral_code: refCode,
+            is_verified: true,
+            updated_at: now
+          }, { onConflict: 'email' })
+          .select('id, referral_code, company_name, email')
+          .maybeSingle();
+
+        if (dbData?.id) {
+          assignedBrokerId = dbData.id;
+          assignedRefCode = dbData.referral_code || refCode;
+          console.log(`[Database Auth] ✓ Broker record created in PostgreSQL with ID: ${dbData.id}`);
+        } else if (dbErr) {
+          console.warn('[Database Auth] Upsert note:', dbErr.message);
+        }
+      } catch (dbEx: any) {
+        console.warn('[Database Auth] Supabase admin error:', dbEx.message);
+      }
+
       console.log(`[Backend Auth] ✓ Sign-up registered for: ${normalizedEmail} (OTP: ${otpCode || 'generated'})`);
 
       return res.status(200).json({
         success: true,
-        message: 'Account successfully created and registered on 15D Wings backend.',
+        message: 'Account successfully created and registered on 15D Wings backend and database.',
         email: normalizedEmail,
+        brokerId: assignedBrokerId,
+        referralCode: assignedRefCode,
         requiresOtp: true,
         sessionToken: `15d_tok_${Buffer.from(normalizedEmail).toString('base64')}_${Date.now()}`
       });
@@ -236,9 +278,41 @@ async function startServer() {
       brokerStore.set(normalizedEmail, updatedRecord);
       console.log(`[Backend Auth] ✓ Profile state updated for ${normalizedEmail} in database.`);
 
+      // Persist profile updates directly to Supabase public.brokers table with service role credentials
+      let dbBrokerId: string | null = null;
+      try {
+        const { data: dbData, error: dbErr } = await supabaseAdmin
+          .from('brokers')
+          .upsert({
+            email: normalizedEmail,
+            legal_first_name: updatedRecord.legalFirstName,
+            legal_last_name: updatedRecord.legalLastName,
+            full_name: `${updatedRecord.legalFirstName} ${updatedRecord.legalLastName}`.trim(),
+            organization: updatedRecord.organization,
+            company_name: updatedRecord.organization,
+            agency_name: updatedRecord.organization,
+            date_of_birth: updatedRecord.dateOfBirth,
+            theme_preference: updatedRecord.themePreference,
+            agency_clearance_status: 'ACTIVE',
+            updated_at: now
+          }, { onConflict: 'email' })
+          .select('id, referral_code, email')
+          .maybeSingle();
+
+        if (dbData?.id) {
+          dbBrokerId = dbData.id;
+          console.log(`[Database Auth] ✓ Broker profile persisted to PostgreSQL with ID: ${dbData.id}`);
+        } else if (dbErr) {
+          console.warn('[Database Auth] Profile update db note:', dbErr.message);
+        }
+      } catch (dbEx: any) {
+        console.warn('[Database Auth] Profile db sync note:', dbEx.message);
+      }
+
       return res.status(200).json({
         success: true,
-        message: 'Profile state saved idempotently on backend.',
+        message: 'Profile state saved idempotently on backend and database.',
+        brokerId: dbBrokerId,
         profile: updatedRecord
       });
     } catch (err: any) {

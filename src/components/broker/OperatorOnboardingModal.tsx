@@ -23,6 +23,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { copyToClipboard } from '../../lib/utils';
 import { BrokerVerificationWidget } from './BrokerVerificationWidget';
+import { BrokerKycHub } from './BrokerKycHub';
 
 export interface OperatorRecord {
   id: string;
@@ -59,7 +60,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
   const [operatorsList, setOperatorsList] = useState<OperatorRecord[]>([]);
   const [isLoadingOperators, setIsLoadingOperators] = useState(false);
   const [isSimulatingOnboard, setIsSimulatingOnboard] = useState(false);
-  const [activeModalTab, setActiveModalTab] = useState<'worker_clearance' | 'airline_link'>('worker_clearance');
+  const [activeModalTab, setActiveModalTab] = useState<'worker_clearance' | 'kyc_hub' | 'airline_link'>('worker_clearance');
 
   const refCode = brokerReferralCode || (brokerId ? brokerId.substring(0, 8).toUpperCase() : 'REF-15D');
   const inviteUrl = `https://airlines.15dwings.com.ng?broker_ref=${refCode}&broker_id=${brokerId || ''}`;
@@ -226,7 +227,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
             </p>
 
             {/* Modal Subtabs */}
-            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-white/10">
+            <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-white/10">
               <button
                 type="button"
                 onClick={() => setActiveModalTab('worker_clearance')}
@@ -237,6 +238,18 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
                 }`}
               >
                 15D Worker Clearance Gateway
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveModalTab('kyc_hub')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeModalTab === 'kyc_hub'
+                    ? 'bg-white text-slate-900 shadow-sm font-bold'
+                    : 'bg-white/10 hover:bg-white/20 text-purple-200'
+                }`}
+              >
+                <FileCheck className="w-3.5 h-3.5" />
+                <span>Broker KYC Hub (Doc Intelligence)</span>
               </button>
               <button
                 type="button"
@@ -258,6 +271,15 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
                 initialBrokerId={brokerId || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'}
                 brokerEmail={brokerEmail || 'broker@15dwings.com.ng'}
                 onClearanceActive={() => {
+                  if (onVerificationSuccess) onVerificationSuccess();
+                }}
+              />
+            ) : activeModalTab === 'kyc_hub' ? (
+              <BrokerKycHub
+                brokerId={brokerId || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'}
+                brokerEmail={brokerEmail || 'broker@15dwings.com.ng'}
+                brokerName={brokerCompany || 'Precious Ubadike'}
+                onKycComplete={() => {
                   if (onVerificationSuccess) onVerificationSuccess();
                 }}
               />

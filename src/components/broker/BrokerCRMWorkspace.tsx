@@ -59,6 +59,7 @@ import { WhiteLabelProposalBuilder } from "./WhiteLabelProposalBuilder";
 import { FeatureTourModal } from "./FeatureTourModal";
 import { PremiumMailStudio } from "./PremiumMailStudio";
 import { MissionSettlementPanel } from "./MissionSettlementPanel";
+import { BrokerKycHub } from "./BrokerKycHub";
 
 /* Types for CRM Core */
 export interface ClientProfile {
@@ -171,6 +172,7 @@ export const INITIAL_TEAM_MEMBERS: TeamMember[] = [];
 export type CrmWorkspaceSubTab =
   | "tasks"
   | "settlement"
+  | "kyc"
   | "pipeline"
   | "clients"
   | "proposals"
@@ -628,6 +630,27 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               }`}
             >
               Active
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab("kyc")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+              activeSubTab === "kyc"
+                ? "bg-purple-600 text-white shadow-xs"
+                : "text-slate-700 hover:bg-slate-100 bg-slate-50 border border-slate-200/80"
+            }`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+            <span>KYC Verification Hub</span>
+            <span
+              className={`ml-0.5 px-1.5 py-0.2 rounded-md text-[10px] font-mono ${
+                activeSubTab === "kyc"
+                  ? "bg-emerald-400 text-slate-950 font-bold"
+                  : "bg-purple-100 text-purple-900 font-medium"
+              }`}
+            >
+              Doc Intel
             </span>
           </button>
 
@@ -1418,6 +1441,15 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       {/* SUB-TAB 7: MISSION SETTLEMENT ENGINE */}
       {activeSubTab === "tasks" && (
         <MissionSettlementPanel />
+      )}
+
+      {/* SUB-TAB: BROKER KYC CLEARANCE HUB */}
+      {activeSubTab === "kyc" && (
+        <BrokerKycHub
+          brokerId={missionId || "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"}
+          brokerEmail="broker@15dwings.com.ng"
+          brokerName={brokerCompanyName || "Precious Ubadike"}
+        />
       )}
 
       {/* SUB-TAB 8: FLEET DIRECTORY */}

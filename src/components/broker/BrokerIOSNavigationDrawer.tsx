@@ -37,6 +37,7 @@ export type BrokerTabType =
 export type CrmSubTabType = 
   | 'tasks' 
   | 'settlement'
+  | 'kyc'
   | 'pipeline' 
   | 'clients' 
   | 'proposals' 
@@ -355,6 +356,19 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
                   >
                     <Briefcase className="w-4 h-4 text-purple-600 mb-1.5" />
                     <span className="text-xs font-medium text-slate-900">Broker Team</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleCrmSubTabClick('kyc')}
+                    className="p-3 rounded-xl border border-slate-200 bg-white hover:bg-purple-50/50 text-left transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <ShieldCheck className="w-4 h-4 text-purple-600" />
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-purple-100 text-purple-900 font-medium">
+                        v3.2
+                      </span>
+                    </div>
+                    <span className="text-xs font-medium text-slate-900">Broker KYC Hub</span>
                   </button>
 
                   <button

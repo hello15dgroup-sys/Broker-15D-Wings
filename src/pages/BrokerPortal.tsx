@@ -1347,7 +1347,15 @@ export default function BrokerPortal() {
     setAuthError("");
     setIsAuthenticating(true);
     try {
-      const redirectUrl = window.location.origin + window.location.pathname;
+      let redirectUrl = window.location.origin + window.location.pathname;
+      // Guarantee that Google OAuth returns to broker.15dwings.com.ng instead of 15dwings.com.ng
+      if (
+        window.location.hostname.includes("15dwings.com.ng") ||
+        window.location.hostname.includes("15dwings")
+      ) {
+        redirectUrl = "https://broker.15dwings.com.ng" + window.location.pathname;
+      }
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
@@ -3062,8 +3070,10 @@ export default function BrokerPortal() {
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                 >
                   <VipEscrowIframe
-                    amountUsd={totalVerifiedCost || 18687}
+                    amountUsd={totalVerifiedCost || 0}
                     hoursToDeparture={isWithin72Hours ? 36 : 120}
+                    initialMissionId=""
+                    initialEmail=""
                   />
                 </motion.div>
               )}
