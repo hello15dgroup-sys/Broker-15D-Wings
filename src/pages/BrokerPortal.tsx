@@ -731,6 +731,13 @@ export default function BrokerPortal() {
       }
 
       if (broker) {
+        setBrokerDbRecord({
+          id: broker.id,
+          referral_code: broker.referral_code,
+          company_name: broker.company_name || broker.organization,
+          email: broker.email,
+          is_verified: broker.is_verified
+        });
         if (broker.legal_first_name) setLegalFirstName(broker.legal_first_name);
         if (broker.legal_last_name) setLegalLastName(broker.legal_last_name);
         if (broker.organization) setOrganization(broker.organization);

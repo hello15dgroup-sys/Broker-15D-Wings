@@ -122,16 +122,32 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
     setTimeout(() => setCopied(false), 2500);
   };
 
+  const [emailError, setEmailError] = useState('');
+  const [isVibrating, setIsVibrating] = useState(false);
+
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!operatorEmail.trim() || !brokerId) return;
+
+    const emailTrim = operatorEmail.trim().toLowerCase();
+    const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'aol.com', 'zoho.com', 'proton.me', 'protonmail.com'];
+    const domain = emailTrim.split('@')[1];
+
+    if (!domain || personalDomains.includes(domain) || !emailTrim.includes('.')) {
+      setEmailError('Error: Only corporate airline domains allowed (e.g. ops@airline.com). Personal emails rejected.');
+      setIsVibrating(true);
+      setTimeout(() => setIsVibrating(false), 800);
+      return;
+    }
+
+    setEmailError('');
     setIsSendingInvite(true);
     
     try {
       // Record initial operator invitation record in backend
       const { data, error } = await supabase.from('operators').insert({
         company_name: operatorName.trim() || 'Invited Licensed Operator',
-        contact_email: operatorEmail.trim(),
+        contact_email: emailTrim,
         onboarded_by_broker_id: brokerId,
         is_verified: false
       }).select().single();
@@ -365,22 +381,35 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
                 <Mail className="w-3.5 h-3.5 text-purple-600" />
                 Or Dispatch Direct Invitation to Operator
               </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <input
-                  type="text"
-                  placeholder="Airline / Operator Name (e.g. ExecuJet)"
-                  value={operatorName}
-                  onChange={(e) => setOperatorName(e.target.value)}
-                  className="px-3.5 py-2.5 rounded-xl bg-white border border-gray-300 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-600 font-lexend"
-                />
-                <input
-                  type="email"
-                  required
-                  placeholder="Operator Email (e.g. ops@airline.com)"
-                  value={operatorEmail}
-                  onChange={(e) => setOperatorEmail(e.target.value)}
-                  className="px-3.5 py-2.5 rounded-xl bg-white border border-gray-300 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-600 font-lexend"
-                />
+              <div className="space-y-2">
+                <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 transition-transform ${isVibrating ? 'animate-bounce border-red-500 ring-2 ring-red-400 rounded-xl' : ''}`}>
+                  <input
+                    type="text"
+                    placeholder="Airline / Operator Name (e.g. ExecuJet)"
+                    value={operatorName}
+                    onChange={(e) => setOperatorName(e.target.value)}
+                    className="px-3.5 py-2.5 rounded-xl bg-white border border-gray-300 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-600 font-lexend"
+                  />
+                  <input
+                    type="email"
+                    required
+                    placeholder="Operator Email (e.g. ops@airline.com)"
+                    value={operatorEmail}
+                    onChange={(e) => {
+                      setOperatorEmail(e.target.value);
+                      setEmailError('');
+                    }}
+                    className={`px-3.5 py-2.5 rounded-xl bg-white border text-xs text-gray-900 placeholder-gray-400 focus:outline-none font-lexend ${
+                      isVibrating ? 'border-red-500 bg-red-50 ring-2 ring-red-400 text-red-900' : 'border-gray-300 focus:border-purple-600'
+                    }`}
+                  />
+                </div>
+                {emailError && (
+                  <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-[11px] font-lexend font-bold flex items-center gap-2 animate-pulse">
+                    <span className="w-2 h-2 rounded-full bg-red-600 animate-ping shrink-0" />
+                    <span>{emailError}</span>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-between pt-1">

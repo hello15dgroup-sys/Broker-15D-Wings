@@ -137,7 +137,7 @@ async function startServer() {
         email: normalizedEmail,
         brokerId: assignedBrokerId,
         referralCode: assignedRefCode,
-        kycVerified: dbData?.kyc_verified || false,
+        kycVerified: false,
         requiresOtp: true,
         sessionToken: `15d_tok_${Buffer.from(normalizedEmail).toString('base64')}_${Date.now()}`
       });
