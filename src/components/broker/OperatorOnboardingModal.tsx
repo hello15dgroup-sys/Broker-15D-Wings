@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { copyToClipboard } from '../../lib/utils';
+import { sendGasEmail } from '../../lib/premiumMailer';
 import { BrokerVerificationWidget } from './BrokerVerificationWidget';
 import { BrokerKycHub } from './BrokerKycHub';
 
@@ -153,6 +154,23 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
       }).select().single();
 
       if (!error) {
+        // Dispatch GAS mailer to airline operator
+        try {
+          await sendGasEmail({
+            recipientName: operatorName.trim() || 'Executive Operator',
+            recipientEmail: emailTrim,
+            title: 'LICENSED AIRLINE OPERATOR INVITATION',
+            subtitle: '15D WINGS EXECUTIVE BROKER NETWORK',
+            badgeText: 'CARRIER ONBOARDING INVITE',
+            badgeCode: 'AOC-INVITE',
+            message: `You have been invited by broker ID ${brokerId} (Referral Code: ${refCode}) to join the 15D Wings licensed carrier network. Please complete your AOC verification and fleet registration on airlines.15dwings.com.ng.`,
+            portalUrl: `https://airlines.15dwings.com.ng/onboard?ref=${refCode}&broker=${brokerId}`,
+            internalRecipients: 'hello.15dgroup@gmail.com,15dwingsltd@gmail.com'
+          });
+        } catch (mailErr) {
+          console.warn('GAS mailer notification note:', mailErr);
+        }
+
         setInviteSuccess(true);
         setOperatorEmail('');
         setOperatorName('');
