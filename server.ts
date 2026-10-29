@@ -148,7 +148,7 @@ async function startServer() {
   });
 
   // 2. Sign In Endpoint
-  app.post('/api/auth/signin', (req, res) => {
+  app.post('/api/auth/signin', async (req, res) => {
     try {
       const { email, password } = req.body;
       if (!email) {
@@ -156,35 +156,62 @@ async function startServer() {
       }
 
       const normalizedEmail = email.toLowerCase().trim();
-      let record = brokerStore.get(normalizedEmail);
+      const now = new Date().toISOString();
+      let assignedBrokerId: string | null = null;
+      let assignedRefCode: string | null = null;
 
-      // Auto-register any incoming email so sign-in never fails with 403
-      if (!record) {
-        const now = new Date().toISOString();
-        record = {
-          email: normalizedEmail,
-          password_hash: password ? `hash_${password.length}` : 'secured',
-          createdAt: now,
-          updatedAt: now,
-          isVerified: true,
-          organization: '15D Wings for Brokers',
-          legalFirstName: normalizedEmail.split('@')[0],
-          legalLastName: 'Broker',
-          dateOfBirth: '1990-01-01',
-          lastSignInAt: now
-        };
-        brokerStore.set(normalizedEmail, record);
+      try {
+        const refCode = `BRK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+        const { data: dbData, error: dbErr } = await supabaseAdmin
+          .from('brokers')
+          .upsert({
+            email: normalizedEmail,
+            full_name: normalizedEmail.split('@')[0],
+            legal_first_name: normalizedEmail.split('@')[0],
+            legal_last_name: 'Broker',
+            organization: '15D Wings for Brokers',
+            company_name: '15D Wings for Brokers',
+            agency_name: '15D Wings for Brokers',
+            agency_clearance_status: 'ACTIVE',
+            referral_code: refCode,
+            is_verified: true,
+            kyc_verified: false,
+            updated_at: now
+          }, { onConflict: 'email' })
+          .select('id, referral_code, company_name, email, kyc_verified, legal_first_name, legal_last_name, organization')
+          .maybeSingle();
+
+        if (dbData?.id) {
+          assignedBrokerId = dbData.id;
+          assignedRefCode = dbData.referral_code || refCode;
+          console.log(`[Database Auth] ✓ Sign-in broker record synced in PostgreSQL with ID: ${dbData.id}`);
+        } else if (dbErr) {
+          console.warn('[Database Auth] Sign-in upsert note:', dbErr.message);
+        }
+      } catch (dbEx: any) {
+        console.warn('[Database Auth] Sign-in Supabase admin error:', dbEx.message);
       }
 
-      const now = new Date().toISOString();
+      let record: BrokerRecord = brokerStore.get(normalizedEmail) || {
+        email: normalizedEmail,
+        password_hash: password ? `hash_${password.length}` : 'secured',
+        createdAt: now,
+        isVerified: true,
+        organization: '15D Wings for Brokers',
+        legalFirstName: normalizedEmail.split('@')[0],
+        legalLastName: 'Broker',
+        dateOfBirth: '1990-01-01',
+      };
       record.lastSignInAt = now;
       brokerStore.set(normalizedEmail, record);
 
-      console.log(`[Backend Auth] ✓ Authorized sign-in for executive broker: ${normalizedEmail}`);
+      console.log(`[Backend Auth] ✓ Authorized sign-in for executive broker: ${normalizedEmail} (ID: ${assignedBrokerId})`);
 
       return res.status(200).json({
         success: true,
         message: 'Sign-in authorized on 15D Wings Mission Control backend.',
+        brokerId: assignedBrokerId,
+        referralCode: assignedRefCode,
         user: {
           email: normalizedEmail,
           legalFirstName: record.legalFirstName || '',

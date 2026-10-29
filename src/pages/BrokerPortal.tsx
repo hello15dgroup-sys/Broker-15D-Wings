@@ -1397,6 +1397,8 @@ export default function BrokerPortal() {
       if (backendData?.user?.legalFirstName) {
         const profileData = {
           email: inputEmail,
+          brokerId: backendData.brokerId || '',
+          referralCode: backendData.referralCode || '',
           legalFirstName: backendData.user.legalFirstName,
           legalLastName: backendData.user.legalLastName || '',
           organization: backendData.user.organization || '',
@@ -1405,6 +1407,14 @@ export default function BrokerPortal() {
           kycVerified: Boolean(backendData.user.kycVerified)
         };
         localStorage.setItem("15d_broker_profile", JSON.stringify(profileData));
+        if (backendData.brokerId) {
+          setBrokerDbRecord({
+            id: backendData.brokerId,
+            referral_code: backendData.referralCode,
+            email: inputEmail,
+            is_verified: Boolean(backendData.user.isVerified)
+          });
+        }
       }
 
       // 2. Authenticate strictly through Supabase
