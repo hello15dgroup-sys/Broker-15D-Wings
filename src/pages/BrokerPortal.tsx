@@ -1748,8 +1748,8 @@ export default function BrokerPortal() {
 
   if (!sessionVerified) {
     return (
-      <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100 text-gray-900 flex items-center justify-center p-4 md:p-6  overflow-hidden">
-        {/* Ambient Swirl Animation (From Original Luxury Engine) */}
+      <div className="relative min-h-screen bg-gradient-to-br from-purple-50 via-white to-purple-100 text-gray-900 flex items-center justify-center p-4 md:p-6 overflow-hidden">
+        {/* Ambient Swirl Animation */}
         <div
           className="bg-swirl animate-orb-1"
           style={{
@@ -1772,6 +1772,37 @@ export default function BrokerPortal() {
               "radial-gradient(circle, rgba(24, 119, 242, 0.12) 0%, rgba(147, 51, 234, 0.08) 60%, transparent 80%)",
           }}
         />
+
+        {/* Aviation Micro-Animation Background Layer */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          {/* Gliding Private Jet 1 */}
+          <motion.div
+            initial={{ x: "-10vw", y: "20vh", opacity: 0 }}
+            animate={{ x: "110vw", y: "15vh", opacity: [0, 0.6, 0.6, 0] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            className="absolute flex items-center gap-2 text-purple-700/30"
+          >
+            <Plane className="w-5 h-5 transform -rotate-12" />
+            <div className="w-24 h-[1px] bg-gradient-to-r from-purple-600/40 to-transparent dashed" />
+          </motion.div>
+
+          {/* Gliding Private Jet 2 */}
+          <motion.div
+            initial={{ x: "110vw", y: "75vh", opacity: 0 }}
+            animate={{ x: "-10vw", y: "70vh", opacity: [0, 0.5, 0.5, 0] }}
+            transition={{ duration: 24, repeat: Infinity, ease: "linear", delay: 5 }}
+            className="absolute flex items-center gap-2 text-blue-600/30 transform scale-x-[-1]"
+          >
+            <Plane className="w-6 h-6 transform rotate-6" />
+            <div className="w-32 h-[1px] bg-gradient-to-r from-blue-600/40 to-transparent" />
+          </motion.div>
+
+          {/* Radar Sweep Arc */}
+          <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full border border-purple-300/30 flex items-center justify-center animate-spin" style={{ animationDuration: '30s' }}>
+            <div className="w-full h-[1px] bg-purple-400/20" />
+            <div className="absolute w-72 h-72 rounded-full border border-purple-200/20" />
+          </div>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.98 }}
