@@ -122,6 +122,21 @@ async function startServer() {
           assignedBrokerId = dbData.id;
           assignedRefCode = dbData.referral_code || refCode;
           console.log(`[Database Auth] ✓ Broker record created in PostgreSQL with ID: ${dbData.id}`);
+
+          // Also upsert into public.brokers_ref for referral tracking
+          try {
+            await supabaseAdmin.from('brokers_ref').upsert({
+              broker_id: dbData.id,
+              email: normalizedEmail,
+              referral_code: assignedRefCode,
+              agency_name: '15D Wings for Brokers',
+              is_active: true,
+              updated_at: now
+            }, { onConflict: 'email' });
+          } catch (refErr: any) {
+            console.warn('[Brokers Ref Sync Note]:', refErr?.message);
+          }
+
         } else if (dbErr) {
           console.warn('[Database Auth] Upsert note:', dbErr.message);
         }
@@ -185,6 +200,21 @@ async function startServer() {
           assignedBrokerId = dbData.id;
           assignedRefCode = dbData.referral_code || refCode;
           console.log(`[Database Auth] ✓ Sign-in broker record synced in PostgreSQL with ID: ${dbData.id}`);
+
+          // Also upsert into public.brokers_ref for referral tracking
+          try {
+            await supabaseAdmin.from('brokers_ref').upsert({
+              broker_id: dbData.id,
+              email: normalizedEmail,
+              referral_code: assignedRefCode,
+              agency_name: '15D Wings for Brokers',
+              is_active: true,
+              updated_at: now
+            }, { onConflict: 'email' });
+          } catch (refErr: any) {
+            console.warn('[Brokers Ref Sync Note]:', refErr?.message);
+          }
+
         } else if (dbErr) {
           console.warn('[Database Auth] Sign-in upsert note:', dbErr.message);
         }
