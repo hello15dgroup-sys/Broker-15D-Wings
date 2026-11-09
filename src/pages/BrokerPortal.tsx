@@ -2245,6 +2245,16 @@ export default function BrokerPortal() {
             </AnimatePresence>
           </div>
           <RegulatoryDisclaimer />
+          
+          <div className="flex items-center justify-center gap-6 mt-6 text-xs text-purple-600/70 font-mono">
+            <a href="/tos" className="hover:text-purple-600 underline underline-offset-4 transition-colors">
+              Terms of Service (ToS)
+            </a>
+            <span>•</span>
+            <a href="/privacy" className="hover:text-purple-600 underline underline-offset-4 transition-colors">
+              Privacy Policy
+            </a>
+          </div>
         </motion.div>
       </div>
     );
