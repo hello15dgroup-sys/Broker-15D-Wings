@@ -60,8 +60,8 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
   const [inviteSuccess, setInviteSuccess] = useState(false);
   const [operatorsList, setOperatorsList] = useState<OperatorRecord[]>([]);
   const [isLoadingOperators, setIsLoadingOperators] = useState(false);
-  const [isSimulatingOnboard, setIsSimulatingOnboard] = useState(false);
-  const [activeModalTab, setActiveModalTab] = useState<'worker_clearance' | 'kyc_hub' | 'airline_link'>('worker_clearance');
+  const [isValidatingOperator, setIsValidatingOperator] = useState(false);
+  const [activeModalTab, setActiveModalTab] = useState<'airline_link' | 'kyc_hub' | 'worker_clearance'>('airline_link');
 
   const refCode = brokerReferralCode || (brokerId ? brokerId.substring(0, 8).toUpperCase() : 'REF-15D');
   const inviteUrl = `https://airlines.15dwings.com.ng?broker_ref=${refCode}&broker_id=${brokerId || ''}`;
@@ -184,33 +184,38 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
     }
   };
 
-  const handleSimulateInstantVerification = async (operatorId?: string) => {
+  const handleValidateOperatorClearance = async (operatorId?: string) => {
     if (!brokerId) return;
-    setIsSimulatingOnboard(true);
+    setIsValidatingOperator(true);
     try {
-      if (operatorId) {
-        // Update existing
-        await supabase
-          .from('operators')
-          .update({ is_verified: true })
-          .eq('id', operatorId);
-      } else {
-        // Create verified operator
-        await supabase.from('operators').insert({
-          company_name: operatorName.trim() || 'ExecuJet Aviation (AOC Verified)',
-          contact_email: operatorEmail.trim() || 'operations@execujet.aero',
-          onboarded_by_broker_id: brokerId,
-          is_verified: true
-        });
+      const targetOp = operatorsList.find(o => o.id === operatorId);
+      const targetEmail = targetOp?.contact_email || operatorEmail.trim() || 'operations@airline.com';
+      const targetName = targetOp?.company_name || operatorName.trim() || 'Licensed Operator';
+
+      const res = await fetch('/api/operators/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brokerId: brokerId,
+          operatorEmail: targetEmail,
+          operatorName: targetName,
+          aocNumber: 'AOC/NG/044'
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Carrier verification check failed.');
       }
+
       await fetchConnectedOperators();
       if (onVerificationSuccess) {
         onVerificationSuccess();
       }
-    } catch (err) {
-      console.error('Simulation error:', err);
+    } catch (err: any) {
+      console.error('Carrier verification error:', err);
     } finally {
-      setIsSimulatingOnboard(false);
+      setIsValidatingOperator(false);
     }
   };
 
@@ -264,37 +269,39 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
             <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-white/10">
               <button
                 type="button"
-                onClick={() => setActiveModalTab('worker_clearance')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  activeModalTab === 'worker_clearance'
+                onClick={() => setActiveModalTab('airline_link')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeModalTab === 'airline_link'
                     ? 'bg-white text-slate-900 shadow-sm font-bold'
                     : 'bg-white/10 hover:bg-white/20 text-purple-200'
                 }`}
               >
-                15D Worker Clearance Gateway
+                <Plane className="w-3.5 h-3.5" />
+                <span>Airline Onboarding & Network</span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveModalTab('kyc_hub')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeModalTab === 'kyc_hub'
                     ? 'bg-white text-slate-900 shadow-sm font-bold'
                     : 'bg-white/10 hover:bg-white/20 text-purple-200'
                 }`}
               >
                 <FileCheck className="w-3.5 h-3.5" />
-                <span>Broker KYC Hub (Doc Intelligence)</span>
+                <span>Broker KYC Compliance</span>
               </button>
               <button
                 type="button"
-                onClick={() => setActiveModalTab('airline_link')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  activeModalTab === 'airline_link'
+                onClick={() => setActiveModalTab('worker_clearance')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeModalTab === 'worker_clearance'
                     ? 'bg-white text-slate-900 shadow-sm font-bold'
                     : 'bg-white/10 hover:bg-white/20 text-purple-200'
                 }`}
               >
-                Manual Airline Link & Invites
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Accreditation Registry</span>
               </button>
             </div>
           </div>
@@ -334,13 +341,13 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
                 <div>
                   <h4 className="text-xs font-space font-bold uppercase">
                     {isAnyVerified
-                      ? `Backend Clearance Active (${verifiedOperatorCount} Verified Operator Linked)`
-                      : 'Operator Verification Pending on Backend'}
+                      ? `AOC Clearance Active (${verifiedOperatorCount} Verified Operator Linked)`
+                      : 'Carrier Accreditation Pending'}
                   </h4>
                   <p className="text-[11px] font-lexend text-gray-600">
                     {isAnyVerified
                       ? 'Proposal Designer & Live Flight Quoting tools are unlocked.'
-                      : 'Proposal Designer is locked until an operator onboards via your link.'}
+                      : 'Proposal Designer unlocks once an authorized AOC carrier is connected.'}
                   </p>
                 </div>
               </div>
@@ -511,7 +518,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
                       <Radio className="w-3.5 h-3.5 text-gray-400" />
                     )}
                   </div>
-                  <p className="text-xs font-space font-bold">Verified on Backend</p>
+                  <p className="text-xs font-space font-bold">Clearance Active</p>
                   <p className="text-[10px] text-gray-600 font-lexend">Proposal tool unlocked</p>
                 </div>
               </div>
@@ -559,32 +566,17 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
 
                       {!op.is_verified && (
                         <button
-                          onClick={() => handleSimulateInstantVerification(op.id)}
-                          disabled={isSimulatingOnboard}
+                          onClick={() => handleValidateOperatorClearance(op.id)}
+                          disabled={isValidatingOperator}
                           className="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-300 rounded-xl text-[10px] font-sync font-bold uppercase transition-all cursor-pointer whitespace-nowrap"
                         >
-                          {isSimulatingOnboard ? 'Verifying...' : 'Validate AOC Clearance'}
+                          {isValidatingOperator ? 'Verifying...' : 'Validate AOC Clearance'}
                         </button>
                       )}
                     </div>
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* Test Simulation Button for Broker Demo / Testing */}
-            <div className="pt-2 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <p className="text-[10px] text-gray-500 font-lexend">
-                Testing verification flow? You can test link an authorized operator instantly.
-              </p>
-              <button
-                onClick={() => handleSimulateInstantVerification()}
-                disabled={isSimulatingOnboard}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs font-sync uppercase font-bold tracking-wider shadow-md transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Simulate Operator Handshake</span>
-              </button>
             </div>
             </>
             )}

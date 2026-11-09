@@ -96,7 +96,7 @@ export async function fetchBrokerStatus(
   if (!cleanId) {
     const invalidState: BrokerUIState = {
       state: 'INVALID_UUID',
-      message: 'Please enter a valid cryptographic UUID string.',
+      message: 'Please enter a valid broker reference identifier.',
       input: cleanId
     };
     uiCallback?.(invalidState);
@@ -115,7 +115,7 @@ export async function fetchBrokerStatus(
       if (errorMsg.includes('22P02') || errorMsg.toLowerCase().includes('invalid input syntax for type uuid')) {
         const invalidState: BrokerUIState = {
           state: 'INVALID_UUID',
-          message: 'Please enter a valid cryptographic UUID string.',
+          message: 'Please enter a valid broker reference identifier.',
           rawError: errorMsg,
           input: cleanId
         };
@@ -163,7 +163,7 @@ export async function fetchBrokerStatus(
   } catch (err: any) {
     const netState: BrokerUIState = {
       state: 'NETWORK_ERROR',
-      message: err.message || 'Unable to connect to verification worker.'
+      message: err.message || 'Unable to connect to clearance registry.'
     };
     uiCallback?.(netState);
     return netState;

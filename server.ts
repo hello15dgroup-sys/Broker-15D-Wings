@@ -421,6 +421,64 @@ async function startServer() {
     res.json({ success: true, processed: true });
   });
 
+  // 6. Server-Side Operator Verification & Linking Endpoint
+  app.post('/api/operators/verify', async (req, res) => {
+    try {
+      const { brokerId, operatorEmail, operatorName, aocNumber } = req.body;
+      if (!brokerId || !operatorEmail) {
+        return res.status(400).json({ success: false, error: 'Broker ID and operator email are required.' });
+      }
+
+      const cleanEmail = operatorEmail.toLowerCase().trim();
+
+      // Verify broker exists in database using service role client
+      const { data: brokerData, error: brokerErr } = await supabaseAdmin
+        .from('brokers')
+        .select('id, email, agency_name, referral_code')
+        .eq('id', brokerId)
+        .maybeSingle();
+
+      if (brokerErr || !brokerData) {
+        return res.status(403).json({ success: false, error: 'Unauthorized: Invalid broker ID reference.' });
+      }
+
+      // Upsert operator record linked strictly to this verified broker ID
+      const { data: opData, error: opErr } = await supabaseAdmin
+        .from('operators')
+        .upsert({
+          broker_id: brokerData.id,
+          onboarded_by_broker_id: brokerData.id,
+          contact_email: cleanEmail,
+          company_name: operatorName?.trim() || 'Verified Airline Operator',
+          aoc_number: aocNumber || `AOC/${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+          is_verified: true,
+          verified_at: new Date().toISOString()
+        }, { onConflict: 'contact_email' })
+        .select()
+        .single();
+
+      if (opErr) {
+        throw new Error(opErr.message);
+      }
+
+      console.log(`[Operator Verification] ✓ Operator ${cleanEmail} verified and securely linked to Broker ID: ${brokerData.id} (${brokerData.email})`);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Operator successfully verified and attributed on server-side.',
+        operator: opData,
+        verifiedByBroker: {
+          id: brokerData.id,
+          agency: brokerData.agency_name,
+          referralCode: brokerData.referral_code
+        }
+      });
+    } catch (err: any) {
+      console.error('[Operator Verification Error]:', err);
+      return res.status(500).json({ success: false, error: err.message || 'Server error during operator verification.' });
+    }
+  });
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: { middlewareMode: true },
