@@ -189,7 +189,7 @@ export const MissionSettlementPanel: React.FC<MissionSettlementPanelProps> = ({
 
           <span className="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-mono font-bold flex items-center gap-1.5 self-start md:self-auto">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Escrow Rails: Providus NGN / USDC Vault</span>
+            <span>Escrow Rails: Fidelity Bank NGN (4011612222) / USD Wire</span>
           </span>
         </div>
 
@@ -423,7 +423,7 @@ export const MissionSettlementPanel: React.FC<MissionSettlementPanelProps> = ({
                     ${totalSettledClientAmount.toLocaleString()} USD
                   </p>
                   <span className="text-[10px] text-purple-300 font-mono">
-                    ≈ ₦{(totalSettledClientAmount * 1550).toLocaleString()} Providus Clearing
+                    ≈ ₦{(totalSettledClientAmount * 1550).toLocaleString()} Fidelity NGN Settlement
                   </span>
                 </div>
               </div>
@@ -431,7 +431,7 @@ export const MissionSettlementPanel: React.FC<MissionSettlementPanelProps> = ({
               <div className="pt-3 border-t border-purple-800/60 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-xs text-purple-200">
                   <Lock className="w-4 h-4 text-indigo-400 shrink-0" />
-                  <span>Escrow secured by Solana / Base USDC vault contract & Providus NUBAN.</span>
+                  <span>Escrow secured by Fidelity Bank (SKY PARTY LTD 4011612222) & Legacy USD Wire.</span>
                 </div>
 
                 <button

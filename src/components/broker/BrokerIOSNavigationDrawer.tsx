@@ -317,7 +317,7 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
 
                 <div className="grid grid-cols-2 gap-2">
                   <button
-                    onClick={() => handleCrmSubTabClick('tasks')}
+                    onClick={() => handleTabClick('checkout_engine')}
                     className="p-3 rounded-xl border border-slate-200 bg-white hover:bg-purple-50/50 text-left transition-colors cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-1.5">

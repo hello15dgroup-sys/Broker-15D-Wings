@@ -123,7 +123,7 @@ export interface FlightHistoryRecord {
   brokerProfitUsd: number;
   operatorName: string;
   operatorRating: number;
-  paymentRail: "Providus NUBAN (NGN)" | "USDC Escrow (Solana/Base L2)";
+  paymentRail: "Fidelity Bank NUBAN (NGN)" | "Legacy USD Wire (Citibank)" | "USDC Escrow (Solana/Base L2)";
   status: "Completed" | "In Flight" | "Scheduled";
   flightDuration: string;
 }
@@ -411,7 +411,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
               brokerProfitUsd: (h.amount || 0) * 0.1,
               operatorName: "Network Operator",
               operatorRating: 5,
-              paymentRail: "Providus NUBAN (NGN)",
+              paymentRail: "Fidelity Bank NUBAN (NGN)",
               status: h.status === "COMPLETED" ? "Completed" : "Scheduled",
               flightDuration: "4h 30m",
             })),
@@ -1427,7 +1427,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
 
             <div className="p-5 rounded-2xl border border-purple-200 bg-white/80 backdrop-blur-md space-y-2">
               <span className="text-[10px] text-gray-600 block">
-                Providus NGN Clearing Rail
+                Fidelity NGN Clearing Rail
               </span>
               <p className="text-2xl font-bold text-emerald-400 font-mono">
                 {formatCurrency(

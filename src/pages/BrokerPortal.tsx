@@ -3036,104 +3036,103 @@ export default function BrokerPortal() {
               </>
             )}
 
-            {/* BROKER COMMAND NAVIGATION - CLEAN EXECUTIVE DESK SWITCHER */}
-            <div className="bg-white rounded-2xl p-2.5 md:p-3 border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5">
-              <div className="flex items-center gap-2">
+            {/* BROKER COMMAND NAVIGATION - CLEAN EXECUTIVE DESK SWITCHER WITH MOBILE HORIZONTAL SLIDE CUE */}
+            <div className="bg-white rounded-2xl p-2.5 md:p-3 border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 overflow-hidden">
+              <div className="flex items-center gap-2 shrink-0">
                 {/* Directory Trigger */}
                 <button
                   onClick={() => setShowIOSMenu(true)}
-                  className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 shrink-0 grow sm:grow-0"
+                  className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95 shrink-0"
                   title="Open Complete Feature Menu"
                 >
                   <Menu className="w-4 h-4" />
                   <span>Feature Directory</span>
                 </button>
-
-                {/* Active Tab Badge indicator on mobile */}
-                <div className="sm:hidden px-3 py-1.5 rounded-xl bg-slate-100 text-slate-800 text-xs font-medium truncate grow text-center">
-                  {activeTab === "crm_workspace" && "CRM Workspace"}
-                  {activeTab === "proposal_builder" && "Proposal Builder"}
-                  {activeTab === "checkout_engine" && "Payment Vault"}
-                  {activeTab === "operational_radar" && "Fleet Radar"}
-                </div>
               </div>
 
-              {/* Segmented Desk Switcher */}
-              <div className="hidden sm:flex flex-wrap items-center gap-1.5 grow justify-center md:justify-end">
-                <button
-                  onClick={() => setActiveTab("crm_workspace")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
-                    activeTab === "crm_workspace"
-                      ? "bg-purple-600 text-white shadow-xs"
-                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
-                  }`}
+              {/* Horizontally Scrollable Segmented Desk Switcher with Mount Slide Visual Cue */}
+              <div className="w-full md:w-auto overflow-x-auto no-scrollbar scroll-smooth py-0.5">
+                <motion.div
+                  initial={{ x: 0 }}
+                  animate={{ x: [0, -35, 12, -4, 0] }}
+                  transition={{ duration: 1.6, delay: 0.4, ease: "easeInOut" }}
+                  className="flex items-center gap-1.5 min-w-max"
                 >
-                  <Users className="w-3.5 h-3.5" />
-                  <span>CRM & Deals</span>
-                </button>
-                <button
-                  onClick={() => {
-                    if (!hasVerifiedOperator) {
-                      showToast(
-                        "Access Restricted: Operator verification required from backend to use Proposal Designer.",
-                        "warning",
-                      );
-                    }
-                    setActiveTab("proposal_builder");
-                  }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
-                    activeTab === "proposal_builder"
-                      ? "bg-purple-600 text-white shadow-xs"
-                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Proposals</span>
-                  {!hasVerifiedOperator && (
-                    <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-amber-100 text-amber-900 border border-amber-200">
-                      Locked
-                    </span>
-                  )}
-                </button>
-                <button
-                  onClick={() => setActiveTab("checkout_engine")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
-                    activeTab === "checkout_engine"
-                      ? "bg-purple-600 text-white shadow-xs"
-                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
-                  <CreditCard className="w-3.5 h-3.5" />
-                  <span>Escrow</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("operational_radar")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer ${
-                    activeTab === "operational_radar"
-                      ? "bg-purple-600 text-white shadow-xs"
-                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
-                  <Radar className="w-3.5 h-3.5" />
-                  <span>Fleet & Empty Legs</span>
-                </button>
+                  <button
+                    onClick={() => setActiveTab("crm_workspace")}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer shrink-0 ${
+                      activeTab === "crm_workspace"
+                        ? "bg-purple-600 text-white shadow-xs"
+                        : "bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    <Users className="w-3.5 h-3.5" />
+                    <span>CRM & Deals</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (!hasVerifiedOperator) {
+                        showToast(
+                          "Access Restricted: Operator verification required from backend to use Proposal Designer.",
+                          "warning",
+                        );
+                      }
+                      setActiveTab("proposal_builder");
+                    }}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer shrink-0 ${
+                      activeTab === "proposal_builder"
+                        ? "bg-purple-600 text-white shadow-xs"
+                        : "bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Proposals</span>
+                    {!hasVerifiedOperator && (
+                      <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-amber-100 text-amber-900 border border-amber-200">
+                        Locked
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("checkout_engine")}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer shrink-0 ${
+                      activeTab === "checkout_engine"
+                        ? "bg-purple-600 text-white shadow-xs"
+                        : "bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    <CreditCard className="w-3.5 h-3.5" />
+                    <span>Escrow Vault</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("operational_radar")}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer shrink-0 ${
+                      activeTab === "operational_radar"
+                        ? "bg-purple-600 text-white shadow-xs"
+                        : "bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    <Radar className="w-3.5 h-3.5" />
+                    <span>Fleet & Empty Legs</span>
+                  </button>
 
-                <button
-                  onClick={async () => {
-                    await supabase.auth.signOut();
-                    sessionStorage.removeItem("broker_verified");
-                    setSessionVerified(false);
-                    showToast(
-                      "Signed out successfully. Returning to login portal.",
-                      "info",
-                    );
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer border bg-white text-red-600 border-slate-200 hover:bg-red-50 shadow-2xs ml-auto"
-                  title="Sign out of Broker Suite"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Exit</span>
-                </button>
+                  <button
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      sessionStorage.removeItem("broker_verified");
+                      setSessionVerified(false);
+                      showToast(
+                        "Signed out successfully. Returning to login portal.",
+                        "info",
+                      );
+                    }}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer border bg-slate-50 text-red-600 border-slate-200 hover:bg-red-50 shadow-2xs shrink-0"
+                    title="Sign out of Broker Suite"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Exit</span>
+                  </button>
+                </motion.div>
               </div>
             </div>
 

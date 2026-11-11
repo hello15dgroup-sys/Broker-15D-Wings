@@ -215,7 +215,7 @@ export function generate15DWingsHtmlEmail(d: PremiumEmailTemplateData): string {
                       ${totalAmount}
                     </div>
                     <div style="font-size: 11px; color: #a1a1aa; margin-top: 2px;">
-                      Secured in Providus Bank Escrow / USDC Fireblocks Vault
+                      Secured in Fidelity Bank Escrow / USD Wire / USDC Vault
                     </div>
                   </td>
                   <td align="right" style="vertical-align: middle;">

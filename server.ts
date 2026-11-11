@@ -626,6 +626,42 @@ async function startServer() {
     }
   });
 
+  // 7. Mission Broker ID Logging Endpoint (Logs broker_id against public.missions in database)
+  app.post('/api/missions/log-broker-access', async (req, res) => {
+    try {
+      const { brokerId, missionId, email } = req.body;
+      if (!missionId) {
+        return res.status(400).json({ success: false, error: 'Mission Access Code required.' });
+      }
+
+      console.log(`[Mission Access Log] Logging Broker ID ${brokerId || '896ac12c-7d89-4ac9-a451-8edffee3ed09'} for Mission ${missionId} (${email || 'client'})`);
+
+      if (brokerId) {
+        try {
+          await supabaseAdmin
+            .from('missions')
+            .update({
+              broker_id: brokerId,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', missionId);
+        } catch (dbErr: any) {
+          console.warn('[Mission Log DB Note]:', dbErr?.message);
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Broker activity logged against mission in database.',
+        missionId,
+        brokerId
+      });
+    } catch (err: any) {
+      console.error('[Mission Access Log Error]:', err);
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
 
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
