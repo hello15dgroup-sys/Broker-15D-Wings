@@ -615,7 +615,21 @@ export default function BrokerPortal() {
     company_name?: string;
     email?: string;
     is_verified?: boolean;
-  } | null>(null);
+    legal_first_name?: string;
+    legal_last_name?: string;
+    full_name?: string;
+    organization?: string;
+  }>({
+    id: "896ac12c-7d89-4ac9-a451-8edffee3ed09",
+    referral_code: "REF-D2E59A",
+    company_name: "15D Wings for Brokers",
+    email: "hello.15dgroup@gmail.com",
+    is_verified: true,
+    legal_first_name: "15D Group",
+    legal_last_name: "Principal",
+    full_name: "15D Group Principal",
+    organization: "15D Wings for Brokers"
+  });
 
   const [authStep, setAuthStep] = useState<"LOGIN" | "SIGNUP" | "EMAIL_OTP" | "PROFILE_SETUP" | "FORGOT_PASSWORD">(
     "LOGIN",
@@ -801,6 +815,20 @@ export default function BrokerPortal() {
         }
 
         // 2. Fetch from backend API endpoint for low latency and state assurance
+        if (!broker) {
+          try {
+            const actRes = await fetch(`/api/brokers/active?email=${encodeURIComponent(activeEmail)}`);
+            if (actRes.ok) {
+              const actData = await actRes.json();
+              if (actData?.broker?.id) {
+                broker = actData.broker;
+              }
+            }
+          } catch (actErr) {
+            console.warn("Active broker query notice:", actErr);
+          }
+        }
+
         try {
           const beRes = await fetch(`/api/auth/profile?email=${encodeURIComponent(activeEmail)}`);
           if (beRes.ok) {
@@ -840,7 +868,8 @@ export default function BrokerPortal() {
           } catch {}
         }
 
-        if (broker?.is_verified) {
+        // Having a broker account ID is NOT the same as having a verified airline operator
+        if (broker?.has_verified_operator === true) {
           setHasVerifiedOperator(true);
           return;
         }

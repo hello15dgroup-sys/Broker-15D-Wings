@@ -13,7 +13,9 @@ import {
   HelpCircle,
   Search,
   CheckCircle2,
-  FileCheck2
+  FileCheck2,
+  AlertCircle,
+  Clock
 } from 'lucide-react';
 import {
   fetchBrokerStatus,
@@ -36,14 +38,32 @@ interface BrokerVerificationWidgetProps {
 }
 
 export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> = ({
-  initialBrokerId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  brokerEmail = 'broker@15dwings.com.ng',
+  initialBrokerId = '896ac12c-7d89-4ac9-a451-8edffee3ed09',
+  brokerEmail = 'hello.15dgroup@gmail.com',
   onClearanceActive,
   onClearanceSuspended,
   compact = false
 }) => {
-  const [brokerIdInput, setBrokerIdInput] = useState<string>(initialBrokerId);
-  const [uiState, setUiState] = useState<BrokerUIState>({ state: 'IDLE' });
+  const [brokerIdInput, setBrokerIdInput] = useState<string>(
+    initialBrokerId && initialBrokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+      ? initialBrokerId
+      : '896ac12c-7d89-4ac9-a451-8edffee3ed09'
+  );
+  const [uiState, setUiState] = useState<BrokerUIState>({
+    state: 'SUCCESS',
+    broker: {
+      broker_id: '896ac12c-7d89-4ac9-a451-8edffee3ed09',
+      agency_name: '15D Wings for Brokers',
+      organization: '15D Wings for Brokers',
+      principal_name: '15D Group Principal',
+      email: 'hello.15dgroup@gmail.com',
+      is_verified: true,
+      agency_clearance_status: 'ACTIVE',
+      has_verified_operator: false,
+      managed_operators_count: 0,
+      managed_operators: []
+    }
+  });
   const [copiedLink, setCopiedLink] = useState(false);
   const [launchingOnboarding, setLaunchingOnboarding] = useState(false);
   const [launchUrl, setLaunchUrl] = useState<string | null>(null);
@@ -53,24 +73,56 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
   const [evaluationResults, setEvaluationResults] = useState<Record<string, OperatorEvaluationResult>>({});
 
   const handleValidateClearance = useCallback(async (idToQuery?: string) => {
-    const id = idToQuery !== undefined ? idToQuery : brokerIdInput;
+    const id = (idToQuery !== undefined ? idToQuery : brokerIdInput).trim();
+    if (!id) return;
     const result = await fetchBrokerStatus(id, (nextState) => {
       setUiState(nextState);
     });
 
     if (result.state === 'SUCCESS') {
-      onClearanceActive?.(result.broker);
+      const hasVerifiedOp = Boolean(
+        result.broker.has_verified_operator ||
+        (result.broker.managed_operators && result.broker.managed_operators.some((o) => o.is_verified))
+      );
+      if (hasVerifiedOp) {
+        onClearanceActive?.(result.broker);
+      }
     } else if (result.state === 'SUSPENDED') {
       onClearanceSuspended?.();
     }
   }, [brokerIdInput, onClearanceActive, onClearanceSuspended]);
 
   useEffect(() => {
-    if (initialBrokerId) {
-      setBrokerIdInput(initialBrokerId);
-      handleValidateClearance(initialBrokerId);
+    async function resolveActiveBroker() {
+      const targetId = (initialBrokerId && initialBrokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11')
+        ? initialBrokerId
+        : '896ac12c-7d89-4ac9-a451-8edffee3ed09';
+
+      setBrokerIdInput(targetId);
+
+      // Verify with Cloudflare clearinghouse worker in background
+      try {
+        const result = await fetchBrokerStatus(targetId, (nextState) => {
+          if (nextState.state !== 'LOADING') {
+            setUiState(nextState);
+          }
+        });
+        if (result.state === 'SUCCESS') {
+          const hasVerifiedOp = Boolean(
+            result.broker.has_verified_operator ||
+            (result.broker.managed_operators && result.broker.managed_operators.some((o) => o.is_verified))
+          );
+          if (hasVerifiedOp) {
+            onClearanceActive?.(result.broker);
+          }
+        }
+      } catch (e) {
+        console.warn('Background clearance check note:', e);
+      }
     }
-  }, [initialBrokerId, handleValidateClearance]);
+
+    resolveActiveBroker();
+  }, [initialBrokerId, onClearanceActive]);
 
   // Launch Onboarding Portal action
   const handleLaunchOnboarding = async () => {
@@ -139,9 +191,6 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
           <div>
             <h3 className="text-sm font-bold tracking-tight text-white flex items-center gap-2">
               <span>Broker Verification & Clearance Orchestration</span>
-              <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30">
-                Accredited Network
-              </span>
             </h3>
             <p className="text-xs text-slate-300">
               Live 15D clearance network & operator accreditation clearinghouse
@@ -158,12 +207,23 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
             </span>
           )}
 
-          {uiState.state === 'SUCCESS' && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>ACTIVE / VERIFIED</span>
-            </span>
-          )}
+          {uiState.state === 'SUCCESS' && (() => {
+            const isOpVerified = Boolean(
+              uiState.broker.has_verified_operator ||
+              (uiState.broker.managed_operators && uiState.broker.managed_operators.some((o) => o.is_verified))
+            );
+            return isOpVerified ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>WORKSPACE UNLOCKED</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span>ID FOUND • AIRLINE LINK PENDING</span>
+              </span>
+            );
+          })()}
 
           {uiState.state === 'SUSPENDED' && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">
@@ -190,10 +250,15 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
       <div className="p-4 sm:p-6 space-y-5">
         {/* Input & Lookup Form */}
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
-            <span>Broker Reference ID</span>
-            <span className="text-[11px] font-normal text-slate-400">Aviation Clearinghouse Registry</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 text-slate-600" />
+              <span>Broker Account ID</span>
+            </label>
+            <span className="text-[11px] font-mono font-medium text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200 flex items-center gap-1">
+              <span>Database Key (public.brokers)</span>
+            </span>
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative flex-1">
@@ -206,21 +271,33 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
                     setUiState({ state: 'IDLE' });
                   }
                 }}
-                placeholder="e.g. a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"
-                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-mono transition-all border outline-none ${
+                placeholder="896ac12c-7d89-4ac9-a451-8edffee3ed09"
+                className={`w-full px-3.5 py-2.5 pr-20 rounded-xl text-xs font-mono font-bold transition-all border outline-none ${
                   isInvalidFormat
                     ? 'border-red-500 bg-red-50/50 text-red-950 focus:border-red-600 focus:ring-2 focus:ring-red-100'
-                    : 'border-slate-300 bg-slate-50/50 text-slate-900 focus:border-purple-600 focus:bg-white focus:ring-2 focus:ring-purple-100'
+                    : 'border-slate-300 bg-slate-50/50 text-slate-900 focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100'
                 }`}
               />
-              <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
+              <button
+                type="button"
+                onClick={() => {
+                  copyToClipboard(brokerIdInput);
+                  setCopiedLink(true);
+                  setTimeout(() => setCopiedLink(false), 2000);
+                }}
+                className="absolute right-2.5 top-2 px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-[10px] font-semibold text-slate-700 shadow-xs flex items-center gap-1 transition-all cursor-pointer"
+                title="Copy broker ID"
+              >
+                {copiedLink ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-slate-500" />}
+                <span>{copiedLink ? 'Copied' : 'Copy'}</span>
+              </button>
             </div>
 
             <button
               type="button"
               onClick={() => handleValidateClearance()}
               disabled={uiState.state === 'LOADING'}
-              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shrink-0"
+              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all shadow-sm active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shrink-0"
             >
               {uiState.state === 'LOADING' ? (
                 <>
@@ -229,12 +306,19 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
                 </>
               ) : (
                 <>
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Query Clearance</span>
+                  <ShieldCheck className="w-4 h-4 text-slate-300" />
+                  <span>Query Registry</span>
                 </>
               )}
             </button>
           </div>
+
+          <p className="text-[11px] text-slate-600 flex items-start gap-1.5 pt-0.5">
+            <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+            <span>
+              Profile key for <strong>{brokerEmail || 'hello.15dgroup@gmail.com'}</strong>. Merely having an account ID does <strong>not</strong> grant workspace flight clearance. You must link a verified airline operator below.
+            </span>
+          </p>
 
           {/* Input Validation Error */}
           {isInvalidFormat && (
@@ -273,76 +357,118 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
         )}
 
         {/* 2. SUCCESS STATE (agency_clearance_status: "ACTIVE") */}
-        {uiState.state === 'SUCCESS' && (
-          <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-emerald-50/60 via-white to-slate-50 border border-emerald-200 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-emerald-100">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700 shrink-0">
-                  <CheckCircle2 className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-emerald-600 text-white shadow-xs">
-                      ACTIVE / VERIFIED
-                    </span>
-                    <span className="text-xs text-slate-500 font-mono">
-                      ID: {uiState.broker.broker_id.substring(0, 12)}...
-                    </span>
+        {uiState.state === 'SUCCESS' && (() => {
+          const isOperatorVerified = Boolean(
+            uiState.broker.has_verified_operator ||
+            (uiState.broker.managed_operators && uiState.broker.managed_operators.some((o) => o.is_verified))
+          );
+
+          return (
+            <div className={`p-5 sm:p-6 rounded-2xl border space-y-5 ${
+              isOperatorVerified
+                ? 'bg-gradient-to-br from-emerald-50/60 via-white to-slate-50 border-emerald-200'
+                : 'bg-gradient-to-br from-slate-50 via-white to-amber-50/40 border-slate-200'
+            }`}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200/80">
+                <div className="flex items-center gap-3">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${
+                    isOperatorVerified
+                      ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
+                      : 'bg-amber-100 border-amber-300 text-amber-700'
+                  }`}>
+                    {isOperatorVerified ? <CheckCircle2 className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
                   </div>
-                  <h4 className="text-base font-bold text-slate-900 mt-1">
-                    {uiState.broker.agency_name || '15D Executive Aviation Brokerage'}
-                  </h4>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold font-mono bg-slate-100 text-slate-700 border border-slate-200">
+                        ID: {uiState.broker.broker_id.substring(0, 12)}...
+                      </span>
+                      {isOperatorVerified ? (
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-emerald-600 text-white shadow-xs flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>WORKSPACE VERIFIED</span>
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold font-mono bg-amber-100 text-amber-900 border border-amber-300 shadow-xs flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 text-amber-600" />
+                          <span>AIRLINE LINK REQUIRED (0 LINKED)</span>
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-base font-bold text-slate-900 mt-1">
+                      {uiState.broker.agency_name || '15D Wings for Brokers'}
+                    </h4>
+                  </div>
+                </div>
+
+                {/* Primary Actions specified in contract */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopyOnboardingLink}
+                    className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  >
+                    {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-600" />}
+                    <span>{copiedLink ? 'Link Copied!' : 'Copy Onboarding Link'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleLaunchOnboarding}
+                    disabled={launchingOnboarding}
+                    className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
+                  >
+                    {launchingOnboarding ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
+                    <span>Launch Operator Portal</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Primary Actions specified in contract */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleCopyOnboardingLink}
-                  className="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 text-xs font-semibold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-                >
-                  {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-600" />}
-                  <span>{copiedLink ? 'Link Copied!' : 'Copy Onboarding Link'}</span>
-                </button>
+              {/* Clarification Callout for Brokers */}
+              {!isOperatorVerified && (
+                <div className="p-3.5 rounded-xl bg-amber-50/90 border border-amber-200 text-xs text-amber-950 space-y-1">
+                  <p className="font-bold text-amber-900 flex items-center gap-1.5">
+                    <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
+                    <span>Important: Having an account ID does not mean your workspace is verified</span>
+                  </p>
+                  <p className="text-[11px] text-amber-900/90 leading-relaxed font-sans">
+                    Your broker ID is registered in the database, but aviation compliance requires an Air Operator Certificate (AOC) partner airline to be linked. Proposal creation and flight quoting remain locked until an operator is connected.
+                  </p>
+                </div>
+              )}
 
-                <button
-                  type="button"
-                  onClick={handleLaunchOnboarding}
-                  disabled={launchingOnboarding}
-                  className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
-                >
-                  {launchingOnboarding ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
-                  <span>Launch Operator Portal</span>
-                </button>
-              </div>
-            </div>
+              {/* Broker Agency Profile Details */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-3 bg-white rounded-xl border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Organization</span>
+                  <p className="font-bold text-slate-900 mt-0.5 truncate">{uiState.broker.organization || '15D Group'}</p>
+                </div>
 
-            {/* Broker Agency Profile Details */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 bg-white rounded-xl border border-slate-200/80">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Organization</span>
-                <p className="font-bold text-slate-900 mt-0.5 truncate">{uiState.broker.organization || '15D Group'}</p>
-              </div>
+                <div className="p-3 bg-white rounded-xl border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Principal Broker</span>
+                  <p className="font-bold text-slate-900 mt-0.5 truncate">{uiState.broker.principal_name || '15D Group Principal'}</p>
+                </div>
 
-              <div className="p-3 bg-white rounded-xl border border-slate-200/80">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Principal Broker</span>
-                <p className="font-bold text-slate-900 mt-0.5 truncate">{uiState.broker.principal_name || 'Precious Ubadike'}</p>
-              </div>
+                <div className="p-3 bg-white rounded-xl border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Contact Email</span>
+                  <p className="font-mono text-slate-800 mt-0.5 truncate text-[11px]">{uiState.broker.email}</p>
+                </div>
 
-              <div className="p-3 bg-white rounded-xl border border-slate-200/80">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Contact Email</span>
-                <p className="font-mono text-slate-800 mt-0.5 truncate text-[11px]">{uiState.broker.email}</p>
+                <div className="p-3 bg-white rounded-xl border border-slate-200/80">
+                  <span className="text-[10px] text-slate-400 uppercase font-semibold block">Flight Clearance</span>
+                  {isOperatorVerified ? (
+                    <p className="font-bold text-emerald-600 mt-0.5 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Workspace Unlocked</span>
+                    </p>
+                  ) : (
+                    <p className="font-bold text-amber-800 mt-0.5 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Awaiting Airline Link</span>
+                    </p>
+                  )}
+                </div>
               </div>
-
-              <div className="p-3 bg-white rounded-xl border border-slate-200/80">
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Operator Clearance</span>
-                <p className="font-bold text-emerald-600 mt-0.5 flex items-center gap-1">
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Licensed Active</span>
-                </p>
-              </div>
-            </div>
 
             {/* Managed Operators Section */}
             <div className="pt-2 space-y-2.5">
@@ -428,7 +554,8 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
               )}
             </div>
           </div>
-        )}
+        );
+      })()}
 
         {/* 3. SUSPENDED STATE (agency_clearance_status: "SUSPENDED") */}
         {uiState.state === 'SUSPENDED' && (

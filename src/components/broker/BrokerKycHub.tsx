@@ -44,9 +44,9 @@ interface KycDocumentCategory {
 }
 
 export const BrokerKycHub: React.FC<BrokerKycHubProps> = ({
-  brokerId = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-  brokerEmail = 'broker@15dwings.com.ng',
-  brokerName = 'Precious Ubadike',
+  brokerId = '896ac12c-7d89-4ac9-a451-8edffee3ed09',
+  brokerEmail = 'hello.15dgroup@gmail.com',
+  brokerName = '15D Group Principal',
   onKycComplete
 }) => {
   const categories: KycDocumentCategory[] = [

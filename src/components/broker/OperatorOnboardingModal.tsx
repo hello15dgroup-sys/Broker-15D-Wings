@@ -63,17 +63,48 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
   const [isValidatingOperator, setIsValidatingOperator] = useState(false);
   const [activeModalTab, setActiveModalTab] = useState<'airline_link' | 'kyc_hub' | 'worker_clearance'>('airline_link');
 
-  const refCode = brokerReferralCode || (brokerId ? brokerId.substring(0, 8).toUpperCase() : 'REF-15D');
-  const inviteUrl = `https://airlines.15dwings.com.ng?broker_ref=${refCode}&broker_id=${brokerId || ''}`;
+  const [resolvedBrokerId, setResolvedBrokerId] = useState<string>(
+    brokerId && brokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
+      ? brokerId
+      : '896ac12c-7d89-4ac9-a451-8edffee3ed09'
+  );
+  const [resolvedRefCode, setResolvedRefCode] = useState<string>(
+    brokerReferralCode || 'REF-D2E59A'
+  );
+
+  useEffect(() => {
+    if (brokerId && brokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11') {
+      setResolvedBrokerId(brokerId);
+    } else {
+      fetch(`/api/brokers/active?email=${encodeURIComponent(brokerEmail || 'hello.15dgroup@gmail.com')}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data?.broker?.id) {
+            setResolvedBrokerId(data.broker.id);
+            if (data.broker.referral_code) {
+              setResolvedRefCode(data.broker.referral_code);
+            }
+          }
+        })
+        .catch(() => {});
+    }
+    if (brokerReferralCode) {
+      setResolvedRefCode(brokerReferralCode);
+    }
+  }, [brokerId, brokerReferralCode, brokerEmail]);
+
+  const effectiveBrokerId = resolvedBrokerId || '896ac12c-7d89-4ac9-a451-8edffee3ed09';
+  const refCode = resolvedRefCode || 'REF-D2E59A';
+  const inviteUrl = `https://airlines.15dwings.com.ng?broker_ref=${refCode}&broker_id=${effectiveBrokerId}`;
 
   const fetchConnectedOperators = async () => {
-    if (!brokerId) return;
+    if (!effectiveBrokerId) return;
     setIsLoadingOperators(true);
     try {
       const { data, error } = await supabase
         .from('operators')
         .select('id, company_name, contact_email, is_verified, created_at')
-        .eq('onboarded_by_broker_id', brokerId)
+        .eq('onboarded_by_broker_id', effectiveBrokerId)
         .order('created_at', { ascending: false });
 
       if (!error && data) {
@@ -91,7 +122,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
   };
 
   useEffect(() => {
-    if (isOpen && brokerId) {
+    if (isOpen && effectiveBrokerId) {
       fetchConnectedOperators();
 
       // Subscribe to live postgres changes for operators
@@ -103,7 +134,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
             event: '*',
             schema: 'public',
             table: 'operators',
-            filter: `onboarded_by_broker_id=eq.${brokerId}`
+            filter: `onboarded_by_broker_id=eq.${effectiveBrokerId}`
           },
           () => {
             fetchConnectedOperators();
@@ -115,7 +146,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
         supabase.removeChannel(channel);
       };
     }
-  }, [isOpen, brokerId]);
+  }, [isOpen, effectiveBrokerId]);
 
   const handleCopyLink = () => {
     copyToClipboard(inviteUrl);
@@ -128,7 +159,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
 
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!operatorEmail.trim() || !brokerId) return;
+    if (!operatorEmail.trim() || !effectiveBrokerId) return;
 
     const emailTrim = operatorEmail.trim().toLowerCase();
     const personalDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'aol.com', 'zoho.com', 'proton.me', 'protonmail.com'];
@@ -149,7 +180,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
       const { data, error } = await supabase.from('operators').insert({
         company_name: operatorName.trim() || 'Invited Licensed Operator',
         contact_email: emailTrim,
-        onboarded_by_broker_id: brokerId,
+        onboarded_by_broker_id: effectiveBrokerId,
         is_verified: false
       }).select().single();
 
@@ -163,8 +194,8 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
             subtitle: '15D WINGS EXECUTIVE BROKER NETWORK',
             badgeText: 'CARRIER ONBOARDING INVITE',
             badgeCode: 'AOC-INVITE',
-            message: `You have been invited by broker ID ${brokerId} (Referral Code: ${refCode}) to join the 15D Wings licensed carrier network. Please complete your AOC verification and fleet registration on airlines.15dwings.com.ng.`,
-            portalUrl: `https://airlines.15dwings.com.ng/onboard?ref=${refCode}&broker=${brokerId}`,
+            message: `You have been invited by broker ID ${effectiveBrokerId} (Referral Code: ${refCode}) to join the 15D Wings licensed carrier network. Please complete your AOC verification and fleet registration on airlines.15dwings.com.ng.`,
+            portalUrl: `https://airlines.15dwings.com.ng/onboard?ref=${refCode}&broker=${effectiveBrokerId}`,
             internalRecipients: 'hello.15dgroup@gmail.com,15dwingsltd@gmail.com'
           });
         } catch (mailErr) {
@@ -185,7 +216,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
   };
 
   const handleValidateOperatorClearance = async (operatorId?: string) => {
-    if (!brokerId) return;
+    if (!effectiveBrokerId) return;
     setIsValidatingOperator(true);
     try {
       const targetOp = operatorsList.find(o => o.id === operatorId);
@@ -196,7 +227,7 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          brokerId: brokerId,
+          brokerId: effectiveBrokerId,
           operatorEmail: targetEmail,
           operatorName: targetName,
           aocNumber: 'AOC/NG/044'
@@ -226,44 +257,82 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 overflow-y-auto">
+      <div className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-950/85 backdrop-blur-md pt-20 sm:pt-24 pb-16 px-4 sm:px-6 flex justify-center items-start">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 15 }}
+          initial={{ opacity: 0, scale: 0.97, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="w-full max-w-2xl bg-white rounded-[2.5rem] border border-purple-200 shadow-2xl shadow-purple-950/20 overflow-hidden relative my-8"
+          exit={{ opacity: 0, scale: 0.97, y: 15 }}
+          className="w-full max-w-2xl bg-white rounded-3xl border border-purple-200/80 shadow-2xl shadow-purple-950/30 overflow-hidden relative my-0 shrink-0"
         >
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className="absolute top-6 right-6 p-2 rounded-full bg-purple-50 text-gray-500 hover:text-gray-900 hover:bg-purple-100 transition-all cursor-pointer z-10"
-          >
-            <X className="w-5 h-5" />
-          </button>
-
           {/* Modal Header */}
-          <div className="p-6 md:p-8 bg-gradient-to-br from-purple-900 via-indigo-950 to-slate-950 text-white relative">
+          <div className="p-6 md:p-8 bg-gradient-to-br from-purple-950 via-slate-950 to-indigo-950 text-white relative">
+            {/* Close button inside header */}
+            <button
+              onClick={onClose}
+              className="absolute top-5 right-5 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer z-20 flex items-center justify-center border border-white/20 shadow-sm"
+              title="Close modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-purple-300">
-                <ShieldCheck className="w-7 h-7" />
+              <div className={`p-2.5 rounded-2xl backdrop-blur-md border ${
+                isAnyVerified
+                  ? 'bg-emerald-500/20 border-emerald-400/30 text-emerald-300'
+                  : 'bg-amber-500/20 border-amber-400/30 text-amber-300'
+              }`}>
+                {isAnyVerified ? <ShieldCheck className="w-7 h-7" /> : <ShieldAlert className="w-7 h-7" />}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-purple-400/20 border border-purple-300/30 text-[10px] font-mono uppercase tracking-widest text-purple-200 font-bold">
-                    AOC Carrier Network
-                  </span>
-                  <span className="flex items-center gap-1 text-[10px] text-emerald-400 font-mono">
-                    <Radio className="w-3 h-3 animate-pulse" /> Live Telemetry Rail
-                  </span>
+                  {isAnyVerified ? (
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-400/20 border border-emerald-300/30 text-[10px] font-mono uppercase tracking-widest text-emerald-200 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>Workspace Flight Clearance Active</span>
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 border border-amber-300/30 text-[10px] font-mono uppercase tracking-widest text-amber-200 font-bold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                      <span>Account ID Found • Airline Link Required</span>
+                    </span>
+                  )}
                 </div>
                 <h2 className="text-xl md:text-2xl font-space font-bold uppercase tracking-tight">
-                  Operator Onboarding Gateway
+                  Operator Onboarding & Verification Gateway
                 </h2>
               </div>
             </div>
-            <p className="text-xs md:text-sm text-purple-200/90 font-lexend max-w-xl leading-relaxed mt-2">
-              To prevent unauthorized pricing manifests in our ecosystem, brokers must link an Air Operator Certificate (AOC) holder. Send your custom onboarding link to your partner airline to register on <strong className="text-white underline">airlines.15dwings.com.ng</strong>.
+            <p className="text-xs md:text-sm text-purple-200/90 font-lexend max-w-xl leading-relaxed mt-1">
+              {isAnyVerified
+                ? 'Your licensed partner carrier is verified. Proposal designer & flight tools are active.'
+                : 'Your broker ID is loaded from the database. Full flight quoting remains locked until an Air Operator Certificate (AOC) partner airline registers below.'}
             </p>
+
+            {/* Quick-Glance Broker Identification Banner */}
+            <div className="mt-3.5 p-2.5 rounded-xl bg-white/5 border border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono text-slate-400 uppercase">Broker Account ID:</span>
+                <span className="font-mono text-purple-200 font-bold tracking-tight text-[11px] select-all">
+                  {effectiveBrokerId}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded-md bg-white/10 border border-white/20 text-[10px] font-mono font-bold text-purple-200">
+                  REF: {refCode}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    copyToClipboard(effectiveBrokerId);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-white text-[10px] font-mono flex items-center gap-1 cursor-pointer"
+                >
+                  {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-slate-300" />}
+                  <span>{copied ? 'Copied' : 'Copy ID'}</span>
+                </button>
+              </div>
+            </div>
 
             {/* Modal Subtabs */}
             <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-white/10">
@@ -281,18 +350,6 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
               </button>
               <button
                 type="button"
-                onClick={() => setActiveModalTab('kyc_hub')}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  activeModalTab === 'kyc_hub'
-                    ? 'bg-white text-slate-900 shadow-sm font-bold'
-                    : 'bg-white/10 hover:bg-white/20 text-purple-200'
-                }`}
-              >
-                <FileCheck className="w-3.5 h-3.5" />
-                <span>Broker KYC Compliance</span>
-              </button>
-              <button
-                type="button"
                 onClick={() => setActiveModalTab('worker_clearance')}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeModalTab === 'worker_clearance'
@@ -303,23 +360,35 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Accreditation Registry</span>
               </button>
+              <button
+                type="button"
+                onClick={() => setActiveModalTab('kyc_hub')}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeModalTab === 'kyc_hub'
+                    ? 'bg-white text-slate-900 shadow-sm font-bold'
+                    : 'bg-white/10 hover:bg-white/20 text-purple-200'
+                }`}
+              >
+                <FileCheck className="w-3.5 h-3.5" />
+                <span>Broker KYC Compliance</span>
+              </button>
             </div>
           </div>
 
-          <div className="p-6 md:p-8 space-y-6 max-h-[75vh] overflow-y-auto">
+          <div className="p-6 md:p-8 space-y-6">
             {activeModalTab === 'worker_clearance' ? (
               <BrokerVerificationWidget
-                initialBrokerId={brokerId || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'}
-                brokerEmail={brokerEmail || 'broker@15dwings.com.ng'}
+                initialBrokerId={effectiveBrokerId}
+                brokerEmail={brokerEmail || 'hello.15dgroup@gmail.com'}
                 onClearanceActive={() => {
                   if (onVerificationSuccess) onVerificationSuccess();
                 }}
               />
             ) : activeModalTab === 'kyc_hub' ? (
               <BrokerKycHub
-                brokerId={brokerId || 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'}
-                brokerEmail={brokerEmail || 'broker@15dwings.com.ng'}
-                brokerName={brokerCompany || 'Precious Ubadike'}
+                brokerId={effectiveBrokerId}
+                brokerEmail={brokerEmail || 'hello.15dgroup@gmail.com'}
+                brokerName={brokerCompany || '15D Group Principal'}
                 onKycComplete={() => {
                   if (onVerificationSuccess) onVerificationSuccess();
                 }}
@@ -370,9 +439,6 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
                   <LinkIcon className="w-3.5 h-3.5 text-purple-600" />
                   Your Operator Onboarding Link (airlines.15dwings.com.ng)
                 </label>
-                <span className="text-[10px] font-mono text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
-                  Ref Code: {refCode}
-                </span>
               </div>
 
               <div className="p-3 bg-purple-50/70 border border-purple-200 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center gap-2">

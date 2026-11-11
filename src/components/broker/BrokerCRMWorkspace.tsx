@@ -1468,9 +1468,9 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       {/* SUB-TAB: BROKER KYC CLEARANCE HUB */}
       {activeSubTab === "kyc" && (
         <BrokerKycHub
-          brokerId={brokerId || missionId || "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"}
-          brokerEmail={brokerEmail || "broker@15dwings.com.ng"}
-          brokerName={brokerCompanyName || "Precious Ubadike"}
+          brokerId={brokerId || missionId || "896ac12c-7d89-4ac9-a451-8edffee3ed09"}
+          brokerEmail={brokerEmail || "hello.15dgroup@gmail.com"}
+          brokerName={brokerCompanyName || "15D Group Principal"}
         />
       )}
 
