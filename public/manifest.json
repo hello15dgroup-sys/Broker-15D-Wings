@@ -1,21 +1,21 @@
 {
-  "name": "15D WINGS Client Portal",
-  "short_name": "15D WINGS",
-  "description": "Elite Private Aviation Client Interface",
+  "name": "15D Wings™ for Private Jet Flight Brokers",
+  "short_name": "15D Wings™",
+  "description": "Plug into our ecosystem of D-Day Flight Certainty—where your profit margins are set at your own sole discretion, uncapped by airlines. Win the market.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
-  "theme_color": "#1877F2",
+  "theme_color": "#000000",
   "icons": [
     {
-      "src": "https://res.cloudinary.com/dw9m06rgf/image/upload/v1772535031/icon_512x512_q6z8v0.png",
+      "src": "https://lh3.googleusercontent.com/d/1RiTlsS0MWvFhiLVcy6BtJFJSk-3YyoA8",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpeg"
     },
     {
-      "src": "https://res.cloudinary.com/dw9m06rgf/image/upload/v1772535031/icon_192x192_q6z8v1.png",
+      "src": "https://lh3.googleusercontent.com/d/1RiTlsS0MWvFhiLVcy6BtJFJSk-3YyoA8",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpeg"
     }
   ]
 }

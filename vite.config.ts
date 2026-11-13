@@ -13,21 +13,21 @@ export default defineConfig(() => {
         registerType: 'autoUpdate',
         includeAssets: [],
         manifest: {
-          name: '15D WINGS',
-          short_name: '15D',
-          description: '15D WINGS Coordination App',
+          name: '15D Wings™ for Private Jet Flight Brokers',
+          short_name: '15D Wings™',
+          description: 'Plug into our ecosystem of D-Day Flight Certainty—set profit margins at your sole discretion, uncapped by airlines. Win the market.',
           theme_color: '#000000',
           background_color: '#000000',
           icons: [
             {
-              src: 'https://uploads.onecompiler.io/43z22g7dk/44b5wdtpn/1000301979.png',
+              src: 'https://lh3.googleusercontent.com/d/1RiTlsS0MWvFhiLVcy6BtJFJSk-3YyoA8',
               sizes: '192x192',
-              type: 'image/png'
+              type: 'image/jpeg'
             },
             {
-              src: 'https://uploads.onecompiler.io/43z22g7dk/44b5wdtpn/1000301979.png',
+              src: 'https://lh3.googleusercontent.com/d/1RiTlsS0MWvFhiLVcy6BtJFJSk-3YyoA8',
               sizes: '512x512',
-              type: 'image/png'
+              type: 'image/jpeg'
             }
           ]
         },

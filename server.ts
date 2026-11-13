@@ -149,18 +149,18 @@ async function startServer() {
 
   // Lightweight CORS proxy route for Open Graph Image
   app.get('/og-image.png', async (req, res) => {
+    const imageUrl = 'https://lh3.googleusercontent.com/d/1RiTlsS0MWvFhiLVcy6BtJFJSk-3YyoA8';
     try {
-      const imageUrl = 'https://uploads.onecompiler.io/44ptns9c4/1786538079593/Gemini_Generated_Image_ce3selce3selce3s.png';
       const response = await fetch(imageUrl);
       if (!response.ok) throw new Error('Image fetch failed');
       const arrayBuffer = await response.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Type', response.headers.get('content-type') || 'image/jpeg');
       res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.send(buffer);
     } catch (e) {
-      res.redirect('https://uploads.onecompiler.io/44ptns9c4/1786538079593/Gemini_Generated_Image_ce3selce3selce3s.png');
+      res.redirect(imageUrl);
     }
   });
 
