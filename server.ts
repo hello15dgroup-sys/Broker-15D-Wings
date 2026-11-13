@@ -1,7 +1,133 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { createClient } from '@supabase/supabase-js';
+
+const BROKERS_FILE_PATH = path.join(process.cwd(), 'src/data/brokers.json');
+
+interface BrokerRecord {
+  id: string;
+  auth_user_id?: string;
+  referral_code?: string;
+  email: string;
+  company_name?: string;
+  agency_name?: string;
+  password_hash?: string;
+  legalFirstName?: string;
+  legalLastName?: string;
+  full_name?: string;
+  organization?: string;
+  dateOfBirth?: string;
+  themePreference?: string;
+  isVerified?: boolean;
+  has_verified_operator?: boolean;
+  agency_clearance_status?: string;
+  kyc_verified?: boolean;
+  lastSignInAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+function loadBrokersFromDisk(): Map<string, BrokerRecord> {
+  const store = new Map<string, BrokerRecord>();
+  try {
+    if (fs.existsSync(BROKERS_FILE_PATH)) {
+      const content = fs.readFileSync(BROKERS_FILE_PATH, 'utf-8');
+      const parsed = JSON.parse(content);
+      for (const [email, record] of Object.entries(parsed)) {
+        store.set(email.toLowerCase().trim(), record as BrokerRecord);
+      }
+    }
+  } catch (e) {
+    console.warn('[Brokers DB] Error loading from disk:', e);
+  }
+
+  // Ensure default seeds exist if not already loaded
+  if (!store.has('hello.15dgroup@gmail.com')) {
+    store.set('hello.15dgroup@gmail.com', {
+      id: '896ac12c-7d89-4ac9-a451-8edffee3ed09',
+      auth_user_id: 'c606deae-d009-449f-8951-c0bf475d00d1',
+      referral_code: 'REF-D2E59A',
+      email: 'hello.15dgroup@gmail.com',
+      company_name: '15D Wings for Brokers',
+      agency_name: '15D Wings for Brokers',
+      legalFirstName: '15D Group',
+      legalLastName: 'Principal',
+      full_name: '15D Group Principal',
+      organization: '15D Wings for Brokers',
+      dateOfBirth: '1990-01-01',
+      isVerified: true,
+      has_verified_operator: false,
+      agency_clearance_status: 'ACTIVE',
+      themePreference: 'EXECUTIVE_DARK',
+      createdAt: '2026-10-09T09:32:04.566Z',
+      updatedAt: new Date().toISOString()
+    });
+  }
+
+  if (!store.has('15thdlogistics@gmail.com')) {
+    store.set('15thdlogistics@gmail.com', {
+      id: '3cff7c58-dc5b-46dd-8b92-549985366ae4',
+      auth_user_id: '1ca6db0f-5bc2-4990-9f7a-a0702c343710',
+      referral_code: 'REF-2D4CFC',
+      email: '15thdlogistics@gmail.com',
+      company_name: '15D Wings for Brokers',
+      agency_name: '15D Wings for Brokers',
+      legalFirstName: '15thdlogistics',
+      legalLastName: 'Logistics',
+      full_name: '15dlogistics',
+      organization: '15D Wings for Brokers',
+      dateOfBirth: '1992-06-15',
+      isVerified: false,
+      has_verified_operator: false,
+      agency_clearance_status: 'ACTIVE',
+      themePreference: 'EXECUTIVE_DARK',
+      createdAt: '2026-10-13T17:05:55.583Z',
+      updatedAt: new Date().toISOString()
+    });
+  }
+
+  if (!store.has('preciousubadike15@gmail.com')) {
+    store.set('preciousubadike15@gmail.com', {
+      id: 'e83b4b9c-6426-4e7d-bdff-939fe0c0d878',
+      auth_user_id: '8f9951a7-8f44-407d-93c8-f2b817953c22',
+      referral_code: 'REF-BFBC50',
+      email: 'preciousubadike15@gmail.com',
+      company_name: '15D Wings for Brokers',
+      agency_name: '15D Wings for Brokers',
+      legalFirstName: 'Precious',
+      legalLastName: 'Ubadike',
+      full_name: 'Precious Ubadike',
+      organization: '15D Wings for Brokers',
+      dateOfBirth: '1995-05-15',
+      isVerified: false,
+      has_verified_operator: false,
+      agency_clearance_status: 'ACTIVE',
+      themePreference: 'EXECUTIVE_DARK',
+      createdAt: '2026-09-12T16:09:36.924Z',
+      updatedAt: new Date().toISOString()
+    });
+  }
+
+  return store;
+}
+
+function saveBrokersToDisk(store: Map<string, BrokerRecord>) {
+  try {
+    const obj: Record<string, BrokerRecord> = {};
+    for (const [email, record] of store.entries()) {
+      obj[email] = record;
+    }
+    const dir = path.dirname(BROKERS_FILE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(BROKERS_FILE_PATH, JSON.stringify(obj, null, 2), 'utf-8');
+  } catch (e) {
+    console.warn('[Brokers DB] Error saving to disk:', e);
+  }
+}
 
 async function startServer() {
   const app = express();
@@ -38,90 +164,8 @@ async function startServer() {
     }
   });
 
-  interface BrokerRecord {
-    id: string;
-    auth_user_id?: string;
-    referral_code?: string;
-    email: string;
-    company_name?: string;
-    agency_name?: string;
-    password_hash?: string;
-    legalFirstName?: string;
-    legalLastName?: string;
-    full_name?: string;
-    organization?: string;
-    dateOfBirth?: string;
-    themePreference?: string;
-    isVerified?: boolean;
-    has_verified_operator?: boolean;
-    agency_clearance_status?: string;
-    kyc_verified?: boolean;
-    lastSignInAt?: string;
-    createdAt?: string;
-    updatedAt?: string;
-  }
-
-  // In-memory persistent broker profiles store (synced with PostgreSQL public.brokers)
-  const brokerStore = new Map<string, BrokerRecord>();
-
-  // Pre-seed active broker profiles from database public.brokers
-  brokerStore.set('hello.15dgroup@gmail.com', {
-    id: '896ac12c-7d89-4ac9-a451-8edffee3ed09',
-    auth_user_id: 'c606deae-d009-449f-8951-c0bf475d00d1',
-    referral_code: 'REF-D2E59A',
-    email: 'hello.15dgroup@gmail.com',
-    company_name: '15D Wings for Brokers',
-    agency_name: '15D Wings for Brokers',
-    legalFirstName: '15D Group',
-    legalLastName: 'Principal',
-    full_name: '15D Group Principal',
-    organization: '15D Wings for Brokers',
-    dateOfBirth: '1990-01-01',
-    isVerified: true,
-    has_verified_operator: false,
-    agency_clearance_status: 'ACTIVE',
-    themePreference: 'EXECUTIVE_DARK',
-    createdAt: '2026-10-09T09:32:04.566Z',
-    updatedAt: new Date().toISOString()
-  });
-
-  brokerStore.set('15thdlogistics@gmail.com', {
-    id: '3cff7c58-dc5b-46dd-8b92-549985366ae4',
-    auth_user_id: '1ca6db0f-5bc2-4990-9f7a-a0702c343710',
-    referral_code: 'REF-2D4CFC',
-    email: '15thdlogistics@gmail.com',
-    company_name: '15D Wings for Brokers',
-    agency_name: '15D Wings for Brokers',
-    legalFirstName: '15thdlogistics',
-    legalLastName: 'Logistics',
-    full_name: '15dlogistics',
-    organization: '15D Wings for Brokers',
-    isVerified: false,
-    has_verified_operator: false,
-    agency_clearance_status: 'ACTIVE',
-    themePreference: 'EXECUTIVE_DARK',
-    createdAt: '2026-10-13T17:05:55.583Z',
-    updatedAt: new Date().toISOString()
-  });
-
-  brokerStore.set('preciousubadike15@gmail.com', {
-    id: 'e83b4b9c-6426-4e7d-bdff-939fe0c0d878',
-    auth_user_id: '8f9951a7-8f44-407d-93c8-f2b817953c22',
-    referral_code: 'REF-BFBC50',
-    email: 'preciousubadike15@gmail.com',
-    company_name: '15D Wings for Brokers',
-    agency_name: '15D Wings for Brokers',
-    legalFirstName: 'Precious',
-    legalLastName: 'Ubadike',
-    full_name: '15D Group Principal',
-    organization: '15D Wings for Brokers',
-    isVerified: false,
-    has_verified_operator: false,
-    agency_clearance_status: 'ACTIVE',
-    themePreference: 'EXECUTIVE_DARK',
-    createdAt: '2026-09-12T16:09:36.924Z',
-    updatedAt: new Date().toISOString()
-  });
+  // Persistent broker profiles store (synced with PostgreSQL public.brokers & disk)
+  const brokerStore = loadBrokersFromDisk();
 
   // ==========================================
   // BACKEND AUTHENTICATION ENDPOINTS
@@ -232,67 +276,71 @@ async function startServer() {
 
       try {
         const refCode = `BRK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-        const { data: dbData, error: dbErr } = await supabaseAdmin
+        // Query existing broker record from Supabase first
+        const { data: dbData } = await supabaseAdmin
           .from('brokers')
-          .upsert({
-            email: normalizedEmail,
-            full_name: normalizedEmail.split('@')[0],
-            legal_first_name: normalizedEmail.split('@')[0],
-            legal_last_name: 'Broker',
-            organization: '15D Wings for Brokers',
-            company_name: '15D Wings for Brokers',
-            agency_name: '15D Wings for Brokers',
-            agency_clearance_status: 'ACTIVE',
-            referral_code: refCode,
-            is_verified: true,
-            kyc_verified: false,
-            updated_at: now
-          }, { onConflict: 'email' })
-          .select('id, referral_code, company_name, email, kyc_verified, legal_first_name, legal_last_name, organization')
+          .select('*')
+          .eq('email', normalizedEmail)
           .maybeSingle();
 
         if (dbData?.id) {
           assignedBrokerId = dbData.id;
           assignedRefCode = dbData.referral_code || refCode;
-          console.log(`[Database Auth] ✓ Sign-in broker record synced in PostgreSQL with ID: ${dbData.id}`);
-
-          // Also upsert into public.brokers_ref for referral tracking
-          try {
-            await supabaseAdmin.from('brokers_ref').upsert({
-              broker_id: dbData.id,
+          console.log(`[Database Auth] ✓ Sign-in broker found in PostgreSQL with ID: ${dbData.id}`);
+        } else {
+          // New broker insertion only if not found
+          const { data: newDbData } = await supabaseAdmin
+            .from('brokers')
+            .insert({
               email: normalizedEmail,
-              referral_code: assignedRefCode,
+              full_name: normalizedEmail.split('@')[0],
+              organization: '15D Wings for Brokers',
+              company_name: '15D Wings for Brokers',
               agency_name: '15D Wings for Brokers',
-              is_active: true,
+              agency_clearance_status: 'ACTIVE',
+              referral_code: refCode,
+              is_verified: false,
+              kyc_verified: false,
+              created_at: now,
               updated_at: now
-            }, { onConflict: 'email' });
-          } catch (refErr: any) {
-            console.warn('[Brokers Ref Sync Note]:', refErr?.message);
-          }
+            })
+            .select('id, referral_code')
+            .maybeSingle();
 
-        } else if (dbErr) {
-          console.warn('[Database Auth] Sign-in upsert note:', dbErr.message);
+          if (newDbData?.id) {
+            assignedBrokerId = newDbData.id;
+            assignedRefCode = newDbData.referral_code || refCode;
+          }
         }
       } catch (dbEx: any) {
-        console.warn('[Database Auth] Sign-in Supabase admin error:', dbEx.message);
+        console.warn('[Database Auth] Sign-in Supabase query note:', dbEx.message);
       }
 
-      let record: BrokerRecord = brokerStore.get(normalizedEmail) || {
-        id: assignedBrokerId,
-        email: normalizedEmail,
-        referral_code: 'REF-D2E59A',
-        password_hash: password ? `hash_${password.length}` : 'secured',
-        createdAt: now,
-        isVerified: true,
-        organization: '15D Wings for Brokers',
-        legalFirstName: normalizedEmail.split('@')[0],
-        legalLastName: 'Broker',
-        dateOfBirth: '1990-01-01',
-      };
+      let record: BrokerRecord | undefined = brokerStore.get(normalizedEmail);
+      if (!record) {
+        record = {
+          id: assignedBrokerId || `brk_${Date.now()}`,
+          email: normalizedEmail,
+          referral_code: assignedRefCode || 'REF-D2E59A',
+          password_hash: password ? `hash_${password.length}` : 'secured',
+          createdAt: now,
+          isVerified: false,
+          organization: '15D Wings for Brokers',
+          agency_name: '15D Wings for Brokers',
+          company_name: '15D Wings for Brokers',
+          legalFirstName: '',
+          legalLastName: '',
+          dateOfBirth: '',
+          agency_clearance_status: 'ACTIVE'
+        };
+      }
       record.lastSignInAt = now;
+      if (assignedBrokerId) record.id = assignedBrokerId;
+      if (assignedRefCode) record.referral_code = assignedRefCode;
       brokerStore.set(normalizedEmail, record);
+      saveBrokersToDisk(brokerStore);
 
-      console.log(`[Backend Auth] ✓ Authorized sign-in for executive broker: ${normalizedEmail} (ID: ${assignedBrokerId})`);
+      console.log(`[Backend Auth] ✓ Authorized sign-in for executive broker: ${normalizedEmail} (ID: ${record.id}, Name: ${record.legalFirstName || 'Pending Setup'}, DOB: ${record.dateOfBirth || 'Pending'})`);
 
       return res.status(200).json({
         success: true,
@@ -373,11 +421,13 @@ async function startServer() {
 
       const normalizedEmail = email.toLowerCase().trim();
       const existing: BrokerRecord = brokerStore.get(normalizedEmail) || {
-        id: normalizedEmail === 'hello.15dgroup@gmail.com' ? '896ac12c-7d89-4ac9-a451-8edffee3ed09' : '896ac12c-7d89-4ac9-a451-8edffee3ed09',
+        id: `brk_${Date.now()}`,
         email: normalizedEmail,
         referral_code: 'REF-D2E59A',
         agency_name: '15D Wings for Brokers',
-        isVerified: true
+        company_name: '15D Wings for Brokers',
+        organization: '15D Wings for Brokers',
+        isVerified: false
       };
 
       // Foul play audit notification if verified identity is altered
@@ -386,39 +436,43 @@ async function startServer() {
       }
 
       const now = new Date().toISOString();
-      const updatedRecord = {
+      const updatedRecord: BrokerRecord = {
         ...existing,
         email: normalizedEmail,
-        legalFirstName: legalFirstName?.trim() || existing.legalFirstName || '',
-        legalLastName: legalLastName?.trim() || existing.legalLastName || '',
-        organization: organization?.trim() || existing.organization || '15D Executive Aviation Brokerage',
+        legalFirstName: (legalFirstName !== undefined ? legalFirstName : existing.legalFirstName || '').trim(),
+        legalLastName: (legalLastName !== undefined ? legalLastName : existing.legalLastName || '').trim(),
+        organization: (organization !== undefined ? organization : existing.organization || '15D Wings for Brokers').trim(),
+        company_name: (organization !== undefined ? organization : existing.company_name || '15D Wings for Brokers').trim(),
+        agency_name: (organization !== undefined ? organization : existing.agency_name || '15D Wings for Brokers').trim(),
         dateOfBirth: dateOfBirth || existing.dateOfBirth || '',
-        themePreference: themePreference || existing.themePreference || 'apple_dark',
+        themePreference: themePreference || existing.themePreference || 'EXECUTIVE_DARK',
         isVerified: typeof isVerified === 'boolean' ? isVerified : existing.isVerified || false,
+        full_name: `${(legalFirstName !== undefined ? legalFirstName : existing.legalFirstName || '').trim()} ${(legalLastName !== undefined ? legalLastName : existing.legalLastName || '').trim()}`.trim(),
         updatedAt: now
       };
 
+      // Persist to in-memory store and to disk JSON file immediately
       brokerStore.set(normalizedEmail, updatedRecord);
-      console.log(`[Backend Auth] ✓ Profile state updated for ${normalizedEmail} in database.`);
+      saveBrokersToDisk(brokerStore);
+      console.log(`[Backend Auth] ✓ Profile state saved to disk for ${normalizedEmail} (Legal Name: "${updatedRecord.legalFirstName} ${updatedRecord.legalLastName}", DOB: "${updatedRecord.dateOfBirth}")`);
 
-      // Persist profile updates directly to Supabase public.brokers table with service role credentials
-      let dbBrokerId: string | null = null;
+      // Persist profile updates directly to Supabase public.brokers table
+      let dbBrokerId: string | null = updatedRecord.id || null;
       try {
         const { data: dbData, error: dbErr } = await supabaseAdmin
           .from('brokers')
-          .upsert({
-            email: normalizedEmail,
+          .update({
             legal_first_name: updatedRecord.legalFirstName,
             legal_last_name: updatedRecord.legalLastName,
-            full_name: `${updatedRecord.legalFirstName} ${updatedRecord.legalLastName}`.trim(),
+            full_name: updatedRecord.full_name,
             organization: updatedRecord.organization,
-            company_name: updatedRecord.organization,
-            agency_name: updatedRecord.organization,
-            date_of_birth: updatedRecord.dateOfBirth,
+            company_name: updatedRecord.company_name,
+            agency_name: updatedRecord.agency_name,
+            date_of_birth: updatedRecord.dateOfBirth || null,
             theme_preference: updatedRecord.themePreference,
-            agency_clearance_status: 'ACTIVE',
             updated_at: now
-          }, { onConflict: 'email' })
+          })
+          .eq('email', normalizedEmail)
           .select('id, referral_code, email')
           .maybeSingle();
 
@@ -445,16 +499,75 @@ async function startServer() {
   });
 
   // 5. Get Profile Endpoint
-  app.get('/api/auth/profile', (req, res) => {
+  app.get('/api/auth/profile', async (req, res) => {
     const email = req.query.email as string;
     if (!email) {
       return res.status(400).json({ success: false, error: 'Email parameter required.' });
     }
     const cleanEmail = email.toLowerCase().trim();
-    const record = brokerStore.get(cleanEmail) || brokerStore.get('hello.15dgroup@gmail.com');
+    let record = brokerStore.get(cleanEmail);
+
+    if (!record || !record.dateOfBirth || !record.legalFirstName) {
+      try {
+        const { data: dbData } = await supabaseAdmin
+          .from('brokers')
+          .select('*')
+          .eq('email', cleanEmail)
+          .maybeSingle();
+
+        if (dbData?.id) {
+          if (!record) {
+            record = {
+              id: dbData.id,
+              auth_user_id: dbData.auth_user_id,
+              referral_code: dbData.referral_code,
+              email: cleanEmail,
+              legalFirstName: dbData.legal_first_name || '',
+              legalLastName: dbData.legal_last_name || '',
+              full_name: dbData.full_name || '',
+              organization: dbData.organization || dbData.agency_name || '15D Wings for Brokers',
+              agency_name: dbData.agency_name || '15D Wings for Brokers',
+              company_name: dbData.company_name || '15D Wings for Brokers',
+              dateOfBirth: dbData.date_of_birth || '',
+              themePreference: dbData.theme_preference || 'EXECUTIVE_DARK',
+              isVerified: dbData.is_verified ?? false,
+              agency_clearance_status: dbData.agency_clearance_status || 'ACTIVE'
+            };
+            brokerStore.set(cleanEmail, record);
+            saveBrokersToDisk(brokerStore);
+          } else {
+            if (!record.dateOfBirth && dbData.date_of_birth) record.dateOfBirth = dbData.date_of_birth;
+            if (!record.legalFirstName && dbData.legal_first_name) record.legalFirstName = dbData.legal_first_name;
+            if (!record.legalLastName && dbData.legal_last_name) record.legalLastName = dbData.legal_last_name;
+            if (!record.organization && (dbData.organization || dbData.agency_name)) {
+              record.organization = dbData.organization || dbData.agency_name;
+            }
+          }
+        }
+      } catch (err) {}
+    }
+
+    if (!record) {
+      record = {
+        id: `brk_${Date.now()}`,
+        email: cleanEmail,
+        legalFirstName: '',
+        legalLastName: '',
+        full_name: '',
+        organization: '15D Wings for Brokers',
+        agency_name: '15D Wings for Brokers',
+        company_name: '15D Wings for Brokers',
+        dateOfBirth: '',
+        themePreference: 'EXECUTIVE_DARK',
+        isVerified: false,
+        agency_clearance_status: 'ACTIVE'
+      };
+      brokerStore.set(cleanEmail, record);
+      saveBrokersToDisk(brokerStore);
+    }
     return res.status(200).json({
       success: true,
-      profile: record || null
+      profile: record
     });
   });
 
@@ -474,11 +587,21 @@ async function startServer() {
         }
         const { data: dbData } = await query.maybeSingle();
         if (dbData?.id) {
-          return res.json({ success: true, broker: dbData });
+          const localRecord = brokerStore.get(email) || (brokerId ? Array.from(brokerStore.values()).find(b => b.id === brokerId) : undefined);
+          const merged = {
+            ...dbData,
+            legal_first_name: dbData.legal_first_name || localRecord?.legalFirstName || '',
+            legal_last_name: dbData.legal_last_name || localRecord?.legalLastName || '',
+            full_name: dbData.full_name || (localRecord?.legalFirstName ? `${localRecord.legalFirstName} ${localRecord.legalLastName || ''}`.trim() : '') || '',
+            date_of_birth: dbData.date_of_birth || localRecord?.dateOfBirth || null,
+            organization: dbData.organization || dbData.agency_name || localRecord?.organization || '15D Wings for Brokers',
+            agency_name: dbData.agency_name || dbData.organization || localRecord?.agency_name || '15D Wings for Brokers',
+          };
+          return res.json({ success: true, broker: merged });
         }
       } catch (err) {}
 
-      // 2. Query in-memory broker store (seeded from public.brokers)
+      // 2. Query persistent broker store (loaded from disk and seeded from public.brokers)
       let record = brokerStore.get(email);
       if (!record && brokerId) {
         for (const [_, b] of brokerStore.entries()) {
@@ -502,6 +625,7 @@ async function startServer() {
           legal_first_name: record.legalFirstName,
           legal_last_name: record.legalLastName,
           full_name: record.full_name || `${record.legalFirstName || ''} ${record.legalLastName || ''}`.trim(),
+          date_of_birth: record.dateOfBirth || null,
           company_name: record.company_name || '15D Wings for Brokers',
           agency_name: record.agency_name || '15D Wings for Brokers',
           organization: record.organization || '15D Wings for Brokers',
@@ -665,7 +789,7 @@ async function startServer() {
 
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: false },
       appType: 'spa',
     });
     app.use(vite.middlewares);

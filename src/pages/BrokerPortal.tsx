@@ -613,22 +613,26 @@ export default function BrokerPortal() {
     id: string;
     referral_code?: string;
     company_name?: string;
+    agency_name?: string;
     email?: string;
     is_verified?: boolean;
     legal_first_name?: string;
     legal_last_name?: string;
     full_name?: string;
     organization?: string;
+    date_of_birth?: string;
   }>({
     id: "896ac12c-7d89-4ac9-a451-8edffee3ed09",
     referral_code: "REF-D2E59A",
     company_name: "15D Wings for Brokers",
+    agency_name: "15D Wings for Brokers",
     email: "hello.15dgroup@gmail.com",
     is_verified: true,
     legal_first_name: "15D Group",
     legal_last_name: "Principal",
     full_name: "15D Group Principal",
-    organization: "15D Wings for Brokers"
+    organization: "15D Wings for Brokers",
+    date_of_birth: "1990-01-01"
   });
 
   const [authStep, setAuthStep] = useState<"LOGIN" | "SIGNUP" | "EMAIL_OTP" | "PROFILE_SETUP" | "FORGOT_PASSWORD">(
@@ -671,7 +675,16 @@ export default function BrokerPortal() {
     } catch {}
     return "15D Wings for Brokers";
   });
-  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState<string>(() => {
+    try {
+      const stored = localStorage.getItem("15d_broker_profile");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.dateOfBirth || parsed.date_of_birth || "";
+      }
+    } catch {}
+    return "";
+  });
   const [dashboardTheme, setDashboardTheme] = useState("EXECUTIVE_DARK");
   const [otpDigits, setOtpDigits] = useState<string[]>([
     "1",
@@ -750,11 +763,42 @@ export default function BrokerPortal() {
           referral_code: broker.referral_code,
           company_name: broker.company_name || broker.organization,
           email: broker.email,
-          is_verified: broker.is_verified
+          is_verified: broker.is_verified,
+          legal_first_name: broker.legal_first_name,
+          legal_last_name: broker.legal_last_name,
+          organization: broker.organization,
+          date_of_birth: broker.date_of_birth
         });
         if (broker.legal_first_name) setLegalFirstName(broker.legal_first_name);
         if (broker.legal_last_name) setLegalLastName(broker.legal_last_name);
+        if (broker.date_of_birth) setDateOfBirth(broker.date_of_birth);
         if (broker.organization) setOrganization(broker.organization);
+
+        // Also sync profile fields from backend store (disk & PostgreSQL)
+        try {
+          const beRes = await fetch(`/api/auth/profile?email=${encodeURIComponent(email)}`);
+          if (beRes.ok) {
+            const beData = await beRes.json();
+            if (beData?.profile) {
+              const p = beData.profile;
+              if (p.legalFirstName) setLegalFirstName(p.legalFirstName);
+              if (p.legalLastName) setLegalLastName(p.legalLastName);
+              if (p.organization) setOrganization(p.organization);
+              if (p.dateOfBirth) setDateOfBirth(p.dateOfBirth);
+              localStorage.setItem("15d_broker_profile", JSON.stringify({
+                email,
+                legalFirstName: p.legalFirstName || broker.legal_first_name || '',
+                legalLastName: p.legalLastName || broker.legal_last_name || '',
+                organization: p.organization || broker.organization || '15D Wings for Brokers',
+                dateOfBirth: p.dateOfBirth || broker.date_of_birth || '',
+                isVerified: Boolean(broker.is_verified)
+              }));
+              if (p.legalFirstName && p.dateOfBirth) {
+                localStorage.setItem("15d_profile_completed", "true");
+              }
+            }
+          }
+        } catch (e) {}
 
         // Only show modal if legal_first_name is missing or placeholder AND not previously completed
         const profileCompleted = localStorage.getItem("15d_profile_completed");
@@ -837,6 +881,7 @@ export default function BrokerPortal() {
               setLegalFirstName(beData.profile.legalFirstName);
               if (beData.profile.legalLastName) setLegalLastName(beData.profile.legalLastName);
               if (beData.profile.organization) setOrganization(beData.profile.organization);
+              if (beData.profile.dateOfBirth) setDateOfBirth(beData.profile.dateOfBirth);
             }
           }
         } catch (beErr) {
@@ -850,6 +895,7 @@ export default function BrokerPortal() {
             setLegalFirstName(fname);
           }
           if (broker.legal_last_name) setLegalLastName(broker.legal_last_name);
+          if (broker.date_of_birth) setDateOfBirth(broker.date_of_birth);
           if (broker.organization || broker.company_name || broker.agency_name) {
             setOrganization(broker.organization || broker.company_name || broker.agency_name);
           }
@@ -861,6 +907,7 @@ export default function BrokerPortal() {
               ...existing,
               legalFirstName: fname || existing.legalFirstName || '',
               legalLastName: broker.legal_last_name || existing.legalLastName || '',
+              dateOfBirth: broker.date_of_birth || existing.dateOfBirth || '',
               organization: broker.organization || broker.company_name || existing.organization || '15D Wings for Brokers',
               email: broker.email || activeEmail,
               isVerified: Boolean(broker.is_verified)
@@ -1423,12 +1470,17 @@ export default function BrokerPortal() {
         throw new Error(backendData?.error || "Access Denied: Unrecognized email credentials cannot access Mission Control.");
       }
 
-      if (backendData?.user?.legalFirstName) {
+      if (backendData?.user) {
+        if (backendData.user.legalFirstName) setLegalFirstName(backendData.user.legalFirstName);
+        if (backendData.user.legalLastName) setLegalLastName(backendData.user.legalLastName);
+        if (backendData.user.organization) setOrganization(backendData.user.organization);
+        if (backendData.user.dateOfBirth) setDateOfBirth(backendData.user.dateOfBirth);
+
         const profileData = {
           email: inputEmail,
           brokerId: backendData.brokerId || '',
           referralCode: backendData.referralCode || '',
-          legalFirstName: backendData.user.legalFirstName,
+          legalFirstName: backendData.user.legalFirstName || '',
           legalLastName: backendData.user.legalLastName || '',
           organization: backendData.user.organization || '',
           dateOfBirth: backendData.user.dateOfBirth || '',
@@ -1436,12 +1488,19 @@ export default function BrokerPortal() {
           kycVerified: Boolean(backendData.user.kycVerified)
         };
         localStorage.setItem("15d_broker_profile", JSON.stringify(profileData));
+        if (backendData.user.legalFirstName && backendData.user.dateOfBirth) {
+          localStorage.setItem("15d_profile_completed", "true");
+        }
         if (backendData.brokerId) {
           setBrokerDbRecord({
             id: backendData.brokerId,
             referral_code: backendData.referralCode,
             email: inputEmail,
-            is_verified: Boolean(backendData.user.isVerified)
+            is_verified: Boolean(backendData.user.isVerified),
+            legal_first_name: backendData.user.legalFirstName,
+            legal_last_name: backendData.user.legalLastName,
+            organization: backendData.user.organization,
+            date_of_birth: backendData.user.dateOfBirth
           });
         }
       }
@@ -1593,56 +1652,73 @@ export default function BrokerPortal() {
 
     setIsAuthenticating(true);
     try {
-      // 1. Send profile to backend server endpoint
-      try {
-        await fetch('/api/auth/profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: inputEmail,
-            legalFirstName: legalFirstName.trim(),
-            legalLastName: legalLastName.trim(),
-            organization: organization.trim(),
-            dateOfBirth,
-            themePreference: dashboardTheme,
-            isVerified: false
-          })
-        });
-      } catch (backendErr) {
-        console.warn('[Backend Auth] Profile save relay notice:', backendErr);
+      // 1. Send profile to backend server endpoint and guarantee persistence
+      const resp = await fetch('/api/auth/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: inputEmail,
+          legalFirstName: legalFirstName.trim(),
+          legalLastName: legalLastName.trim(),
+          organization: organization.trim(),
+          dateOfBirth,
+          themePreference: dashboardTheme,
+          isVerified: false
+        })
+      });
+
+      if (!resp.ok) {
+        const errJson = await resp.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Server error while persisting profile to backend database.');
       }
 
       // 2. Upsert to Supabase
-      const { data: sessionData } = await supabase.auth.getSession();
-      const currentAuthId = sessionData?.session?.user?.id;
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const currentAuthId = sessionData?.session?.user?.id;
 
-      const { error: upsertErr } = await supabase.from('brokers').upsert({
-        email: inputEmail.toLowerCase(),
-        ...(currentAuthId ? { auth_user_id: currentAuthId } : {}),
-        legal_first_name: legalFirstName,
-        legal_last_name: legalLastName,
-        organization: organization,
-        agency_name: organization,
-        date_of_birth: dateOfBirth,
-        theme_preference: dashboardTheme,
-        agency_clearance_status: 'ACTIVE'
-      }, { onConflict: 'email' });
+        const { error: upsertErr } = await supabase.from('brokers').upsert({
+          email: inputEmail.toLowerCase(),
+          ...(currentAuthId ? { auth_user_id: currentAuthId } : {}),
+          legal_first_name: legalFirstName.trim(),
+          legal_last_name: legalLastName.trim(),
+          full_name: `${legalFirstName.trim()} ${legalLastName.trim()}`,
+          organization: organization.trim(),
+          agency_name: organization.trim(),
+          date_of_birth: dateOfBirth,
+          theme_preference: dashboardTheme,
+          agency_clearance_status: 'ACTIVE'
+        }, { onConflict: 'email' });
 
-      if (upsertErr) {
-        console.warn("Backend profile upsert note:", upsertErr.message);
+        if (upsertErr) {
+          console.warn("Backend profile upsert note:", upsertErr.message);
+        }
+      } catch (sbEx) {
+        console.warn("Supabase upsert notice:", sbEx);
       }
 
       const brokerRecord = {
         email: inputEmail,
-        legalFirstName,
-        legalLastName,
-        organization,
+        legalFirstName: legalFirstName.trim(),
+        legalLastName: legalLastName.trim(),
+        organization: organization.trim(),
         dateOfBirth,
         themePreference: dashboardTheme
       };
       localStorage.setItem("15d_broker_profile", JSON.stringify(brokerRecord));
+      localStorage.setItem("15d_profile_completed", "true");
       sessionStorage.setItem("broker_verified", "true");
       setSessionVerified(true);
+      setBrokerDbRecord(prev => ({
+        ...prev,
+        legal_first_name: legalFirstName.trim(),
+        legal_last_name: legalLastName.trim(),
+        full_name: `${legalFirstName.trim()} ${legalLastName.trim()}`,
+        organization: organization.trim(),
+        company_name: organization.trim(),
+        date_of_birth: dateOfBirth
+      }));
+      setShowUserProfileModal(false);
     } catch (err: any) {
       setAuthError(err.message || "Error saving profile details.");
     } finally {
@@ -3373,6 +3449,16 @@ export default function BrokerPortal() {
             setLegalFirstName(p.legalFirstName);
             setLegalLastName(p.legalLastName);
             setOrganization(p.organization);
+            if (p.dateOfBirth) setDateOfBirth(p.dateOfBirth);
+            setBrokerDbRecord(prev => ({
+              ...prev,
+              legal_first_name: p.legalFirstName,
+              legal_last_name: p.legalLastName,
+              full_name: `${p.legalFirstName} ${p.legalLastName}`.trim(),
+              organization: p.organization,
+              company_name: p.organization,
+              date_of_birth: p.dateOfBirth
+            }));
             showToast("Profile credentials synchronized.", "success");
           }}
         />

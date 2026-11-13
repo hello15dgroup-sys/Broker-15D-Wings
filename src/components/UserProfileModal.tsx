@@ -96,6 +96,26 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           } catch {}
         }
 
+        // Fetch from backend server persistent store
+        if (userEmail) {
+          try {
+            const resp = await fetch(`/api/auth/profile?email=${encodeURIComponent(userEmail)}`);
+            if (resp.ok) {
+              const resData = await resp.json();
+              if (resData?.profile) {
+                const prof = resData.profile;
+                if (prof.legalFirstName) initialData.legalFirstName = prof.legalFirstName;
+                if (prof.legalLastName) initialData.legalLastName = prof.legalLastName;
+                if (prof.organization) initialData.organization = prof.organization;
+                if (prof.dateOfBirth) initialData.dateOfBirth = prof.dateOfBirth;
+                if (prof.isVerified !== undefined) initialData.isVerified = Boolean(prof.isVerified);
+              }
+            }
+          } catch (e) {
+            console.warn('Backend profile fetch note:', e);
+          }
+        }
+
         // Check live Supabase brokers table
         if (userEmail) {
           const { data, error } = await supabase
@@ -110,7 +130,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
               legalLastName: data.legal_last_name || initialData.legalLastName,
               organization: data.organization || data.agency_name || initialData.organization,
               dateOfBirth: data.date_of_birth || initialData.dateOfBirth,
-              isVerified: data.has_verified_operator || data.agency_clearance_status === 'ACTIVE',
+              isVerified: data.has_verified_operator || data.agency_clearance_status === 'ACTIVE' || initialData.isVerified,
               email: data.email || userEmail
             };
           }
@@ -220,45 +240,57 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
         email: userEmail
       };
 
-      // 1. Send profile to backend server endpoint
-      try {
-        await fetch('/api/auth/profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: userEmail,
-            legalFirstName: updatedProfile.legalFirstName,
-            legalLastName: updatedProfile.legalLastName,
-            organization: updatedProfile.organization,
-            dateOfBirth: updatedProfile.dateOfBirth,
-            isVerified: updatedProfile.isVerified,
-            hasIdentityChanged
-          })
-        });
-      } catch (backendErr) {
-        console.warn('Backend profile relay notice:', backendErr);
+      // 1. Send profile to backend server endpoint and ensure successful persistence
+      const backendRes = await fetch('/api/auth/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userEmail,
+          legalFirstName: updatedProfile.legalFirstName,
+          legalLastName: updatedProfile.legalLastName,
+          organization: updatedProfile.organization,
+          dateOfBirth: updatedProfile.dateOfBirth,
+          isVerified: updatedProfile.isVerified,
+          hasIdentityChanged
+        })
+      });
+
+      if (!backendRes.ok) {
+        const errJson = await backendRes.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Failed to save profile on backend server.');
       }
 
-      // 2. Upsert to Supabase brokers table
-      const { data: sessionData } = await supabase.auth.getSession();
-      const currentAuthId = sessionData?.session?.user?.id;
+      // 2. Persist to localStorage immediately for instant UI availability
+      try {
+        localStorage.setItem('15d_broker_profile', JSON.stringify(updatedProfile));
+        localStorage.setItem('15d_profile_completed', 'true');
+      } catch {}
 
-      const { error: upsertErr } = await supabase.from('brokers').upsert(
-        {
-          email: userEmail.toLowerCase(),
-          ...(currentAuthId ? { auth_user_id: currentAuthId } : {}),
-          legal_first_name: updatedProfile.legalFirstName,
-          legal_last_name: updatedProfile.legalLastName,
-          organization: updatedProfile.organization,
-          agency_name: updatedProfile.organization,
-          date_of_birth: updatedProfile.dateOfBirth,
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'email' }
-      );
+      // 3. Upsert to Supabase brokers table
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const currentAuthId = sessionData?.session?.user?.id;
 
-      if (upsertErr) {
-        console.warn('Backend profile upsert note:', upsertErr.message);
+        const { error: upsertErr } = await supabase.from('brokers').upsert(
+          {
+            email: userEmail.toLowerCase(),
+            ...(currentAuthId ? { auth_user_id: currentAuthId } : {}),
+            legal_first_name: updatedProfile.legalFirstName,
+            legal_last_name: updatedProfile.legalLastName,
+            full_name: `${updatedProfile.legalFirstName} ${updatedProfile.legalLastName}`.trim(),
+            organization: updatedProfile.organization,
+            agency_name: updatedProfile.organization,
+            date_of_birth: updatedProfile.dateOfBirth,
+            updated_at: new Date().toISOString()
+          },
+          { onConflict: 'email' }
+        );
+
+        if (upsertErr) {
+          console.warn('Backend profile upsert note:', upsertErr.message);
+        }
+      } catch (sbErr) {
+        console.warn('Supabase sync note:', sbErr);
       }
 
       setOriginalProfile(updatedProfile);
