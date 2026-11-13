@@ -574,8 +574,12 @@ async function startServer() {
   // 5b. Get Active / Current Broker from Database public.brokers
   app.get('/api/brokers/active', async (req, res) => {
     try {
-      const email = ((req.query.email as string) || 'hello.15dgroup@gmail.com').toLowerCase().trim();
+      const email = ((req.query.email as string) || '').toLowerCase().trim();
       const brokerId = (req.query.brokerId as string) || '';
+
+      if (!email && !brokerId) {
+        return res.status(400).json({ success: false, broker: null, error: 'Broker email or ID is required.' });
+      }
 
       // 1. Try querying Supabase public.brokers
       try {
@@ -587,7 +591,7 @@ async function startServer() {
         }
         const { data: dbData } = await query.maybeSingle();
         if (dbData?.id) {
-          const localRecord = brokerStore.get(email) || (brokerId ? Array.from(brokerStore.values()).find(b => b.id === brokerId) : undefined);
+          const localRecord = (email ? brokerStore.get(email) : undefined) || (brokerId ? Array.from(brokerStore.values()).find(b => b.id === brokerId) : undefined);
           const merged = {
             ...dbData,
             legal_first_name: dbData.legal_first_name || localRecord?.legalFirstName || '',
@@ -602,7 +606,7 @@ async function startServer() {
       } catch (err) {}
 
       // 2. Query persistent broker store (loaded from disk and seeded from public.brokers)
-      let record = brokerStore.get(email);
+      let record = email ? brokerStore.get(email) : undefined;
       if (!record && brokerId) {
         for (const [_, b] of brokerStore.entries()) {
           if (b.id === brokerId) {
@@ -612,7 +616,7 @@ async function startServer() {
         }
       }
       if (!record) {
-        record = brokerStore.get('hello.15dgroup@gmail.com')!;
+        return res.status(404).json({ success: false, broker: null, error: 'No broker record found for credentials.' });
       }
 
       return res.json({

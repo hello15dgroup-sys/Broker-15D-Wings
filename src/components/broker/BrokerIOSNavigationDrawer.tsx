@@ -300,7 +300,14 @@ export const BrokerIOSNavigationDrawer: React.FC<BrokerIOSNavigationDrawerProps>
                     <div className="flex items-center gap-3">
                       <Radar className="w-4 h-4 text-sky-600" />
                       <div>
-                        <span className="text-xs font-medium">Live Fleet & Empty Legs</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-medium">Live Fleet & Empty Legs</span>
+                          {!hasVerifiedOperator && (
+                            <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 text-[10px] font-medium flex items-center gap-0.5">
+                              <Lock className="w-2.5 h-2.5" /> Locked
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[11px] text-slate-500">Active flights, fleet network & deals</p>
                       </div>
                     </div>

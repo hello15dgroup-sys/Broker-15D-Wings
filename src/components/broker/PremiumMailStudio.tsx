@@ -128,18 +128,10 @@ export const PremiumMailStudio: React.FC<PremiumMailStudioProps> = ({
 
       if (error) {
         console.warn('Missions check note:', error);
-        // Fallback demo support
-        if (cleanId === '15D-782' || cleanEmail === 'mrpreciousubadike@gmail.com' || cleanEmail === 'hello.15dgroup@gmail.com') {
-          setAuthStatus({
-            success: true,
-            message: `AUTHENTICATED! Flight mission [${cleanId}] verified. Template populated.`
-          });
-        } else {
-          setAuthStatus({
-            success: false,
-            message: `Authentication check note: Connection state.`
-          });
-        }
+        setAuthStatus({
+          success: false,
+          message: `Authentication check failed: ${error.message}`
+        });
       } else if (data && data.length > 0) {
         const m = data[0];
         

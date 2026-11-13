@@ -64,20 +64,18 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
   const [activeModalTab, setActiveModalTab] = useState<'airline_link' | 'kyc_hub' | 'worker_clearance'>('airline_link');
 
   const [resolvedBrokerId, setResolvedBrokerId] = useState<string>(
-    brokerId && brokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
-      ? brokerId
-      : '896ac12c-7d89-4ac9-a451-8edffee3ed09'
+    brokerId && brokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11' ? brokerId : ''
   );
   const [resolvedRefCode, setResolvedRefCode] = useState<string>(
-    brokerReferralCode || 'REF-D2E59A'
+    brokerReferralCode || ''
   );
 
   useEffect(() => {
     if (brokerId && brokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11') {
       setResolvedBrokerId(brokerId);
-    } else {
-      fetch(`/api/brokers/active?email=${encodeURIComponent(brokerEmail || 'hello.15dgroup@gmail.com')}`)
-        .then(res => res.json())
+    } else if (brokerEmail) {
+      fetch(`/api/brokers/active?email=${encodeURIComponent(brokerEmail)}`)
+        .then(res => (res.ok ? res.json() : null))
         .then(data => {
           if (data?.broker?.id) {
             setResolvedBrokerId(data.broker.id);
@@ -93,9 +91,11 @@ export const OperatorOnboardingModal: React.FC<OperatorOnboardingModalProps> = (
     }
   }, [brokerId, brokerReferralCode, brokerEmail]);
 
-  const effectiveBrokerId = resolvedBrokerId || '896ac12c-7d89-4ac9-a451-8edffee3ed09';
-  const refCode = resolvedRefCode || 'REF-D2E59A';
-  const inviteUrl = `https://airlines.15dwings.com.ng?broker_ref=${refCode}&broker_id=${effectiveBrokerId}`;
+  const effectiveBrokerId = resolvedBrokerId;
+  const refCode = resolvedRefCode;
+  const inviteUrl = effectiveBrokerId
+    ? `https://airlines.15dwings.com.ng?broker_ref=${refCode || ''}&broker_id=${effectiveBrokerId}`
+    : '';
 
   const fetchConnectedOperators = async () => {
     if (!effectiveBrokerId) return;

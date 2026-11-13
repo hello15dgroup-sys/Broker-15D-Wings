@@ -38,8 +38,8 @@ interface BrokerVerificationWidgetProps {
 }
 
 export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> = ({
-  initialBrokerId = '896ac12c-7d89-4ac9-a451-8edffee3ed09',
-  brokerEmail = 'hello.15dgroup@gmail.com',
+  initialBrokerId = '',
+  brokerEmail = '',
   onClearanceActive,
   onClearanceSuspended,
   compact = false
@@ -47,23 +47,9 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
   const [brokerIdInput, setBrokerIdInput] = useState<string>(
     initialBrokerId && initialBrokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
       ? initialBrokerId
-      : '896ac12c-7d89-4ac9-a451-8edffee3ed09'
+      : ''
   );
-  const [uiState, setUiState] = useState<BrokerUIState>({
-    state: 'SUCCESS',
-    broker: {
-      broker_id: '896ac12c-7d89-4ac9-a451-8edffee3ed09',
-      agency_name: '15D Wings for Brokers',
-      organization: '15D Wings for Brokers',
-      principal_name: '15D Group Principal',
-      email: 'hello.15dgroup@gmail.com',
-      is_verified: true,
-      agency_clearance_status: 'ACTIVE',
-      has_verified_operator: false,
-      managed_operators_count: 0,
-      managed_operators: []
-    }
-  });
+  const [uiState, setUiState] = useState<BrokerUIState>({ state: 'IDLE' });
   const [copiedLink, setCopiedLink] = useState(false);
   const [launchingOnboarding, setLaunchingOnboarding] = useState(false);
   const [launchUrl, setLaunchUrl] = useState<string | null>(null);
@@ -94,10 +80,23 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
 
   useEffect(() => {
     async function resolveActiveBroker() {
-      const targetId = (initialBrokerId && initialBrokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11')
+      let targetId = (initialBrokerId && initialBrokerId !== 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11')
         ? initialBrokerId
-        : '896ac12c-7d89-4ac9-a451-8edffee3ed09';
+        : '';
 
+      if (!targetId && brokerEmail) {
+        try {
+          const actRes = await fetch(`/api/brokers/active?email=${encodeURIComponent(brokerEmail)}`);
+          if (actRes.ok) {
+            const actData = await actRes.json();
+            if (actData?.broker?.id) {
+              targetId = actData.broker.id;
+            }
+          }
+        } catch {}
+      }
+
+      if (!targetId) return;
       setBrokerIdInput(targetId);
 
       // Verify with Cloudflare clearinghouse worker in background
@@ -122,7 +121,7 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
     }
 
     resolveActiveBroker();
-  }, [initialBrokerId, onClearanceActive]);
+  }, [initialBrokerId, brokerEmail, onClearanceActive]);
 
   // Launch Onboarding Portal action
   const handleLaunchOnboarding = async () => {
@@ -316,7 +315,7 @@ export const BrokerVerificationWidget: React.FC<BrokerVerificationWidgetProps> =
           <p className="text-[11px] text-slate-600 flex items-start gap-1.5 pt-0.5">
             <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
             <span>
-              Profile key for <strong>{brokerEmail || 'hello.15dgroup@gmail.com'}</strong>. Merely having an account ID does <strong>not</strong> grant workspace flight clearance. You must link a verified airline operator below.
+              Profile key for <strong>{brokerEmail || 'your registered broker account'}</strong>. Merely having an account ID does <strong>not</strong> grant workspace flight clearance. You must link a verified airline operator below.
             </span>
           </p>
 

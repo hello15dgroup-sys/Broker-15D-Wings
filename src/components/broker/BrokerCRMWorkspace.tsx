@@ -297,26 +297,39 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
     async function fetchCRMData() {
       setIsLoadingData(true);
       try {
-        const { data: fleetData, error: fleetErr } = await supabase
-          .from("fleet_aircraft")
-          .select("*");
-        if (!fleetErr && fleetData) {
-          setAircraftDirectory(
-            fleetData.map((f: any) => ({
-              id: f.id,
-              tailNumber: f.tail_number,
-              model: f.model,
-              category: f.category || "Heavy Jet",
-              baseAirport: `${f.home_hub_name || ""} (${f.home_hub_icao || ""})`,
-              hourlyRateUsd: Number(f.hourly_rate_usd) || 0,
-              maxPassengers: f.pax_capacity || 8,
-              rangeNm: f.max_range_nm || 3500,
-              operatorName: f.operator_name || "Operator",
-              operatorAoc: f.aoc_number || "AOC-VERIFIED",
-              argusRating: f.is_verified_aoc ? "AOC Verified" : "Standard",
-              availableNow: f.readiness_status === "READY_NOW" || f.readiness_status === "AVAILABLE",
-            })),
-          );
+        // Gate fleet_aircraft reads strictly behind verified operator clearance
+        if (hasVerifiedOperator) {
+          const { data: fleetData, error: fleetErr } = await supabase
+            .from("fleet_aircraft")
+            .select("*");
+          if (!fleetErr && fleetData) {
+            setAircraftDirectory(
+              fleetData.map((f: any) => ({
+                id: f.id,
+                tailNumber: f.tail_number,
+                model: f.model,
+                category: f.category || "Heavy Jet",
+                baseAirport: `${f.home_hub_name || ""} (${f.home_hub_icao || ""})`,
+                hourlyRateUsd: Number(f.hourly_rate_usd) || 0,
+                maxPassengers: f.pax_capacity || 8,
+                rangeNm: f.max_range_nm || 3500,
+                operatorName: f.operator_name || "Operator",
+                operatorAoc: f.aoc_number || "AOC-VERIFIED",
+                argusRating: f.is_verified_aoc ? "AOC Verified" : "Standard",
+                availableNow: f.readiness_status === "READY_NOW" || f.readiness_status === "AVAILABLE",
+              })),
+            );
+          }
+        } else {
+          setAircraftDirectory([]);
+        }
+
+        // Only query broker-scoped records if brokerId or brokerEmail is present
+        if (!brokerId && !brokerEmail) {
+          setClients([]);
+          setDeals([]);
+          setHistory([]);
+          return;
         }
 
         // Fetch clients strictly scoped to this broker
@@ -424,7 +437,7 @@ export const BrokerCRMWorkspace: React.FC<BrokerCRMWorkspaceProps> = ({
       }
     }
     fetchCRMData();
-  }, [brokerId, brokerEmail]);
+  }, [brokerId, brokerEmail, hasVerifiedOperator]);
 
   /* State for Messages */
   const [chatMessages, setChatMessages] = useState([

@@ -35,6 +35,10 @@ interface OperationalIntegrityIndexProps {
   regionalQuotaCount?: number;
   regionalQuotaTarget?: number;
   daysInactive?: number;
+  hasVerifiedOperator?: boolean;
+  brokerId?: string;
+  brokerEmail?: string;
+  onRequireOperator?: () => void;
 }
 
 export interface FleetAircraftRecord {
@@ -91,22 +95,26 @@ interface BookedMission {
 }
 
 export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps> = ({
-  missionId = '15D-782',
+  missionId = '',
+  hasVerifiedOperator = false,
+  brokerId = '',
+  brokerEmail = '',
+  onRequireOperator,
 }) => {
   const [activeTab, setActiveTab] = useState<'ALL' | 'PAID_MISSIONS' | 'FLEET' | 'EMPTY_LEGS'>('ALL');
   const [selectedHub, setSelectedHub] = useState<string>('ALL');
 
   const [fleetList, setFleetList] = useState<FleetAircraftRecord[]>([]);
   const [emptyLegsList, setEmptyLegsList] = useState<EmptyLegRecord[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Active Flight Mission Lookup & Verification State
-  const [searchMissionId, setSearchMissionId] = useState(missionId || '15D-782');
-  const [searchClientEmail, setSearchClientEmail] = useState('hello.15dgroup@gmail.com');
+  const [searchMissionId, setSearchMissionId] = useState(missionId || '');
+  const [searchClientEmail, setSearchClientEmail] = useState(brokerEmail || '');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authStatus, setAuthStatus] = useState<{ success: boolean; message: string } | null>(null);
   
-  // Verification Gate: Live Fleet and Real-Time Empty Legs are locked until verified
+  // Verification Gate: Live Fleet and Real-Time Empty Legs remain strictly locked until operator clearance is verified
   const [isMissionVerified, setIsMissionVerified] = useState<boolean>(false);
 
   const [bookedMissionsList, setBookedMissionsList] = useState<BookedMission[]>([]);
@@ -114,10 +122,20 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
   const [copiedShare, setCopiedShare] = useState<boolean>(false);
 
   useEffect(() => {
+    // STRICT SECURITY GATE: Never read fleet_aircraft, empty_legs, or missions unless operator verification is active
+    if (!hasVerifiedOperator) {
+      setFleetList([]);
+      setEmptyLegsList([]);
+      setBookedMissionsList([]);
+      setIsMissionVerified(false);
+      setIsLoading(false);
+      return;
+    }
+
     async function fetchRealtimeDatabaseData() {
       setIsLoading(true);
       try {
-        // Query fleet aircraft directly from database SQL table
+        // Query fleet aircraft directly from database SQL table (strictly gated by hasVerifiedOperator)
         const { data: fleetData, error: fleetErr } = await supabase
           .from('fleet_aircraft')
           .select('*')
@@ -129,7 +147,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
           setFleetList([]);
         }
 
-        // Query empty legs directly from database SQL table in real time
+        // Query empty legs directly from database SQL table in real time (strictly gated by hasVerifiedOperator)
         const { data: emptyData, error: emptyErr } = await supabase
           .from('empty_legs')
           .select('*')
@@ -141,14 +159,27 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
           setEmptyLegsList([]);
         }
 
-        // Query active missions directly from database SQL table
-        const { data: missionsData, error: missionsErr } = await supabase
-          .from('missions')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(3);
+        // Query missions ONLY if strictly scoped to this verified broker's ID or email
+        let missionsData: any[] | null = null;
+        if (brokerId) {
+          const { data, error } = await supabase
+            .from('missions')
+            .select('*')
+            .eq('broker_id', brokerId)
+            .order('created_at', { ascending: false })
+            .limit(10);
+          if (!error && data) missionsData = data;
+        } else if (brokerEmail) {
+          const { data, error } = await supabase
+            .from('missions')
+            .select('*')
+            .ilike('broker_email', brokerEmail.trim().toLowerCase())
+            .order('created_at', { ascending: false })
+            .limit(10);
+          if (!error && data) missionsData = data;
+        }
 
-        if (!missionsErr && missionsData && missionsData.length > 0) {
+        if (missionsData && missionsData.length > 0) {
           const mappedMissions: BookedMission[] = missionsData.map((m: any) => {
             let legsArray: any[] = [];
             if (Array.isArray(m.legs)) {
@@ -181,15 +212,15 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
               captain: 'Assigned Flight Crew',
               fboLounge: 'ExecuJet VIP Terminal',
               currentMilestone: 3,
-              clientEmail: m.client_email || 'client@15dwings.com.ng',
+              clientEmail: m.client_email || 'Private Client',
               operatorName: m.raw_payload?.operator_name || 'Charter Carrier'
             };
           });
           setBookedMissionsList(mappedMissions);
-          setIsMissionVerified(true);
         } else {
           setBookedMissionsList([]);
         }
+        setIsMissionVerified(true);
       } catch (err) {
         console.error('Error fetching database fleet and empty legs data:', err);
         setFleetList([]);
@@ -201,42 +232,58 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
     }
 
     fetchRealtimeDatabaseData();
-  }, []);
+  }, [hasVerifiedOperator, brokerId, brokerEmail]);
 
-  // Authenticate Request against database
+  // Authenticate Request against database (strictly requires operator verification + matching credentials)
   const handleAuthenticateMission = async (overrideId?: string, overrideEmail?: string) => {
+    if (!hasVerifiedOperator) {
+      setAuthStatus({
+        success: false,
+        message: 'Access Restricted: Operator AOC verification is required before querying flight missions.'
+      });
+      return;
+    }
+
     setIsAuthenticating(true);
     setAuthStatus(null);
     try {
       const cleanId = (overrideId || searchMissionId).trim();
       const cleanEmail = (overrideEmail || searchClientEmail).trim().toLowerCase();
 
-      // Query database table where id = cleanId and client_email = cleanEmail
+      if (!cleanId || !cleanEmail) {
+        setAuthStatus({
+          success: false,
+          message: 'Please provide both a valid Flight Mission ID and matching Client or Broker Email.'
+        });
+        return;
+      }
+
+      // Query database table strictly where id = cleanId
       const { data, error } = await supabase
         .from('missions')
         .select('*')
         .eq('id', cleanId)
-        .ilike('client_email', cleanEmail);
+        .limit(1);
 
       if (error) {
-        console.warn("Database missions query note:", error);
-        // Fallback authorization for seamless demo verification if database table is initializing
-        if (cleanId === '15D-782' || cleanId.toUpperCase().includes('15D')) {
-          setIsMissionVerified(true);
-          setAuthStatus({
-            success: true,
-            message: `AUTHENTICATION CONFIRMED: Mission ${cleanId} verified for ${cleanEmail}. Telemetry unlocked.`
-          });
-        } else {
-          setAuthStatus({
-            success: false,
-            message: `Authentication check: ${error.message}. Please verify Mission ID and email.`
-          });
-        }
+        setAuthStatus({
+          success: false,
+          message: `Authentication check failed: ${error.message}. Please verify Mission ID and email.`
+        });
       } else if (data && data.length > 0) {
         const m = data[0];
+        const matchesClient = m.client_email && m.client_email.toLowerCase() === cleanEmail;
+        const matchesBrokerEmail = m.broker_email && m.broker_email.toLowerCase() === cleanEmail;
+        const matchesBrokerId = Boolean(brokerId && m.broker_id && m.broker_id === brokerId);
 
-        // Parse legs if present
+        if (!matchesClient && !matchesBrokerEmail && !matchesBrokerId) {
+          setAuthStatus({
+            success: false,
+            message: `ACCESS DENIED: Mission ID "${cleanId}" is not associated with "${cleanEmail}".`
+          });
+          return;
+        }
+
         let legsArray: any[] = [];
         if (Array.isArray(m.legs)) {
           legsArray = m.legs;
@@ -247,51 +294,45 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
 
         const depAirport = m.departure_airport || (firstLeg && (firstLeg.origin || firstLeg.from)) || 'Lagos Murtala Muhammed (DNMM)';
         const destAirport = m.destination_airport || (firstLeg && (firstLeg.destination || firstLeg.to)) || 'London Luton Airport (EGGW)';
-        const flightDate = (firstLeg && firstLeg.date) || (m.created_at ? new Date(m.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'October 18, 2026');
+        const flightDate = (firstLeg && firstLeg.date) || (m.created_at ? new Date(m.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'Scheduled');
         const flightTime = (firstLeg && (firstLeg.departure_time || firstLeg.time)) || '14:00 Local';
-        const aircraft = m.operator_aircraft || m.aircraft_class || 'Bombardier Challenger 650 (5N-B15D)';
-        const escrowAmt = m.escrow_deposit || m.midpoint_estimate || m.estimated_upper || m.operator_quote || 65000;
+        const aircraft = m.operator_aircraft || m.aircraft_class || 'Executive Jet';
+        const escrowAmt = m.escrow_deposit || m.midpoint_estimate || m.estimated_upper || m.operator_quote || 0;
 
         const newMission: BookedMission = {
           id: m.id || cleanId,
           route: `${depAirport} ➔ ${destAirport}`,
-          depIcao: 'DNMM',
-          destIcao: 'EGGW',
+          depIcao: depAirport.includes('(') ? depAirport.split('(')[1].replace(')', '') : 'DNMM',
+          destIcao: destAirport.includes('(') ? destAirport.split('(')[1].replace(')', '') : 'EGGW',
           depName: `${depAirport} FBO Terminal`,
           destName: `${destAirport} Executive Terminal`,
           aircraft: aircraft,
           tail: aircraft.includes('5N-') ? aircraft.split('(')[1]?.replace(')', '') || '5N-B15D' : '5N-B15D',
           pax: m.pax || (m.adults ? m.adults + (m.children || 0) : 6),
-          escrowStatus: 'PAID_AND_SECURED',
+          escrowStatus: m.payment_status === 'PAID' ? 'PAID_AND_SECURED' : 'HOLD',
           escrowAmountUsd: Number(escrowAmt),
           targetDeparture: `${flightDate} • ${flightTime}`,
-          captain: 'Capt. E. Danladi / FO K. Okafor',
-          fboLounge: 'ExecuJet VIP Lounge Terminal 2',
+          captain: 'Assigned Flight Crew',
+          fboLounge: 'ExecuJet VIP Lounge',
           currentMilestone: 3,
           clientEmail: m.client_email || cleanEmail,
-          operatorName: m.raw_payload?.operator_name || 'Max Air Executive Charter'
+          operatorName: m.raw_payload?.operator_name || 'Verified Charter Carrier'
         };
 
-        setBookedMissionsList([newMission]);
+        setBookedMissionsList(prev => {
+          const others = prev.filter(item => item.id !== newMission.id);
+          return [newMission, ...others];
+        });
         setIsMissionVerified(true);
         setAuthStatus({
           success: true,
-          message: `AUTHENTICATION CONFIRMED: Mission ${cleanId} verified for ${cleanEmail}. Telemetry unlocked.`
+          message: `AUTHENTICATION CONFIRMED: Mission ${cleanId} verified for ${cleanEmail}.`
         });
       } else {
-        // Fallback authorization for standard mission reference codes
-        if (cleanId === '15D-782' || cleanEmail === 'hello.15dgroup@gmail.com') {
-          setIsMissionVerified(true);
-          setAuthStatus({
-            success: true,
-            message: `AUTHENTICATION CONFIRMED: Mission ${cleanId} verified for ${cleanEmail}. Telemetry unlocked.`
-          });
-        } else {
-          setAuthStatus({
-            success: false,
-            message: `AUTHENTICATION FAILED: Mission ID "${cleanId}" for email "${cleanEmail}" could not be verified in database.`
-          });
-        }
+        setAuthStatus({
+          success: false,
+          message: `AUTHENTICATION FAILED: Mission ID "${cleanId}" for email "${cleanEmail}" could not be verified in database.`
+        });
       }
     } catch (e: any) {
       setAuthStatus({
@@ -314,6 +355,38 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
     setCopiedShare(true);
     setTimeout(() => setCopiedShare(false), 2500);
   };
+
+  if (!hasVerifiedOperator) {
+    return (
+      <div className="max-w-2xl mx-auto my-8 p-8 md:p-12 rounded-3xl border border-amber-200 bg-white shadow-lg text-center space-y-5">
+        <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600">
+          <Lock className="w-7 h-7" />
+        </div>
+        <div className="space-y-2">
+          <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 text-xs font-medium inline-flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-amber-700" /> Carrier AOC Verification Required
+          </span>
+          <h3 className="text-xl font-semibold text-slate-900">
+            Live Fleet Radar & Empty Legs Locked
+          </h3>
+          <p className="text-xs md:text-sm text-slate-600 leading-relaxed max-w-lg mx-auto">
+            To protect principal manifests, aircraft tail records, and wholesale empty leg availability, access to the live fleet database is strictly restricted to brokers with a backend-verified airline operator partner.
+          </p>
+        </div>
+        {onRequireOperator && (
+          <div className="pt-2 flex items-center justify-center">
+            <button
+              onClick={onRequireOperator}
+              className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-medium shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Verify Partner Operator</span>
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 text-left">
@@ -435,7 +508,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                   type="text"
                   value={searchMissionId}
                   onChange={(e) => setSearchMissionId(e.target.value)}
-                  placeholder="e.g. 15D-782"
+                  placeholder="e.g. 15D-001"
                   className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-mono font-bold outline-none focus:border-purple-500"
                 />
               </div>
@@ -446,7 +519,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                   type="email"
                   value={searchClientEmail}
                   onChange={(e) => setSearchClientEmail(e.target.value)}
-                  placeholder="e.g. hello.15dgroup@gmail.com"
+                  placeholder="Enter client or broker email"
                   className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 font-medium outline-none focus:border-purple-500"
                 />
               </div>
@@ -510,7 +583,7 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
                         </span>
                       </div>
                       <p className="text-xs text-slate-600">
-                        Departure: <span className="font-medium text-slate-900">{m.targetDeparture}</span> • Client: <span className="font-mono text-purple-800 font-semibold">{m.clientEmail || 'hello.15dgroup@gmail.com'}</span>
+                        Departure: <span className="font-medium text-slate-900">{m.targetDeparture}</span> • Client: <span className="font-mono text-purple-800 font-semibold">{m.clientEmail || 'Private Client'}</span>
                       </p>
                     </div>
 
@@ -615,13 +688,6 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
               >
                 <Key className="w-4 h-4" />
                 <span>Enter Query Credentials</span>
-              </button>
-              <button
-                onClick={() => handleAuthenticateMission('15D-782', 'hello.15dgroup@gmail.com')}
-                className="px-5 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 text-xs font-semibold transition-all cursor-pointer flex items-center gap-2"
-              >
-                <Unlock className="w-4 h-4 text-purple-700" />
-                <span>Query Operational Database</span>
               </button>
             </div>
           </div>
@@ -749,13 +815,6 @@ export const OperationalIntegrityIndex: React.FC<OperationalIntegrityIndexProps>
               >
                 <Key className="w-4 h-4" />
                 <span>Enter Query Credentials</span>
-              </button>
-              <button
-                onClick={() => handleAuthenticateMission('15D-782', 'hello.15dgroup@gmail.com')}
-                className="px-5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 text-xs font-semibold transition-all cursor-pointer flex items-center gap-2"
-              >
-                <Unlock className="w-4 h-4 text-amber-700" />
-                <span>Query Operational Database</span>
               </button>
             </div>
           </div>

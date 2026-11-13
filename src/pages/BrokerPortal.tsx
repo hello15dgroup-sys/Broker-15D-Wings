@@ -621,18 +621,39 @@ export default function BrokerPortal() {
     full_name?: string;
     organization?: string;
     date_of_birth?: string;
-  }>({
-    id: "896ac12c-7d89-4ac9-a451-8edffee3ed09",
-    referral_code: "REF-D2E59A",
-    company_name: "15D Wings for Brokers",
-    agency_name: "15D Wings for Brokers",
-    email: "hello.15dgroup@gmail.com",
-    is_verified: true,
-    legal_first_name: "15D Group",
-    legal_last_name: "Principal",
-    full_name: "15D Group Principal",
-    organization: "15D Wings for Brokers",
-    date_of_birth: "1990-01-01"
+  }>(() => {
+    try {
+      const stored = localStorage.getItem("15d_broker_profile");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return {
+          id: parsed.brokerId || parsed.id || "",
+          referral_code: parsed.referralCode || parsed.referral_code || "",
+          company_name: parsed.organization || parsed.company_name || "15D Wings for Brokers",
+          agency_name: parsed.organization || parsed.agency_name || "15D Wings for Brokers",
+          email: parsed.email || "",
+          is_verified: Boolean(parsed.isVerified),
+          legal_first_name: parsed.legalFirstName || "",
+          legal_last_name: parsed.legalLastName || "",
+          full_name: `${parsed.legalFirstName || ""} ${parsed.legalLastName || ""}`.trim(),
+          organization: parsed.organization || "15D Wings for Brokers",
+          date_of_birth: parsed.dateOfBirth || ""
+        };
+      }
+    } catch {}
+    return {
+      id: "",
+      referral_code: "",
+      company_name: "15D Wings for Brokers",
+      agency_name: "15D Wings for Brokers",
+      email: "",
+      is_verified: false,
+      legal_first_name: "",
+      legal_last_name: "",
+      full_name: "",
+      organization: "15D Wings for Brokers",
+      date_of_birth: ""
+    };
   });
 
   const [authStep, setAuthStep] = useState<"LOGIN" | "SIGNUP" | "EMAIL_OTP" | "PROFILE_SETUP" | "FORGOT_PASSWORD">(
@@ -836,7 +857,18 @@ export default function BrokerPortal() {
       }
       try {
         const { data: user } = await supabase.auth.getUser();
-        const activeEmail = user.user?.email || inputEmail || "hello.15dgroup@gmail.com";
+        const storedEmail = (() => {
+          try {
+            return JSON.parse(localStorage.getItem("15d_broker_profile") || "{}").email || "";
+          } catch {
+            return "";
+          }
+        })();
+        const activeEmail = user.user?.email || inputEmail || storedEmail;
+        if (!activeEmail && !user.user?.id) {
+          setHasVerifiedOperator(false);
+          return;
+        }
 
         // 1. Fetch from Supabase with resilient lookup by auth_user_id OR email
         let broker: any = null;
@@ -1103,11 +1135,14 @@ export default function BrokerPortal() {
   });
 
   const activeEmailForFilter = brokerDbRecord?.email || inputEmail || sessionStorage.getItem(`15d_email_${missionId}`) || "";
-  const isAuthorizedMission = rawFlight && (
-    !activeEmailForFilter ||
-    (rawFlight.client_email && rawFlight.client_email.toLowerCase() === activeEmailForFilter.toLowerCase()) ||
-    (rawFlight.broker_email && rawFlight.broker_email.toLowerCase() === activeEmailForFilter.toLowerCase()) ||
-    (brokerDbRecord?.id && rawFlight.broker_id === brokerDbRecord.id)
+  const isAuthorizedMission = Boolean(
+    rawFlight &&
+    (activeEmailForFilter || brokerDbRecord?.id) &&
+    (
+      (activeEmailForFilter && rawFlight.client_email && rawFlight.client_email.toLowerCase() === activeEmailForFilter.toLowerCase()) ||
+      (activeEmailForFilter && rawFlight.broker_email && rawFlight.broker_email.toLowerCase() === activeEmailForFilter.toLowerCase()) ||
+      (brokerDbRecord?.id && rawFlight.broker_id === brokerDbRecord.id)
+    )
   );
 
   const mission = isAuthorizedMission
@@ -2875,7 +2910,7 @@ export default function BrokerPortal() {
 
                 <div className="flex items-center gap-3">
                   <UserMenu
-                    userEmail={brokerDbRecord?.email || inputEmail || 'hello.15dgroup@gmail.com'}
+                    userEmail={brokerDbRecord?.email || inputEmail || ""}
                     onOpenProfile={() => setShowUserProfileModal(true)}
                   />
                 </div>
@@ -3181,7 +3216,15 @@ export default function BrokerPortal() {
                     <span>Escrow Vault</span>
                   </button>
                   <button
-                    onClick={() => setActiveTab("operational_radar")}
+                    onClick={() => {
+                      if (!hasVerifiedOperator) {
+                        showToast(
+                          "Access Restricted: Operator verification required from backend to view Fleet & Empty Legs.",
+                          "warning",
+                        );
+                      }
+                      setActiveTab("operational_radar");
+                    }}
                     className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium transition-colors whitespace-nowrap cursor-pointer shrink-0 ${
                       activeTab === "operational_radar"
                         ? "bg-purple-600 text-white shadow-xs"
@@ -3190,6 +3233,11 @@ export default function BrokerPortal() {
                   >
                     <Radar className="w-3.5 h-3.5" />
                     <span>Fleet & Empty Legs</span>
+                    {!hasVerifiedOperator && (
+                      <span className="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-amber-100 text-amber-900 border border-amber-200">
+                        Locked
+                      </span>
+                    )}
                   </button>
 
                   <button
@@ -3223,7 +3271,9 @@ export default function BrokerPortal() {
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                 >
                   <BrokerCRMWorkspace
-                    missionId={mission?.id || missionId || "15D-001"}
+                    missionId={mission?.id || missionId || ""}
+                    brokerId={brokerDbRecord?.id || ""}
+                    brokerEmail={brokerDbRecord?.email || inputEmail || ""}
                     brokerCompanyName={
                       brokerCompany || "15D Wings for Brokers"
                     }
@@ -3325,7 +3375,41 @@ export default function BrokerPortal() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
                 >
-                  <OperationalIntegrityIndex missionId={mission?.id || missionId || "15D-001"} />
+                  {hasVerifiedOperator ? (
+                    <OperationalIntegrityIndex
+                      missionId={mission?.id || missionId || ""}
+                      hasVerifiedOperator={hasVerifiedOperator}
+                      brokerId={brokerDbRecord?.id || ""}
+                      brokerEmail={brokerDbRecord?.email || inputEmail || ""}
+                      onRequireOperator={() => setShowAOCModal(true)}
+                    />
+                  ) : (
+                    <div className="max-w-2xl mx-auto my-8 p-8 md:p-12 rounded-3xl border border-amber-200 bg-white shadow-lg text-center space-y-5">
+                      <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600">
+                        <Lock className="w-7 h-7" />
+                      </div>
+                      <div className="space-y-2">
+                        <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 border border-amber-200 text-xs font-medium inline-flex items-center gap-1.5">
+                          <ShieldAlert className="w-3.5 h-3.5 text-amber-700" /> Carrier AOC Verification Required
+                        </span>
+                        <h3 className="text-xl font-semibold text-slate-900">
+                          Fleet & Empty Legs Access Locked
+                        </h3>
+                        <p className="text-xs md:text-sm text-slate-600 leading-relaxed max-w-lg mx-auto">
+                          To protect principal privacy, aircraft fleet telemetry, and wholesale empty leg availability, 15D Wings requires an active verified airline operator partner before unlocking live radar access.
+                        </p>
+                      </div>
+                      <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <button
+                          onClick={() => setShowAOCModal(true)}
+                          className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-medium shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+                        >
+                          <ShieldCheck className="w-4 h-4" />
+                          <span>Verify Partner Operator</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -3437,14 +3521,14 @@ export default function BrokerPortal() {
             brokerCompany || "15D Wings for Brokers"
           }
           brokerEmail={
-            brokerDbRecord?.email || inputEmail || "hello.15dgroup@gmail.com"
+            brokerDbRecord?.email || inputEmail || ""
           }
         />
 
         <UserProfileModal
           isOpen={showUserProfileModal}
           onClose={() => setShowUserProfileModal(false)}
-          userEmail={brokerDbRecord?.email || inputEmail || 'hello.15dgroup@gmail.com'}
+          userEmail={brokerDbRecord?.email || inputEmail || ""}
           onProfileUpdated={(p) => {
             setLegalFirstName(p.legalFirstName);
             setLegalLastName(p.legalLastName);
